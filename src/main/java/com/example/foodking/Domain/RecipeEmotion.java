@@ -15,6 +15,7 @@ public class RecipeEmotion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recipeEmotionId;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EmotionType emotionStatus;
 

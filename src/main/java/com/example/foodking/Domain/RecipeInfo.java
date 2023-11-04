@@ -17,6 +17,7 @@ public class RecipeInfo extends  TimeEntity{
     @Column(nullable = false)
     private String recipeName;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RecipeType recipeType;
 

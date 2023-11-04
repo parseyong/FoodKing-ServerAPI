@@ -19,7 +19,7 @@ public class Ingredient {
     private String ingredientName;
 
     @ManyToOne
-    @JoinColumn(name = "ingredient_id",nullable = false)
+    @JoinColumn(name = "recipe_Info_id",nullable = false)
     private RecipeInfo recipeInfo;
 
     @Builder

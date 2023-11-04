@@ -15,6 +15,7 @@ public class ReplyEmotion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long replyEmotionId;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EmotionType emotionStatus;
 
