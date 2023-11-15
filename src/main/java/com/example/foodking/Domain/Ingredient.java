@@ -12,10 +12,11 @@ import lombok.NoArgsConstructor;
 public class Ingredient {
 
     @Id
+    @Column(name = "ingredient_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ingredientId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "ingredient_name")
     private String ingredientName;
 
     @ManyToOne

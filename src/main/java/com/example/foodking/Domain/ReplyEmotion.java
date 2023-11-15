@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -12,11 +14,13 @@ import lombok.NoArgsConstructor;
 public class ReplyEmotion {
 
     @Id
+    @Column(name = "reply_emotion_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long replyEmotionId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @Column(nullable = false, name = "emotion_status")
     private EmotionType emotionStatus;
 
     @ManyToOne
@@ -24,6 +28,7 @@ public class ReplyEmotion {
     private User user;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "reply_id",nullable = false)
     private Reply reply;
     @Builder

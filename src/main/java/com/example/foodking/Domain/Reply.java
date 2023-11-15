@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class Reply extends TimeEntity{
 
     @Id
+    @Column(name = "reply_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long replyId;
 
@@ -19,6 +22,7 @@ public class Reply extends TimeEntity{
     private String content;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 

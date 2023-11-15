@@ -12,13 +12,14 @@ import lombok.NoArgsConstructor;
 public class Recipe {
 
     @Id
+    @Column(name = "recipe_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recipeId;
 
-    @Column(nullable = false)
+    @Column(nullable = false,name = "recipe_way")
     private String recipeWay;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "recipe_order")
     private Long recipeOrder;
 
     @ManyToOne

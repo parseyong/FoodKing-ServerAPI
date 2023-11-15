@@ -11,29 +11,30 @@ import java.util.List;
 public class RecipeInfo extends  TimeEntity{
 
     @Id
+    @Column(name = "recipe_info_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recipeInfoId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "recipe_name")
     private String recipeName;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "recipe_type")
     private RecipeType recipeType;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "ingredient_cost")
     private String ingredientCost;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "cooking_time")
     private String cookingTime;
 
     @Column(nullable = false)
     private Long calogy;
 
-    @Column
+    @Column(name = "recioe_image")
     private String recipeImage;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "recipe_tip")
     private String recipeTip;
 
     @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
