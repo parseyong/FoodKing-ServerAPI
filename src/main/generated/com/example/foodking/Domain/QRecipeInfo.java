@@ -2,6 +2,11 @@ package com.example.foodking.Domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.example.foodking.Ingredient.Ingredient;
+import com.example.foodking.Recipe.Recipe;
+import com.example.foodking.RecipeInfo.RecipeInfo;
+import com.example.foodking.RecipeInfo.RecipeInfoType;
+import com.example.foodking.Reply.Reply;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -45,7 +50,7 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final StringPath recipeTip = createString("recipeTip");
 
-    public final EnumPath<RecipeType> recipeType = createEnum("recipeType", RecipeType.class);
+    public final EnumPath<RecipeInfoType> recipeType = createEnum("recipeType", RecipeInfoType.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> regDate = _super.regDate;

@@ -2,6 +2,7 @@ package com.example.foodking.Domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.example.foodking.Recipe.Recipe;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;

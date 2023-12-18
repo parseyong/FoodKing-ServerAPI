@@ -1,14 +1,22 @@
-package com.example.foodking.Domain;
+package com.example.foodking.RecipeInfo;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.example.foodking.Common.TimeEntity;
+import com.example.foodking.Ingredient.Ingredient;
+import com.example.foodking.Recipe.Recipe;
+import com.example.foodking.Reply.Reply;
+import com.example.foodking.User.User;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RecipeInfo extends  TimeEntity{
+public class RecipeInfo extends TimeEntity {
 
     @Id
     @Column(name = "recipe_info_id")
@@ -20,7 +28,7 @@ public class RecipeInfo extends  TimeEntity{
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "recipe_type")
-    private RecipeType recipeType;
+    private RecipeInfoType recipeInfoType;
 
     @Column(nullable = false, name = "ingredient_cost")
     private String ingredientCost;
@@ -51,10 +59,10 @@ public class RecipeInfo extends  TimeEntity{
     private List<Ingredient> ingredientList;
 
     @Builder
-    public RecipeInfo(String recipeName, RecipeType recipeType, String ingredientCost, String cookingTime, Long calogy, String recipeTip,
+    public RecipeInfo(String recipeName, RecipeInfoType recipeInfoType, String ingredientCost, String cookingTime, Long calogy, String recipeTip,
                       User user, List<Recipe> recipeList, List<Ingredient> ingredientList){
         this.recipeName=recipeName;
-        this.recipeType=recipeType;
+        this.recipeInfoType=recipeInfoType;
         this.ingredientCost=ingredientCost;
         this.cookingTime=cookingTime;
         this.calogy=calogy;
@@ -66,8 +74,8 @@ public class RecipeInfo extends  TimeEntity{
     public void changeRecipeName(String recipeName){
         this.recipeName = recipeName;
     }
-    public void changeRecipeType(RecipeType recipeType){
-        this.recipeType = recipeType;
+    public void changeRecipeType(RecipeInfoType recipeInfoType){
+        this.recipeInfoType = recipeInfoType;
     }
     public void changeIngredientCost(String ingredientCost){
         this.ingredientCost = ingredientCost;

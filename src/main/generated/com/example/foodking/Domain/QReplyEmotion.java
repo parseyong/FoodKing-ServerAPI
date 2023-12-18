@@ -2,6 +2,8 @@ package com.example.foodking.Domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.example.foodking.Common.EmotionType;
+import com.example.foodking.ReplyEmotion.ReplyEmotion;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;

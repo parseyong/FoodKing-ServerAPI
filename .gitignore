@@ -17,6 +17,7 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 **/CoolSMS.properties
+**/DB.properties
 
 ### IntelliJ IDEA ###
 .idea

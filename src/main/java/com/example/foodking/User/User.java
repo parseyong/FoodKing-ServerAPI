@@ -1,8 +1,12 @@
-package com.example.foodking.Domain;
+package com.example.foodking.User;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.example.foodking.RecipeInfo.RecipeInfo;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.util.List;
 
 @Entity

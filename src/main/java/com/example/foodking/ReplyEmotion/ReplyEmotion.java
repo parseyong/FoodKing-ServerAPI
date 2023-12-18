@@ -1,12 +1,16 @@
-package com.example.foodking.Domain;
+package com.example.foodking.ReplyEmotion;
 
-import jakarta.persistence.*;
+import com.example.foodking.Common.EmotionType;
+import com.example.foodking.Reply.Reply;
+import com.example.foodking.User.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -19,11 +23,11 @@ public class ReplyEmotion {
     private Long replyEmotionId;
 
     @Enumerated(EnumType.STRING)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @Column(nullable = false, name = "emotion_status")
     private EmotionType emotionStatus;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 

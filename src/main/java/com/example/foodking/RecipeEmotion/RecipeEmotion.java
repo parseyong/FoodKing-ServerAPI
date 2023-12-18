@@ -1,12 +1,16 @@
-package com.example.foodking.Domain;
+package com.example.foodking.RecipeEmotion;
 
-import jakarta.persistence.*;
+import com.example.foodking.Common.EmotionType;
+import com.example.foodking.RecipeInfo.RecipeInfo;
+import com.example.foodking.User.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import javax.persistence.*;
 
 @Entity
 @Getter

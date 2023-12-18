@@ -1,6 +1,5 @@
-package com.example.foodking.Repository;
+package com.example.foodking.RecipeEmotion;
 
-import com.example.foodking.Domain.RecipeEmotion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 

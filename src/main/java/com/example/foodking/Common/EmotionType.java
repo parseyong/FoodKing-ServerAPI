@@ -1,4 +1,4 @@
-package com.example.foodking.Domain;
+package com.example.foodking.Common;
 
 public enum EmotionType {
     Like
