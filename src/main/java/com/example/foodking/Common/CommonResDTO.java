@@ -1,6 +1,7 @@
 package com.example.foodking.Common;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor(staticName = "of")
