@@ -1,4 +1,4 @@
-package com.example.foodking.Exception;
+package com.example.foodking.Exception.Handler;
 
 import com.example.foodking.Common.CommonResDTO;
 import com.google.gson.Gson;

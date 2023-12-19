@@ -2,8 +2,8 @@ package com.example.foodking.Config;
 
 import com.example.foodking.Auth.JwtAuthenticationFilter;
 import com.example.foodking.Auth.JwtProvider;
-import com.example.foodking.Exception.CustomAccessDeniedHandler;
-import com.example.foodking.Exception.CustomAuthenticationEntryPoint;
+import com.example.foodking.Exception.Handler.CustomAccessDeniedHandler;
+import com.example.foodking.Exception.Handler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +34,7 @@ public class SecurityConfig {
         http
                 .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers("/login").permitAll()
+                .antMatchers("/login","/messages").permitAll()
                 .antMatchers(HttpMethod.POST,"/users").permitAll()
                 .antMatchers("/**").hasRole("USER")
                 .anyRequest().authenticated()

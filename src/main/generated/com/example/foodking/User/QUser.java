@@ -1,9 +1,7 @@
-package com.example.foodking.Domain;
+package com.example.foodking.User;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.example.foodking.RecipeInfo.RecipeInfo;
-import com.example.foodking.User.User;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -18,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QUser extends EntityPathBase<User> {
 
-    private static final long serialVersionUID = 1450261133L;
+    private static final long serialVersionUID = 1564081638L;
 
     public static final QUser user = new QUser("user");
 
@@ -30,7 +28,9 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath phoneNum = createString("phoneNum");
 
-    public final ListPath<RecipeInfo, QRecipeInfo> recipeInfoList = this.<RecipeInfo, QRecipeInfo>createList("recipeInfoList", RecipeInfo.class, QRecipeInfo.class, PathInits.DIRECT2);
+    public final ListPath<com.example.foodking.RecipeInfo.RecipeInfo, com.example.foodking.RecipeInfo.QRecipeInfo> recipeInfoList = this.<com.example.foodking.RecipeInfo.RecipeInfo, com.example.foodking.RecipeInfo.QRecipeInfo>createList("recipeInfoList", com.example.foodking.RecipeInfo.RecipeInfo.class, com.example.foodking.RecipeInfo.QRecipeInfo.class, PathInits.DIRECT2);
+
+    public final StringPath roleName = createString("roleName");
 
     public final NumberPath<Long> userId = createNumber("userId", Long.class);
 

@@ -47,6 +47,7 @@ public class User implements UserDetails {
         this.password=password;
         this.nickName=nickName;
         this.phoneNum=phoneNum;
+        this.roleName="ROLE_USER";
     }
     public void changePhoneNum(String phoneNum){
         this.phoneNum=phoneNum;

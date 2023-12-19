@@ -3,6 +3,7 @@ package com.example.foodking.User;
 import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
+import com.example.foodking.User.DTO.AddUserReqDTO;
 import com.example.foodking.User.DTO.LoginReqDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +28,19 @@ public class UserService {
 
         isMatchPassword(loginReqDTO.getPassword(), user.getPassword(), ExceptionCode.LOGIN_FAIL);
         return jwtProvider.createToken(user.getUserId(), user.getAuthorities());
+    }
+
+    public void addUser(AddUserReqDTO addUserReqDTO){
+
+        if(userRepository.existsByEmail(addUserReqDTO.getEmail()))
+           throw new CommondException(ExceptionCode.EMAIL_DUPLICATED);
+        if(userRepository.existsByNickName(addUserReqDTO.getNickName()))
+            throw new CommondException(ExceptionCode.NICKNAME_DUPLICATED);
+        if(!addUserReqDTO.getPassword().equals(addUserReqDTO.getPasswordRepeat()))
+            throw new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT);
+
+        addUserReqDTO.setPassword(passwordEncoder.encode(addUserReqDTO.getPassword()));
+        userRepository.save(AddUserReqDTO.toEntity(addUserReqDTO));
     }
 
     public void isMatchPassword(String password1, String password2,ExceptionCode exceptionCode){

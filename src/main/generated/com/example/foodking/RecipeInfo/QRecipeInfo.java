@@ -1,12 +1,7 @@
-package com.example.foodking.Domain;
+package com.example.foodking.RecipeInfo;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.example.foodking.Ingredient.Ingredient;
-import com.example.foodking.Recipe.Recipe;
-import com.example.foodking.RecipeInfo.RecipeInfo;
-import com.example.foodking.RecipeInfo.RecipeInfoType;
-import com.example.foodking.Reply.Reply;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -21,13 +16,13 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
-    private static final long serialVersionUID = 1783131294L;
+    private static final long serialVersionUID = 609083142L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
     public static final QRecipeInfo recipeInfo = new QRecipeInfo("recipeInfo");
 
-    public final QTimeEntity _super = new QTimeEntity(this);
+    public final com.example.foodking.Common.QTimeEntity _super = new com.example.foodking.Common.QTimeEntity(this);
 
     public final NumberPath<Long> calogy = createNumber("calogy", Long.class);
 
@@ -35,7 +30,7 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final StringPath ingredientCost = createString("ingredientCost");
 
-    public final ListPath<Ingredient, QIngredient> ingredientList = this.<Ingredient, QIngredient>createList("ingredientList", Ingredient.class, QIngredient.class, PathInits.DIRECT2);
+    public final ListPath<com.example.foodking.Ingredient.Ingredient, com.example.foodking.Ingredient.QIngredient> ingredientList = this.<com.example.foodking.Ingredient.Ingredient, com.example.foodking.Ingredient.QIngredient>createList("ingredientList", com.example.foodking.Ingredient.Ingredient.class, com.example.foodking.Ingredient.QIngredient.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modDate = _super.modDate;
@@ -44,20 +39,20 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final NumberPath<Long> recipeInfoId = createNumber("recipeInfoId", Long.class);
 
-    public final ListPath<Recipe, QRecipe> recipeList = this.<Recipe, QRecipe>createList("recipeList", Recipe.class, QRecipe.class, PathInits.DIRECT2);
+    public final EnumPath<RecipeInfoType> recipeInfoType = createEnum("recipeInfoType", RecipeInfoType.class);
+
+    public final ListPath<com.example.foodking.Recipe.Recipe, com.example.foodking.Recipe.QRecipe> recipeList = this.<com.example.foodking.Recipe.Recipe, com.example.foodking.Recipe.QRecipe>createList("recipeList", com.example.foodking.Recipe.Recipe.class, com.example.foodking.Recipe.QRecipe.class, PathInits.DIRECT2);
 
     public final StringPath recipeName = createString("recipeName");
 
     public final StringPath recipeTip = createString("recipeTip");
 
-    public final EnumPath<RecipeInfoType> recipeType = createEnum("recipeType", RecipeInfoType.class);
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> regDate = _super.regDate;
 
-    public final ListPath<Reply, QReply> replyList = this.<Reply, QReply>createList("replyList", Reply.class, QReply.class, PathInits.DIRECT2);
+    public final ListPath<com.example.foodking.Reply.Reply, com.example.foodking.Reply.QReply> replyList = this.<com.example.foodking.Reply.Reply, com.example.foodking.Reply.QReply>createList("replyList", com.example.foodking.Reply.Reply.class, com.example.foodking.Reply.QReply.class, PathInits.DIRECT2);
 
-    public final QUser user;
+    public final com.example.foodking.User.QUser user;
 
     public QRecipeInfo(String variable) {
         this(RecipeInfo.class, forVariable(variable), INITS);
@@ -77,7 +72,7 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public QRecipeInfo(Class<? extends RecipeInfo> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new QUser(forProperty("user")) : null;
+        this.user = inits.isInitialized("user") ? new com.example.foodking.User.QUser(forProperty("user")) : null;
     }
 
 }

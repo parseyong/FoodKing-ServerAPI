@@ -1,8 +1,7 @@
-package com.example.foodking.Domain;
+package com.example.foodking.Ingredient;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.example.foodking.Ingredient.Ingredient;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -17,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QIngredient extends EntityPathBase<Ingredient> {
 
-    private static final long serialVersionUID = 1928537875L;
+    private static final long serialVersionUID = -1939459098L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
@@ -27,7 +26,7 @@ public class QIngredient extends EntityPathBase<Ingredient> {
 
     public final StringPath ingredientName = createString("ingredientName");
 
-    public final QRecipeInfo recipeInfo;
+    public final com.example.foodking.RecipeInfo.QRecipeInfo recipeInfo;
 
     public QIngredient(String variable) {
         this(Ingredient.class, forVariable(variable), INITS);
@@ -47,7 +46,7 @@ public class QIngredient extends EntityPathBase<Ingredient> {
 
     public QIngredient(Class<? extends Ingredient> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.recipeInfo = inits.isInitialized("recipeInfo") ? new QRecipeInfo(forProperty("recipeInfo"), inits.get("recipeInfo")) : null;
+        this.recipeInfo = inits.isInitialized("recipeInfo") ? new com.example.foodking.RecipeInfo.QRecipeInfo(forProperty("recipeInfo"), inits.get("recipeInfo")) : null;
     }
 
 }

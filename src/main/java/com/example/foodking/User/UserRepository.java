@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User,Long>,
         QuerydslPredicateExecutor<User> {
     Optional<User> findUserByEmail(String email);
+    boolean existsByEmail(String email);
+    boolean existsByNickName(String nickName);
 }

@@ -1,6 +1,7 @@
 package com.example.foodking.User;
 
 import com.example.foodking.Common.CommonResDTO;
+import com.example.foodking.User.DTO.AddUserReqDTO;
 import com.example.foodking.User.DTO.LoginReqDTO;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +15,21 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final CoolSmsService coolSmsService;
 
-    @PostMapping("/users")
-    public ResponseEntity<CommonResDTO> addUser(@RequestBody LoginReqDTO loginReqDTO){
+    @PostMapping("/login")
+    public ResponseEntity<CommonResDTO> login(@RequestBody LoginReqDTO loginReqDTO){
 
         String accessToken = userService.login(loginReqDTO);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("HttpStatus.OK","로그인 성공!",accessToken));
+    }
+
+    @PostMapping("/users")
+    public ResponseEntity<CommonResDTO> addUser(@RequestBody AddUserReqDTO addUserReqDTO){
+
+        coolSmsService.isAuthenticatedNum(addUserReqDTO.getPhoneNum());
+        userService.addUser(addUserReqDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("HttpStatus.CREATED","회원가입 완료",null));
     }
 
     @GetMapping("/email/check")
