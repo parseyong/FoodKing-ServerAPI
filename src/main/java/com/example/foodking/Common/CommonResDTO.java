@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(staticName = "of")
 public class CommonResDTO<D> {
 
-    private final String statusCode;
     private final String message;
     private final D data;
 }

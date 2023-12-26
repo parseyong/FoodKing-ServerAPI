@@ -3,8 +3,7 @@ package com.example.foodking.User;
 import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
-import com.example.foodking.User.DTO.AddUserReqDTO;
-import com.example.foodking.User.DTO.LoginReqDTO;
+import com.example.foodking.User.DTO.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,18 +28,62 @@ public class UserService {
         isMatchPassword(loginReqDTO.getPassword(), user.getPassword(), ExceptionCode.LOGIN_FAIL);
         return jwtProvider.createToken(user.getUserId(), user.getAuthorities());
     }
-
+    @Transactional
     public void addUser(AddUserReqDTO addUserReqDTO){
 
-        if(userRepository.existsByEmail(addUserReqDTO.getEmail()))
+        if(emailDuplicatedChecking(addUserReqDTO.getEmail()))
            throw new CommondException(ExceptionCode.EMAIL_DUPLICATED);
-        if(userRepository.existsByNickName(addUserReqDTO.getNickName()))
+        if(nickNameDuplicatedChecking(addUserReqDTO.getNickName()))
             throw new CommondException(ExceptionCode.NICKNAME_DUPLICATED);
         if(!addUserReqDTO.getPassword().equals(addUserReqDTO.getPasswordRepeat()))
             throw new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT);
 
         addUserReqDTO.setPassword(passwordEncoder.encode(addUserReqDTO.getPassword()));
         userRepository.save(AddUserReqDTO.toEntity(addUserReqDTO));
+    }
+
+    public boolean emailDuplicatedChecking(String email){
+        return userRepository.existsByEmail(email);
+    }
+
+    public boolean nickNameDuplicatedChecking(String nickName){
+        return userRepository.existsByNickName(nickName);
+    }
+
+    public String findEmail(String phoneNum){
+        return userRepository.findEmailByPhoneNum(phoneNum).orElseThrow();
+    }
+
+    public String findPassword(String email){
+        return userRepository.findPasswordByEmail(email).orElseThrow();
+    }
+
+    public ReadUserInfoResDTO readUserInfo(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow();
+
+        return ReadUserInfoResDTO.toDTO(user);
+    }
+    @Transactional
+    public void updateUserInfo(UpdateUserInfoReqDTO updateUserInfoReqDTO,Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow();
+
+        isMatchPassword(updateUserInfoReqDTO.getOldPassword(),updateUserInfoReqDTO.getNewPassword()
+                ,ExceptionCode.PASSWORD_NOT_COLLECT);
+
+        user.changeNickName(updateUserInfoReqDTO.getNickName());
+        user.changePhoneNum(updateUserInfoReqDTO.getPhoneNum());
+        user.changePassword(updateUserInfoReqDTO.getNewPassword());
+        userRepository.save(user);
+    }
+    @Transactional
+    public void deleteUser(DeleteUserReqDTO deleteUserReqDTO){
+        User user = userRepository.findUserByEmail(deleteUserReqDTO.getEmail())
+                .orElseThrow();
+
+        isMatchPassword(user.getPassword(), deleteUserReqDTO.getPassword(),ExceptionCode.PASSWORD_NOT_COLLECT);
+        userRepository.delete(user);
     }
 
     public void isMatchPassword(String password1, String password2,ExceptionCode exceptionCode){

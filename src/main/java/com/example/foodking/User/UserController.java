@@ -1,13 +1,16 @@
 package com.example.foodking.User;
 
+import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Common.CommonResDTO;
-import com.example.foodking.User.DTO.AddUserReqDTO;
-import com.example.foodking.User.DTO.LoginReqDTO;
+import com.example.foodking.CoolSms.CoolSmsService;
+import com.example.foodking.User.DTO.*;
+import com.example.foodking.CoolSms.DTO.PhoneAuthReqDTO;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,12 +19,13 @@ public class UserController {
 
     private final UserService userService;
     private final CoolSmsService coolSmsService;
+    private final JwtProvider jwtProvider;
 
     @PostMapping("/login")
     public ResponseEntity<CommonResDTO> login(@RequestBody LoginReqDTO loginReqDTO){
 
         String accessToken = userService.login(loginReqDTO);
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("HttpStatus.OK","로그인 성공!",accessToken));
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("로그인 성공!",accessToken));
     }
 
     @PostMapping("/users")
@@ -29,41 +33,63 @@ public class UserController {
 
         coolSmsService.isAuthenticatedNum(addUserReqDTO.getPhoneNum());
         userService.addUser(addUserReqDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("HttpStatus.CREATED","회원가입 완료",null));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("회원가입 완료",null));
     }
 
     @GetMapping("/email/check")
-    public ResponseEntity<?> emailDuplicatedChecking(){
-        return ResponseEntity.status(200).body("gkdl");
+    public ResponseEntity<CommonResDTO> emailDuplicatedChecking(@RequestParam(name = "email") String email){
+
+        boolean isDuplicated = userService.emailDuplicatedChecking(email);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이메일 중복체크 완료",isDuplicated));
     }
 
     @GetMapping("/nickname/check")
-    public ResponseEntity<?> nickNameDuplicatedChecking(){
-        return ResponseEntity.status(200).body("gkdl");
+    public ResponseEntity<CommonResDTO> nickNameDuplicatedChecking(@RequestParam(name = "nickName") String nickName){
+
+        boolean isDuplicated = userService.nickNameDuplicatedChecking(nickName);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("닉네임 중복체크 완료",isDuplicated));
     }
 
     @GetMapping("/email/find")
-    public ResponseEntity<?> findEmail(){
-        return ResponseEntity.status(200).body("gkdl");
+    public ResponseEntity<CommonResDTO> findEmail(@RequestBody PhoneAuthReqDTO phoneAuthReqDTO){
+
+        coolSmsService.authNumCheck(phoneAuthReqDTO);
+        String email = userService.findEmail(phoneAuthReqDTO.getPhoneNum());
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이메일 찾기 성공",email));
     }
 
     @GetMapping("/password/find")
-    public ResponseEntity<?> findPassword(){
-        return ResponseEntity.status(200).body("gkdl");
+    public ResponseEntity<CommonResDTO> findPassword(@RequestBody FindPwdReqDTO findPwdReqDTO){
+
+        coolSmsService.authNumCheck(PhoneAuthReqDTO.builder()
+                        .phoneNum(findPwdReqDTO.getPhoneNum())
+                        .authenticationNumber(findPwdReqDTO.getAuthenticationNumber())
+                        .build());
+        String password = userService.findPassword(findPwdReqDTO.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("비밀번호 찾기성공",password));
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> readUserInfo(){
-        return ResponseEntity.status(200).body("gkdl");
+    public ResponseEntity<CommonResDTO> readUserInfo(HttpServletRequest servletRequest){
+
+        Long userId = jwtProvider.readUserIdByToken(servletRequest);
+        ReadUserInfoResDTO readUserInfoResDTO = userService.readUserInfo(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 조회 성공",readUserInfoResDTO));
     }
 
     @PatchMapping("/users")
-    public ResponseEntity<?> changeUserInfo(){
-        return ResponseEntity.status(200).body("gkdl");
+    public ResponseEntity<CommonResDTO> changeUserInfo(@RequestBody UpdateUserInfoReqDTO updateUserInfoReqDTO, HttpServletRequest servletRequest){
+
+        Long userId = jwtProvider.readUserIdByToken(servletRequest);
+        userService.updateUserInfo(updateUserInfoReqDTO,userId);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 변경 성공",null));
+
     }
 
     @DeleteMapping("/users")
-    public ResponseEntity<?> deleteUserInfo(){
-        return ResponseEntity.status(200).body("gkdl");
+    public ResponseEntity<CommonResDTO> deleteUserInfo(@RequestBody DeleteUserReqDTO deleteUserReqDTO){
+
+        userService.deleteUser(deleteUserReqDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저 삭제완료",null));
     }
 }

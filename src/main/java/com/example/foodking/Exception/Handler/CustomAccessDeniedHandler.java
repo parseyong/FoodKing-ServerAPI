@@ -22,7 +22,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(403);
         Gson gson = new Gson();
 
-        CommonResDTO commonResponseDTO = CommonResDTO.of("HttpStatus.FORBIDDEN","권한이 없습니다",null);
+        CommonResDTO commonResponseDTO = CommonResDTO.of("권한이 없습니다",null);
 
         response.getWriter().write(gson.toJson(commonResponseDTO));
     }

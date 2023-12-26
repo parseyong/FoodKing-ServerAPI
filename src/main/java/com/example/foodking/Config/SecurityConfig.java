@@ -34,7 +34,7 @@ public class SecurityConfig {
         http
                 .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers("/login","/messages").permitAll()
+                .antMatchers("/login","/messages","/nickname/check","/email/check","/email/find","/password/find").permitAll()
                 .antMatchers(HttpMethod.POST,"/users").permitAll()
                 .antMatchers("/**").hasRole("USER")
                 .anyRequest().authenticated()

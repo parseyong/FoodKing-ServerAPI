@@ -22,7 +22,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setStatus(401);
         Gson gson = new Gson();
 
-        CommonResDTO commonResponseDTO = CommonResDTO.of("HttpStatus.UNAUTHORIZED","인증에 실패하였습니다",null);
+        CommonResDTO commonResponseDTO = CommonResDTO.of("인증에 실패하였습니다",null);
 
         response.getWriter().write(gson.toJson(commonResponseDTO));
     }

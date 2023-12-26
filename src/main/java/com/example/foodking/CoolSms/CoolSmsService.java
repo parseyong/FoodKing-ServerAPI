@@ -1,13 +1,13 @@
-package com.example.foodking.User;
+package com.example.foodking.CoolSms;
 
+import com.example.foodking.CoolSms.DTO.PhoneAuthReqDTO;
 import com.example.foodking.Exception.CommondException;
-import com.example.foodking.User.DTO.PhoneAuthReqDTO;
 import lombok.extern.log4j.Log4j2;
+import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import net.nurigo.java_sdk.api.Message;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
@@ -48,7 +48,7 @@ public class CoolSmsService {
         params.put("text", "FoodKing 휴대폰인증 메시지 : 인증번호는" + "["+authenticationNumber+"]" + "입니다.");
 
         try {
-            JSONObject obj = coolSms.send(params);
+            coolSms.send(params);
             authenticationNumberMap.put(phoneNum, String.valueOf(authenticationNumber)); //인증번호 확인을 위한 저장.
         } catch (CoolsmsException e) {
             System.out.println(e.getCode()+":"+e.getMessage());
@@ -56,7 +56,7 @@ public class CoolSmsService {
             throw new CommondException(COOLSMS_EXCEPTION);
         }
     }
-    public void authenticationMessage(PhoneAuthReqDTO phoneAuthReqDTO) {
+    public void authNumCheck(PhoneAuthReqDTO phoneAuthReqDTO) {
 
         String authenticationNum = authenticationNumberMap.get(phoneAuthReqDTO.getPhoneNum());
 
