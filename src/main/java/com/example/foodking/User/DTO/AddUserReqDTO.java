@@ -12,17 +12,17 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class AddUserReqDTO {
 
-    @Email
-    @NotBlank
+    @Email(message = "이메일 형식이 올바르지 않습니다")
+    @NotBlank(message = "이메일 정보를 입력해주세요")
     private String email;
-    @NotBlank
+    @NotBlank(message = "비밀번호를 입력해주세요")
     @Setter
     private String password;
-    @NotBlank
+    @NotBlank(message = "비밀번호를 입력해주세요")
     private String passwordRepeat;
-    @NotBlank
+    @NotBlank(message = "닉네임을 입력해주세요")
     private String nickName;
-    @NotBlank
+    @NotBlank(message = "전화번호를 입력해주세요")
     private String phoneNum;
 
     public static User toEntity(AddUserReqDTO addUserReqDTO){

@@ -56,7 +56,7 @@ public class User implements UserDetails {
         this.nickName=nickName;
     }
     public void changePassword(String password){
-        this.phoneNum=password;
+        this.password=password;
     }
 
     @Override

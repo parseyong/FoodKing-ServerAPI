@@ -24,7 +24,7 @@ public class ReplyEmotion {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "emotion_status")
-    private EmotionType emotionStatus;
+    private EmotionType emotionType;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -36,8 +36,8 @@ public class ReplyEmotion {
     @JoinColumn(name = "reply_id",nullable = false)
     private Reply reply;
     @Builder
-    public ReplyEmotion(EmotionType emotionStatus, User user, Reply reply){
-        this.emotionStatus=emotionStatus;
+    public ReplyEmotion(EmotionType emotionType, User user, Reply reply){
+        this.emotionType=emotionType;
         this.reply=reply;
         this.user=user;
     }

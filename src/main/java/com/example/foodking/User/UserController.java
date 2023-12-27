@@ -9,10 +9,15 @@ import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 @RestController
+@Validated
 @RequiredArgsConstructor
 @Api(tags = "USER")
 public class UserController {
@@ -22,14 +27,14 @@ public class UserController {
     private final JwtProvider jwtProvider;
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResDTO> login(@RequestBody LoginReqDTO loginReqDTO){
+    public ResponseEntity<CommonResDTO> login(@RequestBody @Valid LoginReqDTO loginReqDTO){
 
         String accessToken = userService.login(loginReqDTO);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("로그인 성공!",accessToken));
     }
 
     @PostMapping("/users")
-    public ResponseEntity<CommonResDTO> addUser(@RequestBody AddUserReqDTO addUserReqDTO){
+    public ResponseEntity<CommonResDTO> addUser(@RequestBody @Valid AddUserReqDTO addUserReqDTO){
 
         coolSmsService.isAuthenticatedNum(addUserReqDTO.getPhoneNum());
         userService.addUser(addUserReqDTO);
@@ -37,21 +42,21 @@ public class UserController {
     }
 
     @GetMapping("/email/check")
-    public ResponseEntity<CommonResDTO> emailDuplicatedChecking(@RequestParam(name = "email") String email){
+    public ResponseEntity<CommonResDTO> emailDuplicatedChecking(@RequestParam(name = "email") @Email @NotBlank String email){
 
         boolean isDuplicated = userService.emailDuplicatedChecking(email);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이메일 중복체크 완료",isDuplicated));
     }
 
     @GetMapping("/nickname/check")
-    public ResponseEntity<CommonResDTO> nickNameDuplicatedChecking(@RequestParam(name = "nickName") String nickName){
+    public ResponseEntity<CommonResDTO> nickNameDuplicatedChecking(@RequestParam(name = "nickName") @NotBlank String nickName){
 
         boolean isDuplicated = userService.nickNameDuplicatedChecking(nickName);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("닉네임 중복체크 완료",isDuplicated));
     }
 
     @GetMapping("/email/find")
-    public ResponseEntity<CommonResDTO> findEmail(@RequestBody PhoneAuthReqDTO phoneAuthReqDTO){
+    public ResponseEntity<CommonResDTO> findEmail(@RequestBody @Valid PhoneAuthReqDTO phoneAuthReqDTO){
 
         coolSmsService.authNumCheck(phoneAuthReqDTO);
         String email = userService.findEmail(phoneAuthReqDTO.getPhoneNum());
@@ -59,7 +64,7 @@ public class UserController {
     }
 
     @GetMapping("/password/find")
-    public ResponseEntity<CommonResDTO> findPassword(@RequestBody FindPwdReqDTO findPwdReqDTO){
+    public ResponseEntity<CommonResDTO> findPassword(@RequestBody @Valid FindPwdReqDTO findPwdReqDTO){
 
         coolSmsService.authNumCheck(PhoneAuthReqDTO.builder()
                         .phoneNum(findPwdReqDTO.getPhoneNum())
@@ -78,7 +83,7 @@ public class UserController {
     }
 
     @PatchMapping("/users")
-    public ResponseEntity<CommonResDTO> changeUserInfo(@RequestBody UpdateUserInfoReqDTO updateUserInfoReqDTO, HttpServletRequest servletRequest){
+    public ResponseEntity<CommonResDTO> changeUserInfo(@RequestBody @Valid UpdateUserInfoReqDTO updateUserInfoReqDTO, HttpServletRequest servletRequest){
 
         Long userId = jwtProvider.readUserIdByToken(servletRequest);
         userService.updateUserInfo(updateUserInfoReqDTO,userId);
@@ -87,7 +92,7 @@ public class UserController {
     }
 
     @DeleteMapping("/users")
-    public ResponseEntity<CommonResDTO> deleteUserInfo(@RequestBody DeleteUserReqDTO deleteUserReqDTO){
+    public ResponseEntity<CommonResDTO> deleteUserInfo(@RequestBody @Valid DeleteUserReqDTO deleteUserReqDTO){
 
         userService.deleteUser(deleteUserReqDTO);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저 삭제완료",null));

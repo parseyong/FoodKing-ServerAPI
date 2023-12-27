@@ -15,6 +15,7 @@ public class PhoneAuthReqDTO {
 
     @NotBlank(message = "전화번호를 입력하세요")
     private String phoneNum;
+
     @NotBlank(message = "인증번호를 입력하세요")
     private String authenticationNumber;
 }

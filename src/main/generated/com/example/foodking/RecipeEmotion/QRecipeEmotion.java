@@ -22,7 +22,7 @@ public class QRecipeEmotion extends EntityPathBase<RecipeEmotion> {
 
     public static final QRecipeEmotion recipeEmotion = new QRecipeEmotion("recipeEmotion");
 
-    public final EnumPath<com.example.foodking.Common.EmotionType> emotionStatus = createEnum("emotionStatus", com.example.foodking.Common.EmotionType.class);
+    public final EnumPath<com.example.foodking.Common.EmotionType> emotionType = createEnum("emotionType", com.example.foodking.Common.EmotionType.class);
 
     public final NumberPath<Long> recipeEmotionId = createNumber("recipeEmotionId", Long.class);
 

@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,7 @@ import java.util.Collection;
 import java.util.Date;
 
 @Component
+@Log4j2
 @RequiredArgsConstructor
 public class JwtProvider {
 
@@ -51,6 +53,7 @@ public class JwtProvider {
     }
 
     public String getUserId(String token) {
+        log.info(token);
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
@@ -65,10 +68,10 @@ public class JwtProvider {
 
     public String resolveToken(HttpServletRequest request) {
 
-        return request.getHeader("ACT");
+        return request.getHeader("Auth");
     }
 
     public Long readUserIdByToken(HttpServletRequest request){
-        return Long.valueOf(this.getUserId(request.getHeader("ACT")));
+        return Long.valueOf(this.getUserId(request.getHeader("Auth")));
     }
 }

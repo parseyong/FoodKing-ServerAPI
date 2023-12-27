@@ -69,12 +69,12 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow();
 
-        isMatchPassword(updateUserInfoReqDTO.getOldPassword(),updateUserInfoReqDTO.getNewPassword()
+        isMatchPassword(updateUserInfoReqDTO.getOldPassword(),user.getPassword()
                 ,ExceptionCode.PASSWORD_NOT_COLLECT);
 
         user.changeNickName(updateUserInfoReqDTO.getNickName());
         user.changePhoneNum(updateUserInfoReqDTO.getPhoneNum());
-        user.changePassword(updateUserInfoReqDTO.getNewPassword());
+        user.changePassword(passwordEncoder.encode(updateUserInfoReqDTO.getNewPassword()));
         userRepository.save(user);
     }
     @Transactional
@@ -82,11 +82,12 @@ public class UserService {
         User user = userRepository.findUserByEmail(deleteUserReqDTO.getEmail())
                 .orElseThrow();
 
-        isMatchPassword(user.getPassword(), deleteUserReqDTO.getPassword(),ExceptionCode.PASSWORD_NOT_COLLECT);
+        isMatchPassword(deleteUserReqDTO.getPassword(), user.getPassword(), ExceptionCode.PASSWORD_NOT_COLLECT);
         userRepository.delete(user);
     }
 
-    public void isMatchPassword(String password1, String password2,ExceptionCode exceptionCode){
+    //password1에는 인코딩 되지않은 값을, password2에는 인코딩이 되어있는 값을 넣어야한다.
+    public void isMatchPassword(String password1, String password2, ExceptionCode exceptionCode){
 
         if(!passwordEncoder.matches(password1,password2))
             throw new CommondException(exceptionCode);

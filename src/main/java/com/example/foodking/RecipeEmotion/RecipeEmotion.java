@@ -24,7 +24,7 @@ public class RecipeEmotion {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "emotion_status")
-    private EmotionType emotionStatus;
+    private EmotionType emotionType;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -36,8 +36,8 @@ public class RecipeEmotion {
     @JoinColumn(name = "recipe_info_id",nullable = false)
     private RecipeInfo recipeInfo;
     @Builder
-    public RecipeEmotion(EmotionType emotionStatus,User user, RecipeInfo recipeInfo){
-        this.emotionStatus=emotionStatus;
+    public RecipeEmotion(EmotionType emotionType,User user, RecipeInfo recipeInfo){
+        this.emotionType=emotionType;
         this.recipeInfo=recipeInfo;
         this.user=user;
     }
