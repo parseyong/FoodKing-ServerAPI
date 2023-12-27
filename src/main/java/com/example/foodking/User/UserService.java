@@ -51,23 +51,25 @@ public class UserService {
     }
 
     public String findEmail(String phoneNum){
-        return userRepository.findEmailByPhoneNum(phoneNum).orElseThrow();
+        return userRepository.findEmailByPhoneNum(phoneNum)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
     }
 
     public String findPassword(String email){
-        return userRepository.findPasswordByEmail(email).orElseThrow();
+        return userRepository.findPasswordByEmail(email)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
     }
 
     public ReadUserInfoResDTO readUserInfo(Long userId){
         User user = userRepository.findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         return ReadUserInfoResDTO.toDTO(user);
     }
     @Transactional
     public void updateUserInfo(UpdateUserInfoReqDTO updateUserInfoReqDTO,Long userId){
         User user = userRepository.findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         isMatchPassword(updateUserInfoReqDTO.getOldPassword(),user.getPassword()
                 ,ExceptionCode.PASSWORD_NOT_COLLECT);
@@ -80,7 +82,7 @@ public class UserService {
     @Transactional
     public void deleteUser(DeleteUserReqDTO deleteUserReqDTO){
         User user = userRepository.findUserByEmail(deleteUserReqDTO.getEmail())
-                .orElseThrow();
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         isMatchPassword(deleteUserReqDTO.getPassword(), user.getPassword(), ExceptionCode.PASSWORD_NOT_COLLECT);
         userRepository.delete(user);

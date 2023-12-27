@@ -2,6 +2,7 @@ package com.example.foodking.CoolSms;
 
 import com.example.foodking.CoolSms.DTO.PhoneAuthReqDTO;
 import com.example.foodking.Exception.CommondException;
+import com.example.foodking.Exception.ExceptionCode;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import static com.example.foodking.Exception.ExceptionCode.*;
 
@@ -36,6 +38,10 @@ public class CoolSmsService {
     private HashSet<String> authenticationedPhoneNumSet = new HashSet<>();
 
     public void sendMessage(String phoneNum){
+
+        if(phoneNum.length() > 12 || phoneNum.length() < 8 || !Pattern.matches("\\d+", phoneNum))
+            throw new CommondException(NOT_PHONENUM);
+
         Random randomNum = new Random();
         int authenticationNumber = randomNum.nextInt(0,9999); // 인증번호 생성
 

@@ -3,6 +3,7 @@ package com.example.foodking.Exception.Handler;
 import com.example.foodking.Common.CommonResDTO;
 import com.example.foodking.Exception.CommondException;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,14 +11,18 @@ import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @RestControllerAdvice
 @Log4j2
@@ -34,6 +39,39 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<CommonResDTO> handleContranintViolation(ConstraintViolationException ex){
+        Map<String, String> errors = new HashMap<>();
+        Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
+
+        for (ConstraintViolation<?> violation : violations) {
+            String fieldName = violation.getPropertyPath().toString();
+            if(fieldName.contains("email"))
+                fieldName="email";
+            else if(fieldName.contains("phoneNum"))
+                fieldName="phoneNum";
+            else if(fieldName.contains("nickName"))
+                fieldName="nickName";
+
+            String message = violation.getMessage();
+            errors.put(fieldName,message);
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
+    }
+
+    /*
+        RequestParam으로 받은 값이 존재하지 않을때 발생하는 예외처리 로직
+        이 예외는 사용자의 잘못된 요청값이 아닌 클라이언트 개발자가 폼데이터를 통해 요청을 보내지 않았을 때 발생한다.
+        ex) 폼데이터가 아닌 json형태로 요청을 보냈을 경우
+    */
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put(ex.getParameterName(), ex.getMessage()+"(관리자에게 문의하세요)");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
+    }
+
     // 커스텀 예외발생 시
     @ExceptionHandler(CommondException.class)
     public ResponseEntity<CommonResDTO> commandExceptionHandler(CommondException ex){
@@ -47,6 +85,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<CommonResDTO> handleException(Exception ex) {
+
         String message = "서버 내부에 에러가 발생했습니다.";
         log.error(message+":"+ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResDTO.of(message,null));
