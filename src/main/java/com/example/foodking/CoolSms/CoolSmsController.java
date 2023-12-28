@@ -4,14 +4,12 @@ import com.example.foodking.Common.CommonResDTO;
 import com.example.foodking.CoolSms.DTO.PhoneAuthReqDTO;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 @RestController
 @Validated

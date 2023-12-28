@@ -2,7 +2,6 @@ package com.example.foodking.CoolSms;
 
 import com.example.foodking.CoolSms.DTO.PhoneAuthReqDTO;
 import com.example.foodking.Exception.CommondException;
-import com.example.foodking.Exception.ExceptionCode;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
@@ -65,6 +64,8 @@ public class CoolSmsService {
     public void authNumCheck(PhoneAuthReqDTO phoneAuthReqDTO) {
 
         String authenticationNum = authenticationNumberMap.get(phoneAuthReqDTO.getPhoneNum());
+        log.info(authenticationNumberMap.toString() + "authNumcheck");
+        log.info(authenticationedPhoneNumSet.toString() + "authNumcheck");
 
         if(authenticationNum == null || !authenticationNum.equals(phoneAuthReqDTO.getAuthenticationNumber()))
             throw new CommondException(SMS_AUTHENTICATION_FAIL);
@@ -73,10 +74,14 @@ public class CoolSmsService {
     }
     public void isAuthenticatedNum(String phoneNum){
 
+        log.info(authenticationNumberMap.toString() + "isAuth");
+        log.info(authenticationedPhoneNumSet.toString() + "isAuth");
+
         if(!authenticationedPhoneNumSet.contains(phoneNum)){
             throw new CommondException(SMS_NOT_AUTHENTICATION);
         }
-
+    }
+    public void deleteAuthInfo(String phoneNum){
         authenticationedPhoneNumSet.remove(phoneNum);
         authenticationNumberMap.remove(phoneNum);
     }

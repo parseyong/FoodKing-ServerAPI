@@ -3,14 +3,15 @@ package com.example.foodking.User;
 import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Common.CommonResDTO;
 import com.example.foodking.CoolSms.CoolSmsService;
-import com.example.foodking.User.DTO.*;
 import com.example.foodking.CoolSms.DTO.PhoneAuthReqDTO;
+import com.example.foodking.User.DTO.*;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
@@ -38,6 +39,7 @@ public class UserController {
 
         coolSmsService.isAuthenticatedNum(addUserReqDTO.getPhoneNum());
         userService.addUser(addUserReqDTO);
+        coolSmsService.deleteAuthInfo(addUserReqDTO.getPhoneNum());
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("회원가입 완료",null));
     }
 

@@ -3,7 +3,6 @@ package com.example.foodking.Exception.Handler;
 import com.example.foodking.Common.CommonResDTO;
 import com.example.foodking.Exception.CommondException;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -75,11 +74,15 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
     // 커스텀 예외발생 시
     @ExceptionHandler(CommondException.class)
     public ResponseEntity<CommonResDTO> commandExceptionHandler(CommondException ex){
-        log.error("예외가 발생했습니다. - "+ex.getExceptionCode().getMessage());
+        Map<String, String> errors = new HashMap<>();
+        String fieldName = ex.getExceptionCode().getFieldName();
+        if(fieldName != null)
+            errors.put(fieldName,ex.getExceptionCode().getMessage());
+
+        log.error("예외가 발생했습니다. - "+fieldName+":"+ex.getExceptionCode().getMessage());
         return ResponseEntity
                 .status(ex.getExceptionCode().getStatus())
-                .body(CommonResDTO.of(ex.getExceptionCode().getMessage(),null));
-
+                .body(CommonResDTO.of(ex.getExceptionCode().getMessage(),errors));
     }
 
     @ExceptionHandler
