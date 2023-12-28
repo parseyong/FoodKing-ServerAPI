@@ -55,6 +55,7 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
     //시큐리티
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation("org.springframework.security:spring-security-test")
     //CoolSMS
     implementation 'net.nurigo:sdk:4.2.7'
     implementation 'net.nurigo:javaSDK:2.2'

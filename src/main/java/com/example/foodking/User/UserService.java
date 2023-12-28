@@ -29,7 +29,7 @@ public class UserService {
         return jwtProvider.createToken(user.getUserId(), user.getAuthorities());
     }
     @Transactional
-    public void addUser(AddUserReqDTO addUserReqDTO){
+    public User addUser(AddUserReqDTO addUserReqDTO){
 
         if(emailDuplicatedChecking(addUserReqDTO.getEmail()))
            throw new CommondException(ExceptionCode.EMAIL_DUPLICATED);
@@ -39,7 +39,9 @@ public class UserService {
             throw new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT);
 
         addUserReqDTO.setPassword(passwordEncoder.encode(addUserReqDTO.getPassword()));
-        userRepository.save(AddUserReqDTO.toEntity(addUserReqDTO));
+        User user = AddUserReqDTO.toEntity(addUserReqDTO);
+        userRepository.save(user);
+        return user;
     }
 
     public boolean emailDuplicatedChecking(String email){
@@ -67,7 +69,7 @@ public class UserService {
         return ReadUserInfoResDTO.toDTO(user);
     }
     @Transactional
-    public void updateUserInfo(UpdateUserInfoReqDTO updateUserInfoReqDTO,Long userId){
+    public User updateUserInfo(UpdateUserInfoReqDTO updateUserInfoReqDTO,Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
 
@@ -78,6 +80,7 @@ public class UserService {
         user.changePhoneNum(updateUserInfoReqDTO.getPhoneNum());
         user.changePassword(passwordEncoder.encode(updateUserInfoReqDTO.getNewPassword()));
         userRepository.save(user);
+        return user;
     }
     @Transactional
     public void deleteUser(DeleteUserReqDTO deleteUserReqDTO){

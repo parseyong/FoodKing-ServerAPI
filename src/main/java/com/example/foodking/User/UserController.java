@@ -44,14 +44,15 @@ public class UserController {
     }
 
     @GetMapping("/email/check")
-    public ResponseEntity<CommonResDTO> emailDuplicatedChecking(@RequestParam(name = "email") @Email @NotBlank String email){
+    public ResponseEntity<CommonResDTO> emailDuplicatedChecking(
+            @RequestParam(name = "email") @Email(message = "이메일 형식이 올바르지 않습니다") @NotBlank(message = "이메일 정보를 입력해주세요") String email){
 
         boolean isDuplicated = userService.emailDuplicatedChecking(email);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이메일 중복체크 완료",isDuplicated));
     }
 
     @GetMapping("/nickname/check")
-    public ResponseEntity<CommonResDTO> nickNameDuplicatedChecking(@RequestParam(name = "nickName") @NotBlank String nickName){
+    public ResponseEntity<CommonResDTO> nickNameDuplicatedChecking(@RequestParam(name = "nickName") @NotBlank(message = "닉네임 정보를 입력해주세요") String nickName){
 
         boolean isDuplicated = userService.nickNameDuplicatedChecking(nickName);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("닉네임 중복체크 완료",isDuplicated));
