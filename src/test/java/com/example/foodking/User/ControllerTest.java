@@ -8,7 +8,6 @@ import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
 import com.example.foodking.User.DTO.*;
 import com.google.gson.Gson;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +19,14 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = UserController.class)
 @Import(SecurityConfig.class)
@@ -739,6 +738,7 @@ public class ControllerTest {
     @WithAnonymousUser
     @DisplayName("유저정보 수정테스트 -> (수정 실패 : 인증 실패)")
     public void updateUserInfoFail1() throws Exception {
+        //given
         UpdateUserInfoReqDTO updateUserInfoReqDTO = UpdateUserInfoReqDTO.builder()
                 .phoneNum("01056962173")
                 .oldPassword("1234")
@@ -761,6 +761,7 @@ public class ControllerTest {
     @WithMockUser
     @DisplayName("유저정보 수정테스트 -> (수정 실패 : 요청값 공백)")
     public void updateUserInfoFail2() throws Exception {
+        //given
         UpdateUserInfoReqDTO updateUserInfoReqDTO = UpdateUserInfoReqDTO.builder()
                 .phoneNum("")
                 .oldPassword("")
@@ -783,6 +784,7 @@ public class ControllerTest {
     @WithMockUser
     @DisplayName("유저정보 수정테스트 -> (수정 실패 : 비밀번호 불일치)")
     public void updateUserInfoFail3() throws Exception {
+        //given
         UpdateUserInfoReqDTO updateUserInfoReqDTO = UpdateUserInfoReqDTO.builder()
                 .phoneNum("01056962173")
                 .oldPassword("1234")
@@ -808,6 +810,7 @@ public class ControllerTest {
     @WithMockUser
     @DisplayName("유저정보 수정테스트 -> (수정 실패 : 존재하지 않는 유저)")
     public void updateUserInfoFail4() throws Exception {
+        //given
         UpdateUserInfoReqDTO updateUserInfoReqDTO = UpdateUserInfoReqDTO.builder()
                 .phoneNum("01056962173")
                 .oldPassword("1234")
@@ -832,6 +835,7 @@ public class ControllerTest {
     @WithMockUser
     @DisplayName("유저 삭제테스트 -> (유저삭제 성공)")
     public void deleteUserInfoSuccess() throws Exception {
+        //given
         DeleteUserReqDTO deleteUserReqDTO = DeleteUserReqDTO.builder()
                 .email("test@google.com")
                 .password("1234")
@@ -853,6 +857,7 @@ public class ControllerTest {
     @WithAnonymousUser
     @DisplayName("유저 삭제테스트 -> (유저삭제 실패 : 인증실패)")
     public void deleteUserInfoFail1() throws Exception {
+        //given
         DeleteUserReqDTO deleteUserReqDTO = DeleteUserReqDTO.builder()
                 .email("test@google.com")
                 .password("1234")
@@ -874,6 +879,7 @@ public class ControllerTest {
     @WithMockUser
     @DisplayName("유저 삭제테스트 -> (유저삭제 실패 : 비밀번호 불일치)")
     public void deleteUserInfoFail2() throws Exception {
+        //given
         DeleteUserReqDTO deleteUserReqDTO = DeleteUserReqDTO.builder()
                 .email("test@google.com")
                 .password("1234")
@@ -897,6 +903,7 @@ public class ControllerTest {
     @WithMockUser
     @DisplayName("유저 삭제테스트 -> (유저삭제 실패 : 존재하지 않는 유저)")
     public void deleteUserInfoFail3() throws Exception {
+        //given
         DeleteUserReqDTO deleteUserReqDTO = DeleteUserReqDTO.builder()
                 .email("test@google.com")
                 .password("1234")
@@ -919,6 +926,7 @@ public class ControllerTest {
     @WithMockUser
     @DisplayName("유저 삭제테스트 -> (유저삭제 실패 : 요청값 공백)")
     public void deleteUserInfoFail4() throws Exception {
+        //given
         DeleteUserReqDTO deleteUserReqDTO = DeleteUserReqDTO.builder()
                 .email("")
                 .password("")
@@ -940,6 +948,7 @@ public class ControllerTest {
     @WithMockUser
     @DisplayName("유저 삭제테스트 -> (유저삭제 실패 : 이메일 형식예외)")
     public void deleteUserInfoFail5() throws Exception {
+        //given
         DeleteUserReqDTO deleteUserReqDTO = DeleteUserReqDTO.builder()
                 .email("testgoogle.com")
                 .password("1234")
