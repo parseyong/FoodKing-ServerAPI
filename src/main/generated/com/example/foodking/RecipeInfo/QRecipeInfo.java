@@ -26,9 +26,9 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final NumberPath<Long> calogy = createNumber("calogy", Long.class);
 
-    public final StringPath cookingTime = createString("cookingTime");
+    public final NumberPath<Long> cookingTime = createNumber("cookingTime", Long.class);
 
-    public final StringPath ingredientCost = createString("ingredientCost");
+    public final NumberPath<Long> ingredientCost = createNumber("ingredientCost", Long.class);
 
     public final ListPath<com.example.foodking.Ingredient.Ingredient, com.example.foodking.Ingredient.QIngredient> ingredientList = this.<com.example.foodking.Ingredient.Ingredient, com.example.foodking.Ingredient.QIngredient>createList("ingredientList", com.example.foodking.Ingredient.Ingredient.class, com.example.foodking.Ingredient.QIngredient.class, PathInits.DIRECT2);
 
@@ -41,11 +41,11 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final EnumPath<RecipeInfoType> recipeInfoType = createEnum("recipeInfoType", RecipeInfoType.class);
 
-    public final ListPath<com.example.foodking.Recipe.Recipe, com.example.foodking.Recipe.QRecipe> recipeList = this.<com.example.foodking.Recipe.Recipe, com.example.foodking.Recipe.QRecipe>createList("recipeList", com.example.foodking.Recipe.Recipe.class, com.example.foodking.Recipe.QRecipe.class, PathInits.DIRECT2);
-
     public final StringPath recipeName = createString("recipeName");
 
     public final StringPath recipeTip = createString("recipeTip");
+
+    public final ListPath<com.example.foodking.RecipeWayInfo.RecipeWayInfo, com.example.foodking.RecipeWayInfo.QRecipeWayInfo> recipeWayInfoList = this.<com.example.foodking.RecipeWayInfo.RecipeWayInfo, com.example.foodking.RecipeWayInfo.QRecipeWayInfo>createList("recipeWayInfoList", com.example.foodking.RecipeWayInfo.RecipeWayInfo.class, com.example.foodking.RecipeWayInfo.QRecipeWayInfo.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> regDate = _super.regDate;

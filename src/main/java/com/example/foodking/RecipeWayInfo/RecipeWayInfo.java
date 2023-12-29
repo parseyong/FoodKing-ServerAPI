@@ -1,4 +1,4 @@
-package com.example.foodking.Recipe;
+package com.example.foodking.RecipeWayInfo;
 
 import com.example.foodking.RecipeInfo.RecipeInfo;
 import lombok.AccessLevel;
@@ -11,12 +11,12 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Recipe {
+public class RecipeWayInfo {
 
     @Id
-    @Column(name = "recipe_id")
+    @Column(name = "recipe_way_info_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long recipeId;
+    private Long recipeWayInfoId;
 
     @Column(nullable = false,name = "recipe_way")
     private String recipeWay;
@@ -29,7 +29,7 @@ public class Recipe {
     private RecipeInfo recipeInfo;
 
     @Builder
-    public void Recipe(String recipeWay, Long recipeOrder){
+    public void RecipeWayInfo(String recipeWay, Long recipeOrder){
         this.recipeWay=recipeWay;
         this.recipeOrder=recipeOrder;
     }

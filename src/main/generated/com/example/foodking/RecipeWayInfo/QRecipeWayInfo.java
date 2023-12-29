@@ -1,4 +1,4 @@
-package com.example.foodking.Recipe;
+package com.example.foodking.RecipeWayInfo;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -11,18 +11,16 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QRecipe is a Querydsl query type for Recipe
+ * QRecipeWayInfo is a Querydsl query type for RecipeWayInfo
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QRecipe extends EntityPathBase<Recipe> {
+public class QRecipeWayInfo extends EntityPathBase<RecipeWayInfo> {
 
-    private static final long serialVersionUID = 1873994694L;
+    private static final long serialVersionUID = 1654175112L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QRecipe recipe = new QRecipe("recipe");
-
-    public final NumberPath<Long> recipeId = createNumber("recipeId", Long.class);
+    public static final QRecipeWayInfo recipeWayInfo = new QRecipeWayInfo("recipeWayInfo");
 
     public final com.example.foodking.RecipeInfo.QRecipeInfo recipeInfo;
 
@@ -30,23 +28,25 @@ public class QRecipe extends EntityPathBase<Recipe> {
 
     public final StringPath recipeWay = createString("recipeWay");
 
-    public QRecipe(String variable) {
-        this(Recipe.class, forVariable(variable), INITS);
+    public final NumberPath<Long> recipeWayInfoId = createNumber("recipeWayInfoId", Long.class);
+
+    public QRecipeWayInfo(String variable) {
+        this(RecipeWayInfo.class, forVariable(variable), INITS);
     }
 
-    public QRecipe(Path<? extends Recipe> path) {
+    public QRecipeWayInfo(Path<? extends RecipeWayInfo> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QRecipe(PathMetadata metadata) {
+    public QRecipeWayInfo(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QRecipe(PathMetadata metadata, PathInits inits) {
-        this(Recipe.class, metadata, inits);
+    public QRecipeWayInfo(PathMetadata metadata, PathInits inits) {
+        this(RecipeWayInfo.class, metadata, inits);
     }
 
-    public QRecipe(Class<? extends Recipe> type, PathMetadata metadata, PathInits inits) {
+    public QRecipeWayInfo(Class<? extends RecipeWayInfo> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.recipeInfo = inits.isInitialized("recipeInfo") ? new com.example.foodking.RecipeInfo.QRecipeInfo(forProperty("recipeInfo"), inits.get("recipeInfo")) : null;
     }
