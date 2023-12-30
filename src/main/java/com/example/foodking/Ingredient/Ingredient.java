@@ -21,16 +21,23 @@ public class Ingredient {
     @Column(nullable = false, name = "ingredient_name")
     private String ingredientName;
 
+    @Column(nullable = false, name = "ingredient_amount")
+    private String ingredientAmount;
+
     @ManyToOne
     @JoinColumn(name = "recipe_Info_id",nullable = false)
     private RecipeInfo recipeInfo;
 
     @Builder
-    public Ingredient(String ingredientName){
+    public Ingredient(String ingredientName,String ingredientAmount, RecipeInfo recipeInfo){
         this.ingredientName=ingredientName;
+        this.ingredientAmount=ingredientAmount;
+        this.recipeInfo=recipeInfo;
     }
     public void changeIngredientName(String ingredientName){
         this.ingredientName=ingredientName;
     }
-
+    public void changeIngredientAmount(String ingredientAmount){
+        this.ingredientAmount=ingredientAmount;
+    }
 }

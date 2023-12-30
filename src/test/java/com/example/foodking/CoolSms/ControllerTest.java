@@ -99,7 +99,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(get("/messages")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.phoneNum").value("Required request parameter 'phoneNum' for method parameter type String is not present(관리자에게 문의하세요)"))
                 .andDo(print());

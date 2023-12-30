@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -68,7 +69,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         Map<String, String> errors = new HashMap<>();
         errors.put(ex.getParameterName(), ex.getMessage()+"(관리자에게 문의하세요)");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
     }
 
     // 커스텀 예외발생 시
@@ -83,6 +84,17 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity
                 .status(ex.getExceptionCode().getStatus())
                 .body(CommonResDTO.of(ex.getExceptionCode().getMessage(),errors));
+    }
+    
+    // enum타입에 대한 역직렬화과정에서 발생하는 예외처리
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatus status,
+                                                                  WebRequest request) {
+        String message = "서버 내부에 에러가 발생했습니다. : 올바른 ENUM타입이 아닙니다. 관리자에게 문의하세요";
+        log.error(message+":"+ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResDTO.of(message,null));
     }
 
     @ExceptionHandler

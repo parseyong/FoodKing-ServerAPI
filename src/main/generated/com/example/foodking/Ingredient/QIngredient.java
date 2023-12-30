@@ -22,6 +22,8 @@ public class QIngredient extends EntityPathBase<Ingredient> {
 
     public static final QIngredient ingredient = new QIngredient("ingredient");
 
+    public final StringPath ingredientAmount = createString("ingredientAmount");
+
     public final NumberPath<Long> ingredientId = createNumber("ingredientId", Long.class);
 
     public final StringPath ingredientName = createString("ingredientName");
