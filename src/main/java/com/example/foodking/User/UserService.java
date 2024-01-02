@@ -29,7 +29,7 @@ public class UserService {
         return jwtProvider.createToken(user.getUserId(), user.getAuthorities());
     }
     @Transactional
-    public User addUser(AddUserReqDTO addUserReqDTO){
+    public void addUser(AddUserReqDTO addUserReqDTO){
 
         if(emailDuplicatedChecking(addUserReqDTO.getEmail()))
            throw new CommondException(ExceptionCode.EMAIL_DUPLICATED);
@@ -41,7 +41,6 @@ public class UserService {
         addUserReqDTO.setPassword(passwordEncoder.encode(addUserReqDTO.getPassword()));
         User user = AddUserReqDTO.toEntity(addUserReqDTO);
         userRepository.save(user);
-        return user;
     }
 
     public boolean emailDuplicatedChecking(String email){

@@ -19,10 +19,11 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.servlet.http.HttpServletRequest;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -50,7 +51,7 @@ public class ControllerTest {
                 .password("1234")
                 .build();
         String accessToken = "test";
-        given(userService.login(any())).willReturn(accessToken);
+        given(userService.login(any(LoginReqDTO.class))).willReturn(accessToken);
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(loginReqDTO);
@@ -60,11 +61,11 @@ public class ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").value("test"))
+                .andExpect(jsonPath("$.data").value(accessToken))
                 .andExpect(jsonPath("$.message").value("로그인 성공!"))
                 .andDo(print());
 
-        verify(userService).login(any(LoginReqDTO.class));
+        verify(userService,times(1)).login(any(LoginReqDTO.class));
     }
 
     @Test
@@ -76,7 +77,7 @@ public class ControllerTest {
                 .password("")
                 .build();
         String accessToken = "test";
-        given(userService.login(any())).willReturn(accessToken);
+        given(userService.login(any(LoginReqDTO.class))).willReturn(accessToken);
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(loginReqDTO);
@@ -90,6 +91,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.password").value("비밀번호를 입력해주세요"))
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
+        verify(userService,times(0)).login(any(LoginReqDTO.class));
+
     }
 
     @Test
@@ -101,7 +104,7 @@ public class ControllerTest {
                 .password("1234")
                 .build();
         String accessToken = "test";
-        given(userService.login(any())).willReturn(accessToken);
+        given(userService.login(any(LoginReqDTO.class))).willReturn(accessToken);
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(loginReqDTO);
@@ -114,6 +117,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.email").value("이메일 형식이 올바르지 않습니다"))
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
+        verify(userService,times(0)).login(any(LoginReqDTO.class));
+
     }
 
     @Test
@@ -125,7 +130,7 @@ public class ControllerTest {
                 .password("1234")
                 .build();
         String accessToken = "test";
-        given(userService.login(any())).willThrow(new CommondException(ExceptionCode.LOGIN_FAIL));
+        given(userService.login(any(LoginReqDTO.class))).willThrow(new CommondException(ExceptionCode.LOGIN_FAIL));
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(loginReqDTO);
@@ -137,6 +142,8 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("로그인에 실패하였습니다."))
                 .andDo(print());
+        verify(userService,times(1)).login(any(LoginReqDTO.class));
+
     }
 
     @Test
@@ -162,9 +169,9 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("회원가입 완료"))
                 .andDo(print());
 
-        verify(userService).addUser(any());
-        verify(coolSmsService).isAuthenticatedNum(any());
-        verify(coolSmsService).deleteAuthInfo(any());
+        verify(userService,times(1)).addUser(any(AddUserReqDTO.class));
+        verify(coolSmsService,times(1)).isAuthenticatedNum(any(String.class));
+        verify(coolSmsService,times(1)).deleteAuthInfo(any(String.class));
     }
 
     @Test
@@ -194,6 +201,9 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.phoneNum").value("전화번호를 입력해주세요"))
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
+        verify(userService,times(0)).addUser(any(AddUserReqDTO.class));
+        verify(coolSmsService,times(0)).isAuthenticatedNum(any(String.class));
+        verify(coolSmsService,times(0)).deleteAuthInfo(any(String.class));
     }
 
     @Test
@@ -219,6 +229,9 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.email").value("이메일 형식이 올바르지 않습니다"))
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
+        verify(userService,times(0)).addUser(any(AddUserReqDTO.class));
+        verify(coolSmsService,times(0)).isAuthenticatedNum(any(String.class));
+        verify(coolSmsService,times(0)).deleteAuthInfo(any(String.class));
     }
 
     @Test
@@ -233,7 +246,7 @@ public class ControllerTest {
                 .passwordRepeat("1234")
                 .build();
 
-        doThrow(new CommondException(ExceptionCode.EMAIL_DUPLICATED)).when(userService).addUser(any());
+        doThrow(new CommondException(ExceptionCode.EMAIL_DUPLICATED)).when(userService).addUser(any(AddUserReqDTO.class));
         Gson gson = new Gson();
         String requestBody = gson.toJson(addUserReqDTO);
 
@@ -245,6 +258,9 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.email").value("중복된 이메일입니다"))
                 .andExpect(jsonPath("$.message").value("중복된 이메일입니다"))
                 .andDo(print());
+        verify(userService,times(1)).addUser(any(AddUserReqDTO.class));
+        verify(coolSmsService,times(1)).isAuthenticatedNum(any(String.class));
+        verify(coolSmsService,times(0)).deleteAuthInfo(any(String.class));
     }
 
     @Test
@@ -259,7 +275,7 @@ public class ControllerTest {
                 .passwordRepeat("1234")
                 .build();
 
-        doThrow(new CommondException(ExceptionCode.NICKNAME_DUPLICATED)).when(userService).addUser(any());
+        doThrow(new CommondException(ExceptionCode.NICKNAME_DUPLICATED)).when(userService).addUser(any(AddUserReqDTO.class));
         Gson gson = new Gson();
         String requestBody = gson.toJson(addUserReqDTO);
 
@@ -271,6 +287,9 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.nickName").value("중복된 닉네임입니다"))
                 .andExpect(jsonPath("$.message").value("중복된 닉네임입니다"))
                 .andDo(print());
+        verify(userService,times(1)).addUser(any(AddUserReqDTO.class));
+        verify(coolSmsService,times(1)).isAuthenticatedNum(any(String.class));
+        verify(coolSmsService,times(0)).deleteAuthInfo(any(String.class));
     }
 
     @Test
@@ -285,7 +304,7 @@ public class ControllerTest {
                 .passwordRepeat("12345")
                 .build();
 
-        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT)).when(userService).addUser(any());
+        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT)).when(userService).addUser(any(AddUserReqDTO.class));
         Gson gson = new Gson();
         String requestBody = gson.toJson(addUserReqDTO);
 
@@ -297,6 +316,9 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.password").value("비밀번호가 일치하지 않습니다."))
                 .andExpect(jsonPath("$.message").value("비밀번호가 일치하지 않습니다."))
                 .andDo(print());
+        verify(userService,times(1)).addUser(any(AddUserReqDTO.class));
+        verify(coolSmsService,times(1)).isAuthenticatedNum(any(String.class));
+        verify(coolSmsService,times(0)).deleteAuthInfo(any(String.class));
     }
 
     @Test
@@ -311,7 +333,7 @@ public class ControllerTest {
                 .passwordRepeat("1234")
                 .build();
 
-        doThrow(new CommondException(ExceptionCode.SMS_NOT_AUTHENTICATION)).when(coolSmsService).isAuthenticatedNum(any());
+        doThrow(new CommondException(ExceptionCode.SMS_NOT_AUTHENTICATION)).when(coolSmsService).isAuthenticatedNum(any(String.class));
         Gson gson = new Gson();
         String requestBody = gson.toJson(addUserReqDTO);
 
@@ -323,13 +345,16 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.phoneNum").value("인증이 되지않은 번호입니다."))
                 .andExpect(jsonPath("$.message").value("인증이 되지않은 번호입니다."))
                 .andDo(print());
+        verify(userService,times(0)).addUser(any(AddUserReqDTO.class));
+        verify(coolSmsService,times(1)).isAuthenticatedNum(any(String.class));
+        verify(coolSmsService,times(0)).deleteAuthInfo(any(String.class));
     }
 
     @Test
     @DisplayName("이메일 중복 테스트 -> (중복체크 성공)")
     public void emailDupCheckSuccess() throws Exception {
         //given
-        given(userService.emailDuplicatedChecking(any())).willReturn(false);
+        given(userService.emailDuplicatedChecking(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/email/check")
@@ -339,13 +364,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data").value("false"))
                 .andExpect(jsonPath("$.message").value("이메일 중복체크 완료"))
                 .andDo(print());
+        verify(userService,times(1)).emailDuplicatedChecking(any(String.class));
     }
 
     @Test
     @DisplayName("이메일 중복 테스트 -> (중복체크 실패 : 이메일 형식예외)")
     public void emailDupCheckFail1() throws Exception {
         //given
-        given(userService.emailDuplicatedChecking(any())).willReturn(false);
+        given(userService.emailDuplicatedChecking(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/email/check")
@@ -355,13 +381,15 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.email").value("이메일 형식이 올바르지 않습니다"))
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
+        verify(userService,times(0)).emailDuplicatedChecking(any(String.class));
+
     }
 
     @Test
     @DisplayName("이메일 중복 테스트 -> (중복체크 실패 : 이메일값 공백)")
     public void emailDupCheckFail2() throws Exception {
         //given
-        given(userService.emailDuplicatedChecking(any())).willReturn(false);
+        given(userService.emailDuplicatedChecking(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/email/check")
@@ -371,13 +399,15 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.email").value("이메일 정보를 입력해주세요"))
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
+        verify(userService,times(0)).emailDuplicatedChecking(any(String.class));
+
     }
 
     @Test
     @DisplayName("이메일 중복 테스트 -> (중복체크 실패 : 이메일값 파라미터 없음)")
     public void emailDupCheckFail3() throws Exception {
         //given
-        given(userService.emailDuplicatedChecking(any())).willReturn(false);
+        given(userService.emailDuplicatedChecking(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/email/check")
@@ -386,13 +416,15 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.email").value("Required request parameter 'email' for method parameter type String is not present(관리자에게 문의하세요)"))
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
+        verify(userService,times(0)).emailDuplicatedChecking(any(String.class));
+
     }
 
     @Test
     @DisplayName("닉네임 중복 테스트 -> (중복체크 성공)")
     public void nickNameDupCheckSuccess() throws Exception {
         //given
-        given(userService.nickNameDuplicatedChecking(any())).willReturn(false);
+        given(userService.nickNameDuplicatedChecking(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/nickname/check")
@@ -402,13 +434,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data").value("false"))
                 .andExpect(jsonPath("$.message").value("닉네임 중복체크 완료"))
                 .andDo(print());
+        verify(userService,times(1)).nickNameDuplicatedChecking(any(String.class));
     }
 
     @Test
     @DisplayName("닉네임 중복 테스트 -> (중복체크 실패 : 닉네임 공백)")
     public void nickNameDupCheckFail1() throws Exception {
         //given
-        given(userService.nickNameDuplicatedChecking(any())).willReturn(false);
+        given(userService.nickNameDuplicatedChecking(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/nickname/check")
@@ -418,13 +451,15 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.nickName").value("닉네임 정보를 입력해주세요"))
                 .andDo(print());
+        verify(userService,times(0)).nickNameDuplicatedChecking(any(String.class));
+
     }
 
     @Test
     @DisplayName("닉네임 중복 테스트 -> (중복체크 실패 : 닉네임파라미터 없음)")
     public void nickNameDupCheckFail2() throws Exception {
         //given
-        given(userService.nickNameDuplicatedChecking(any())).willReturn(false);
+        given(userService.nickNameDuplicatedChecking(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/nickname/check")
@@ -433,6 +468,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.nickName").value("Required request parameter 'nickName' for method parameter type String is not present(관리자에게 문의하세요)"))
                 .andDo(print());
+        verify(userService,times(0)).nickNameDuplicatedChecking(any(String.class));
+
     }
 
     @Test
@@ -446,7 +483,7 @@ public class ControllerTest {
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(phoneAuthReqDTO);
-        given(userService.findEmail(any())).willReturn("test@google.com");
+        given(userService.findEmail(any(String.class))).willReturn("test@google.com");
 
         //when,then
         this.mockMvc.perform(get("/email/find")
@@ -456,6 +493,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("이메일 찾기 성공"))
                 .andExpect(jsonPath("$.data").value("test@google.com"))
                 .andDo(print());
+        verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
+        verify(userService,times(1)).findEmail(any(String.class));
     }
 
     @Test
@@ -479,6 +518,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.phoneNum").value("전화번호를 입력하세요"))
                 .andExpect(jsonPath("$.data.authenticationNumber").value("인증번호를 입력하세요"))
                 .andDo(print());
+        verify(coolSmsService,times(0)).authNumCheck(any(PhoneAuthReqDTO.class));
+        verify(userService,times(0)).findEmail(any(String.class));
     }
 
     @Test
@@ -492,7 +533,7 @@ public class ControllerTest {
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(phoneAuthReqDTO);
-        doThrow(new CommondException(ExceptionCode.SMS_AUTHENTICATION_FAIL)).when(coolSmsService).authNumCheck(any());
+        doThrow(new CommondException(ExceptionCode.SMS_AUTHENTICATION_FAIL)).when(coolSmsService).authNumCheck(any(PhoneAuthReqDTO.class));
 
         //when,then
         this.mockMvc.perform(get("/email/find")
@@ -502,6 +543,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증번호가 올바르지 않습니다"))
                 .andExpect(jsonPath("$.data.authenticationNumber").value("인증번호가 올바르지 않습니다"))
                 .andDo(print());
+        verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
+        verify(userService,times(0)).findEmail(any(String.class));
     }
 
     @Test
@@ -515,7 +558,7 @@ public class ControllerTest {
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(phoneAuthReqDTO);
-        given(userService.findEmail(any())).willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
+        given(userService.findEmail(any(String.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         //when,then
         this.mockMvc.perform(get("/email/find")
@@ -524,6 +567,8 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
+        verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
+        verify(userService,times(1)).findEmail(any(String.class));
     }
 
     @Test
@@ -538,7 +583,7 @@ public class ControllerTest {
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReqDTO);
-        given(userService.findPassword(any())).willReturn("12345");
+        given(userService.findPassword(any(String.class))).willReturn("12345");
 
         //when,then
         this.mockMvc.perform(get("/password/find")
@@ -548,6 +593,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("비밀번호 찾기성공"))
                 .andExpect(jsonPath("$.data").value("12345"))
                 .andDo(print());
+        verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
+        verify(userService,times(1)).findPassword(any(String.class));
     }
 
     @Test
@@ -562,7 +609,7 @@ public class ControllerTest {
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReqDTO);
-        given(userService.findPassword(any())).willReturn("12345");
+        given(userService.findPassword(any(String.class))).willReturn("12345");
 
         //when,then
         this.mockMvc.perform(get("/password/find")
@@ -571,6 +618,8 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
+        verify(coolSmsService,times(0)).authNumCheck(any(PhoneAuthReqDTO.class));
+        verify(userService,times(0)).findPassword(any(String.class));
     }
 
     @Test
@@ -585,7 +634,7 @@ public class ControllerTest {
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReqDTO);
-        given(userService.findPassword(any())).willReturn("12345");
+        given(userService.findPassword(any(String.class))).willReturn("12345");
 
         //when,then
         this.mockMvc.perform(get("/password/find")
@@ -595,6 +644,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.email").value("이메일 형식이 올바르지 않습니다"))
                 .andDo(print());
+        verify(coolSmsService,times(0)).authNumCheck(any(PhoneAuthReqDTO.class));
+        verify(userService,times(0)).findPassword(any(String.class));
     }
 
     @Test
@@ -609,7 +660,7 @@ public class ControllerTest {
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReqDTO);
-        doThrow(new CommondException(ExceptionCode.SMS_AUTHENTICATION_FAIL)).when(coolSmsService).authNumCheck(any());
+        doThrow(new CommondException(ExceptionCode.SMS_AUTHENTICATION_FAIL)).when(coolSmsService).authNumCheck(any(PhoneAuthReqDTO.class));
 
         //when,then
         this.mockMvc.perform(get("/password/find")
@@ -619,6 +670,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증번호가 올바르지 않습니다"))
                 .andExpect(jsonPath("$.data.authenticationNumber").value("인증번호가 올바르지 않습니다"))
                 .andDo(print());
+        verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
+        verify(userService,times(0)).findPassword(any(String.class));
     }
 
     @Test
@@ -633,7 +686,7 @@ public class ControllerTest {
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReqDTO);
-        given(userService.findPassword(any())).willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
+        given(userService.findPassword(any(String.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         //when,then
         this.mockMvc.perform(get("/password/find")
@@ -642,6 +695,8 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
+        verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
+        verify(userService,times(1)).findPassword(any(String.class));
     }
 
     @Test
@@ -655,8 +710,8 @@ public class ControllerTest {
                 .email("test@google.com")
                 .build();
 
-        given(jwtProvider.readUserIdByToken(any())).willReturn(1l);
-        given(userService.readUserInfo(any())).willReturn(readUserInfoResDTO);
+        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
+        given(userService.readUserInfo(any(Long.class))).willReturn(readUserInfoResDTO);
 
         //when,then
         this.mockMvc.perform(get("/users")
@@ -667,6 +722,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.nickName").value("nickName"))
                 .andExpect(jsonPath("$.data.phoneNum").value("01056962173"))
                 .andDo(print());
+        verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
+        verify(userService,times(1)).readUserInfo(any(Long.class));
     }
 
     @Test
@@ -680,7 +737,7 @@ public class ControllerTest {
                 .email("test@google.com")
                 .build();
 
-        given(userService.readUserInfo(any())).willReturn(readUserInfoResDTO);
+        given(userService.readUserInfo(any(Long.class))).willReturn(readUserInfoResDTO);
 
         //when,then
         this.mockMvc.perform(get("/users")
@@ -688,6 +745,8 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
+        verify(jwtProvider,times(0)).readUserIdByToken(any(HttpServletRequest.class));
+        verify(userService,times(0)).readUserInfo(any(Long.class));
     }
 
     @Test
@@ -701,7 +760,7 @@ public class ControllerTest {
                 .email("test@google.com")
                 .build();
 
-        given(userService.readUserInfo(any())).willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
+        given(userService.readUserInfo(any(Long.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         //when,then
         this.mockMvc.perform(get("/users")
@@ -709,6 +768,8 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
+        verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
+        verify(userService,times(1)).readUserInfo(any(Long.class));
     }
 
     @Test
@@ -724,6 +785,7 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(updateUserInfoReqDTO);
+        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -732,6 +794,8 @@ public class ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("유저정보 변경 성공"))
                 .andDo(print());
+        verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
+        verify(userService,times(1)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -747,6 +811,7 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(updateUserInfoReqDTO);
+        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -755,6 +820,8 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
+        verify(jwtProvider,times(0)).readUserIdByToken(any(HttpServletRequest.class));
+        verify(userService,times(0)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -770,6 +837,7 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(updateUserInfoReqDTO);
+        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -778,6 +846,8 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
+        verify(jwtProvider,times(0)).readUserIdByToken(any(HttpServletRequest.class));
+        verify(userService,times(0)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -793,8 +863,7 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(updateUserInfoReqDTO);
-        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT)).when(userService).updateUserInfo(any(),any());
-
+        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT)).when(userService).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -804,6 +873,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("비밀번호가 일치하지 않습니다."))
                 .andExpect(jsonPath("$.data.password").value("비밀번호가 일치하지 않습니다."))
                 .andDo(print());
+        verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
+        verify(userService,times(1)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -819,8 +890,7 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(updateUserInfoReqDTO);
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(userService).updateUserInfo(any(),any());
-
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(userService).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -829,6 +899,8 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
+        verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
+        verify(userService,times(1)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -851,6 +923,7 @@ public class ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("유저 삭제완료"))
                 .andDo(print());
+        verify(userService,times(1)).deleteUser(any(DeleteUserReqDTO.class));
     }
 
     @Test
@@ -873,6 +946,7 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
+        verify(userService,times(0)).deleteUser(any(DeleteUserReqDTO.class));
     }
 
     @Test
@@ -887,7 +961,7 @@ public class ControllerTest {
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(deleteUserReqDTO);
-        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT)).when(userService).deleteUser(any());
+        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT)).when(userService).deleteUser(any(DeleteUserReqDTO.class));
 
         //when,then
         this.mockMvc.perform(delete("/users")
@@ -897,6 +971,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("비밀번호가 일치하지 않습니다."))
                 .andExpect(jsonPath("$.data.password").value("비밀번호가 일치하지 않습니다."))
                 .andDo(print());
+        verify(userService,times(1)).deleteUser(any(DeleteUserReqDTO.class));
     }
 
     @Test
@@ -911,7 +986,7 @@ public class ControllerTest {
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(deleteUserReqDTO);
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(userService).deleteUser(any());
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(userService).deleteUser(any(DeleteUserReqDTO.class));
 
         //when,then
         this.mockMvc.perform(delete("/users")
@@ -920,6 +995,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
+        verify(userService,times(1)).deleteUser(any(DeleteUserReqDTO.class));
     }
 
     @Test
@@ -942,6 +1018,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
+        verify(userService,times(0)).deleteUser(any(DeleteUserReqDTO.class));
     }
 
     @Test
@@ -964,5 +1041,6 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
+        verify(userService,times(0)).deleteUser(any(DeleteUserReqDTO.class));
     }
 }

@@ -13,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashMap;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,20 +36,21 @@ public class ServiceTest {
     @DisplayName("인증문자 보내기테스트 -> (성공)")
     public void sendMessageSuccess() throws CoolsmsException {
         //given
-        given(coolsms.send(any())).willReturn(new JSONObject());
+        given(coolsms.send(any(HashMap.class))).willReturn(new JSONObject());
 
         //when
         String authenticationNumber = coolSmsService.sendMessage(testPhoneNum);
 
         //then
         assertThat(coolSmsService.getAuthenticationNumberMap().get(testPhoneNum)).isEqualTo(authenticationNumber);
+        verify(coolsms,times(1)).send(any(HashMap.class));
     }
 
     @Test
     @DisplayName("인증문자 보내기테스트 -> (실패 : coolsms 내부 문제)")
     public void sendMessageFail1() throws CoolsmsException {
         //given
-        given(coolsms.send(any())).willThrow(CoolsmsException.class);
+        given(coolsms.send(any(HashMap.class))).willThrow(CoolsmsException.class);
 
         // when, then
         try{
@@ -55,6 +58,7 @@ public class ServiceTest {
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.COOLSMS_EXCEPTION);
+            verify(coolsms,times(1)).send(any(HashMap.class));
         }
     }
 
@@ -69,7 +73,7 @@ public class ServiceTest {
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_PHONENUM);
-            verify(coolsms,times(0)).send(any());
+            verify(coolsms,times(0)).send(any(HashMap.class));
         }
     }
 

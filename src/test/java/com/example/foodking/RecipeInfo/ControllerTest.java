@@ -88,7 +88,7 @@ public class ControllerTest {
         //given
         Gson gson = new Gson();
         String requestBody = gson.toJson(addRecipeReqDTO);
-        given(jwtProvider.readUserIdByToken(any())).willReturn(1l);
+        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -109,7 +109,7 @@ public class ControllerTest {
         //given
         Gson gson = new Gson();
         String requestBody = gson.toJson(addRecipeReqDTO);
-        given(jwtProvider.readUserIdByToken(any())).willReturn(1l);
+        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -134,7 +134,7 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(addRecipeReqDTO);
-        given(jwtProvider.readUserIdByToken(any())).willReturn(1l);
+        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -155,7 +155,7 @@ public class ControllerTest {
         //given
         Gson gson = new Gson();
         String requestBody = gson.toJson(addRecipeReqDTO);
-        given(jwtProvider.readUserIdByToken(any())).willReturn(1l);
+        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(recipeInfoService).addRecipeInfo(any(AddRecipeReqDTO.class),any(Long.class));
 
         //when, then

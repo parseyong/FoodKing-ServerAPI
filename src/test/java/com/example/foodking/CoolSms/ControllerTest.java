@@ -54,14 +54,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증번호 전송"))
                 .andDo(print());
 
-        verify(coolSmsService).sendMessage(any());
+        verify(coolSmsService,times(1)).sendMessage(any(String.class));
     }
 
     @Test
     @DisplayName("문자보내기 테스트 -> (실패 : 전화번호 형식 예외)")
     public void sendMessageFail1() throws Exception {
         //given
-        given(coolSmsService.sendMessage(any())).willThrow(new CommondException(ExceptionCode.NOT_PHONENUM));
+        given(coolSmsService.sendMessage(any(String.class))).willThrow(new CommondException(ExceptionCode.NOT_PHONENUM));
 
         //when,then
         this.mockMvc.perform(get("/messages")
@@ -71,14 +71,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바른 전화번호 형식이 아닙니다"))
                 .andDo(print());
 
-        verify(coolSmsService).sendMessage(any());
+        verify(coolSmsService,times(1)).sendMessage(any(String.class));
     }
 
     @Test
     @DisplayName("문자보내기 테스트 -> (실패 : Coolsms 내부 문제)")
     public void sendMessageFail2() throws Exception {
         //given
-        given(coolSmsService.sendMessage(any())).willThrow(new CommondException(ExceptionCode.COOLSMS_EXCEPTION));
+        given(coolSmsService.sendMessage(any(String.class))).willThrow(new CommondException(ExceptionCode.COOLSMS_EXCEPTION));
 
         //when,then
         this.mockMvc.perform(get("/messages")
@@ -88,7 +88,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증시스템에 문제가 발생했습니다"))
                 .andDo(print());
 
-        verify(coolSmsService).sendMessage(any());
+        verify(coolSmsService,times(1)).sendMessage(any(String.class));
     }
 
     @Test
@@ -104,6 +104,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.phoneNum").value("Required request parameter 'phoneNum' for method parameter type String is not present(관리자에게 문의하세요)"))
                 .andDo(print());
 
+        verify(coolSmsService,times(0)).sendMessage(any(String.class));
     }
 
     @Test
@@ -119,6 +120,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.phoneNum").value("전화번호를 입력해주세요"))
                 .andDo(print());
+
+        verify(coolSmsService,times(0)).sendMessage(any(String.class));
     }
 
     @Test
@@ -139,7 +142,7 @@ public class ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("인증 성공!"))
                 .andDo(print());
-        verify(coolSmsService).authNumCheck(any());
+        verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
     }
 
     @Test
@@ -161,7 +164,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.phoneNum").value("전화번호를 입력하세요"))
                 .andDo(print());
-        verify(coolSmsService,times(0)).authNumCheck(any());
+        verify(coolSmsService,times(0)).authNumCheck(any(PhoneAuthReqDTO.class));
     }
 
     @Test
@@ -174,7 +177,7 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(phoneAuthReqDTO);
-        doThrow(new CommondException(ExceptionCode.SMS_AUTHENTICATION_FAIL)).when(coolSmsService).authNumCheck(any());
+        doThrow(new CommondException(ExceptionCode.SMS_AUTHENTICATION_FAIL)).when(coolSmsService).authNumCheck(any(PhoneAuthReqDTO.class));
 
 
         //when ,then
@@ -184,6 +187,6 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("인증번호가 올바르지 않습니다"))
                 .andDo(print());
-        verify(coolSmsService,times(1)).authNumCheck(any());
+        verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
     }
 }
