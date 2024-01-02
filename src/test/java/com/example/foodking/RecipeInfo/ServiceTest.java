@@ -18,7 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +50,7 @@ public class ServiceTest {
     private List<AddIngredientReqDTO> addIngredientReqDTOList;
     private List<AddRecipeWayInfoReqDTO> addRecipeWayInfoReqDTOList;
     private AddRecipeReqDTO addRecipeReqDTO;
+    private RecipeInfo recipeInfo;
     private User user;
 
     @BeforeEach
@@ -89,6 +93,10 @@ public class ServiceTest {
                 .addIngredientReqDTOList(addIngredientReqDTOList)
                 .addRecipeWayInfoReqDTOList(addRecipeWayInfoReqDTOList)
                 .build();
+
+        this.recipeInfo = RecipeInfo.builder()
+                .user(user)
+                .build();
     }
 
     @Test
@@ -121,6 +129,98 @@ public class ServiceTest {
             verify(ingredientRepository,times(0)).saveAll(any(List.class));
             verify(recipeWayInfoRepository,times(0)).saveAll(any(List.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
+        }
+    }
+
+    /*
+        MockMultipartFile은 Spring Framework에서 제공하는 테스트용 MultipartFile 구현체로
+        MultipartFile 객체를 흉내내어 생성하는 데 사용된다. 파라미터는 다음과 같다
+        name : 클라이언트에서 multipartFile을 업로드할때 지정하는 이름
+        originFileName : 기존 파일 명
+        contentType : 파일의 컨텐츠 타입 또는 MIME 타입
+        content : 업로드된 파일의 바이트 배열, mock객체이기때문에 실제파일의 바이트배열이 아니여도 된다.
+    */
+    @Test
+    @DisplayName("이미지 등록테스트 -> (성공)")
+    public void addImageSucess() {
+        //given
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
+        MockMultipartFile newImage = new MockMultipartFile(
+                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
+        );
+
+        //when
+        String savedImagePath = recipeInfoService.addImage(newImage,1l);
+        File newFile = new File(savedImagePath);
+
+        //then
+        verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
+        assertThat(newFile.exists()).isTrue();
+    }
+
+    @Test
+    @DisplayName("이미지 수정테스트 -> (성공)")
+    public void updateImageSucess() throws IOException {
+        //given
+        recipeInfo.addRecipeImage("C:/upload/testOldImage");
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
+        MockMultipartFile newImage = new MockMultipartFile(
+                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
+        );
+        MockMultipartFile oldImage = new MockMultipartFile(
+                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
+        );
+        File oldFile = new File(recipeInfo.getRecipeImage());
+        oldImage.transferTo(oldFile);
+        assertThat(oldFile.exists()).isTrue();
+
+        //when
+        String savedImagePath = recipeInfoService.addImage(newImage,1l);
+        File newFile = new File(savedImagePath);
+
+        //then
+        verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
+        assertThat(newFile.exists()).isTrue();
+        assertThat(oldFile.exists()).isFalse();
+    }
+
+    @Test
+    @DisplayName("이미지 등록/수정 테스트 -> (실패 : 존재하지 않는 레시피)")
+    public void updateImageFail1(){
+        //given
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.empty());
+        MockMultipartFile newImage = new MockMultipartFile(
+                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
+        );
+
+        //when,then
+        try{
+            recipeInfoService.addImage(newImage,1l);
+            fail("예외가 발생하지 않음");
+
+        }catch (CommondException ex){
+            //then
+            verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
+            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_RECIPEINFO);
+        }
+    }
+
+    @Test
+    @DisplayName("이미지 등록/수정 테스트 -> (실패 : 파일이 없음)")
+    public void updateImageFail2(){
+        //given
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
+
+        MockMultipartFile newImage = null;
+
+        //when,then
+        try{
+            recipeInfoService.addImage(newImage,1l);
+            fail("예외가 발생하지 않음");
+        }catch (CommondException ex){
+            //then
+            verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
+            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.INVALID_SAVE_FILE);
         }
     }
 
@@ -165,6 +265,5 @@ public class ServiceTest {
         assertThat(recipeWayInfoList.get(0).getRecipeOrder()).isEqualTo(1l);
         assertThat(recipeWayInfoList.get(1).getRecipeOrder()).isEqualTo(2l);
         System.out.println("AddRecipeReqDTO -> recipeWayInfoList 변환성공");
-
     }
 }

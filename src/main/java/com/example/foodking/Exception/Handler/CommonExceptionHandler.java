@@ -11,11 +11,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolation;
@@ -39,6 +42,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
     }
 
+    // requestParam으로 입력받은 값의 유효성검사 실패 시
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<CommonResDTO> handleContranintViolation(ConstraintViolationException ex){
         Map<String, String> errors = new HashMap<>();
@@ -52,7 +56,10 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
                 fieldName="phoneNum";
             else if(fieldName.contains("nickName"))
                 fieldName="nickName";
-
+            else if(fieldName.contains("recipeInfoId"))
+                fieldName="recipeInfoId";
+            else if(fieldName.contains("recipeImage"))
+                fieldName="recipeImage";
             String message = violation.getMessage();
             errors.put(fieldName,message);
         }
@@ -71,10 +78,28 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
         errors.put(ex.getParameterName(), ex.getMessage()+"(관리자에게 문의하세요)");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
     }
+    /*
+        Multipart 파일입력 시 Multipart로 받은 값이 존재하지 않을때 발생하는 예외처리 로직
+        클라이언트 개발자가 폼데이터를통해 파일입력요청을 보내지 않았을 때 발생
+    */
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<CommonResDTO> handleMultipartException(MultipartException ex){
+        Map<String, String> errors = new HashMap<>();
+        errors.put("recipeImage","파일이 존재하지 않습니다. 관리자에게 문의하세요");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
+    }
+
+    // PathVariable로 입력받은 값이 공백일 경우 발생하는 예외처리
+    @Override
+    protected ResponseEntity<Object> handleMissingPathVariable(
+            MissingPathVariableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(CommonResDTO.of("올바른 요청이 아닙니다.",null));
+    }
 
     // 커스텀 예외발생 시
     @ExceptionHandler(CommondException.class)
-    public ResponseEntity<CommonResDTO> commandExceptionHandler(CommondException ex){
+    public ResponseEntity<CommonResDTO> handleCommandException(CommondException ex){
         Map<String, String> errors = new HashMap<>();
         String fieldName = ex.getExceptionCode().getFieldName();
         if(fieldName != null)
@@ -95,6 +120,20 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
         String message = "서버 내부에 에러가 발생했습니다. : 올바른 ENUM타입이 아닙니다. 관리자에게 문의하세요";
         log.error(message+":"+ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResDTO.of(message,null));
+    }
+
+    // @PathVariable로 입력받은 값의 타입이 올바르지 않을 때
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<CommonResDTO> handleMethodArgTypeException(MethodArgumentTypeMismatchException ex){
+        Map<String ,String> map= new HashMap<>();
+
+        String fieldName = ex.getName();
+        String requiredType = ex.getRequiredType().getSimpleName();
+        String message = fieldName+"이 "+requiredType+"타입이여야 합니다.";
+        map.put("fieldName",fieldName);
+        map.put("requiredType",requiredType);
+        log.error("URI값이 올바르지 않습니다. - "+ map.toString());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of(message,map));
     }
 
     @ExceptionHandler
@@ -119,6 +158,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(status).body(CommonResDTO.of("원인을 알 수 없는 예외가 발생했습니다.",cause));
     }
 
+    //요청 메소드가 올바르지 않을 때
     @Override
     protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         String message = "올바른 요청이 아닙니다.";

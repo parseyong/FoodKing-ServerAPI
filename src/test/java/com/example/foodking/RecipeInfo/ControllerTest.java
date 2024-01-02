@@ -16,9 +16,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -27,6 +31,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -168,5 +173,153 @@ public class ControllerTest {
 
         verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
         verify(recipeInfoService,times(1)).addRecipeInfo(any(AddRecipeReqDTO.class),any(Long.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("레시피 이미지 등록테스트 -> (성공)")
+    public void addImageSuccess() throws Exception {
+        //given
+        MockMultipartFile newImage = new MockMultipartFile(
+                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
+        );
+
+        //when, then
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
+                        .file(newImage)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value("이미지 등록완료"));
+
+        verify(recipeInfoService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
+    }
+
+    @Test
+    @WithAnonymousUser
+    @DisplayName("레시피 이미지 등록테스트 -> (실패 : 인증실패)")
+    public void addImageFail1() throws Exception {
+        //given
+        MockMultipartFile newImage = new MockMultipartFile(
+                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
+        );
+
+        //when, then
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
+                        .file(newImage)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"));
+
+        verify(recipeInfoService,times(0)).addImage(any(MultipartFile.class),any(Long.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("레시피 이미지 등록테스트 -> (실패 : pathVariable 타입예외)")
+    public void addImageFail2() throws Exception {
+        //given
+        MockMultipartFile newImage = new MockMultipartFile(
+                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
+        );
+
+        //when, then
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", "ㅎㅇ")
+                        .file(newImage)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
+                .andExpect(jsonPath("$.data.fieldName").value("recipeInfoId"))
+                .andExpect(jsonPath("$.data.requiredType").value("Long"));
+
+        verify(recipeInfoService,times(0)).addImage(any(MultipartFile.class),any(Long.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("레시피 이미지 등록테스트 -> (실패 : pathVariable값 공백)")
+    public void addImageFail3() throws Exception {
+        //given
+        MockMultipartFile newImage = new MockMultipartFile(
+                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
+        );
+
+        //when, then
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", " ")
+                        .file(newImage)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
+
+        verify(recipeInfoService,times(0)).addImage(any(MultipartFile.class),any(Long.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("레시피 이미지 등록테스트 -> (실패 : IOException)")
+    public void addImageFail4() throws Exception {
+        //given
+        MockMultipartFile newImage = new MockMultipartFile(
+                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
+        );
+        given(recipeInfoService.addImage(any(MultipartFile.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.FILE_IOEXCEPTION));
+
+        //when, then
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
+                        .file(newImage)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("파일 저장중 문제가 발생했습니다."))
+                .andExpect(jsonPath("$.data.recipeImage").value("파일 저장중 문제가 발생했습니다."));
+
+        verify(recipeInfoService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("레시피 이미지 등록테스트 -> (실패 : 파일이 없거나 저장할 수 없는파일)")
+    public void addImageFail5() throws Exception {
+        //given
+        MockMultipartFile newImage = new MockMultipartFile(
+                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
+        );
+        given(recipeInfoService.addImage(any(MultipartFile.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.INVALID_SAVE_FILE));
+
+        //when, then
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
+                        .file(newImage)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("등록할 파일이 존재하지 않습니다. 파일을 추가해주세요."))
+                .andExpect(jsonPath("$.data.recipeImage").value("등록할 파일이 존재하지 않습니다. 파일을 추가해주세요."));
+
+        verify(recipeInfoService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("레시피 이미지 등록테스트 -> (실패 : 존재하지 않는 레시피)")
+    public void addImageFail6() throws Exception {
+        //given
+        MockMultipartFile newImage = new MockMultipartFile(
+                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
+        );
+        given(recipeInfoService.addImage(any(MultipartFile.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+
+        //when, then
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
+                        .file(newImage)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
+                .andExpect(jsonPath("$.data.recipeInfoId").value("존재하지 않는 레시피입니다"));
+
+        verify(recipeInfoService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
     }
 }

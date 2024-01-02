@@ -12,7 +12,10 @@ public enum ExceptionCode {
     NICKNAME_DUPLICATED(HttpStatus.BAD_REQUEST,"중복된 닉네임입니다","nickName"),
     PASSWORD_NOT_COLLECT(HttpStatus.BAD_REQUEST,"비밀번호가 일치하지 않습니다.","password"),
     NOT_PHONENUM(HttpStatus.BAD_REQUEST,"올바른 전화번호 형식이 아닙니다","phoneNum"),
-    NOT_EXIST_USER(HttpStatus.BAD_REQUEST,"존재하지 않는 유저입니다",null);
+    NOT_EXIST_USER(HttpStatus.BAD_REQUEST,"존재하지 않는 유저입니다",null),
+    NOT_EXIST_RECIPEINFO(HttpStatus.BAD_REQUEST,"존재하지 않는 레시피입니다","recipeInfoId"),
+    INVALID_SAVE_FILE(HttpStatus.BAD_REQUEST,"등록할 파일이 존재하지 않습니다. 파일을 추가해주세요.","recipeImage"),
+    FILE_IOEXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"파일 저장중 문제가 발생했습니다.","recipeImage");
 
     private final HttpStatus status;
     private final String field;
