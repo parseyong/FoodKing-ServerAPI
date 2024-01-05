@@ -20,8 +20,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,8 +29,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -321,5 +318,93 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.recipeInfoId").value("존재하지 않는 레시피입니다"));
 
         verify(recipeInfoService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("이미지 삭제 테스트 -> (성공)")
+    public void deleteImageSuccess() throws Exception {
+        //when, then
+        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1l)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("이미지 삭제완료"))
+                .andDo(print());
+        verify(recipeInfoService,times(1)).deleteImage(any(Long.class));
+    }
+
+    @Test
+    @WithAnonymousUser
+    @DisplayName("이미지 삭제 테스트 -> (실패 : 인증되지 않은 유저)")
+    public void deleteImageFail1() throws Exception {
+        //when, then
+        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1l)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
+                .andDo(print());
+        verify(recipeInfoService,times(0)).deleteImage(any(Long.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("이미지 삭제 테스트 -> (실패 : 존재하지 않는 레시피)")
+    public void deleteImageFail2() throws Exception {
+        //given
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO)).when(recipeInfoService).deleteImage(any(Long.class));
+
+        //when, then
+        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1l)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
+                .andDo(print());
+        verify(recipeInfoService,times(1)).deleteImage(any(Long.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("이미지 삭제 테스트 -> (실패 : 삭제할 파일이 없음)")
+    public void deleteImageFail3() throws Exception {
+        //given
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_FILE)).when(recipeInfoService).deleteImage(any(Long.class));
+
+        //when, then
+        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1l)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("파일이 존재하지 않습니다"))
+                .andDo(print());
+        verify(recipeInfoService,times(1)).deleteImage(any(Long.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("이미지 삭제 테스트 -> (실패 : pathVariable 타입예외)")
+    public void deleteImageFail4() throws Exception {
+        //when, then
+        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}","ㅎㅇ")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
+                .andExpect(jsonPath("$.data.fieldName").value("recipeInfoId"))
+                .andExpect(jsonPath("$.data.requiredType").value("Long"))
+                .andDo(print());
+
+        verify(recipeInfoService,times(0)).deleteImage(any(Long.class));
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("이미지 삭제 테스트 -> (실패 : pathVariable 공백)")
+    public void deleteImageFail5() throws Exception {
+        //when, then
+        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}"," ")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."))
+                .andDo(print());
+
+        verify(recipeInfoService,times(0)).deleteImage(any(Long.class));
     }
 }

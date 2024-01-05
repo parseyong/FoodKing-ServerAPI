@@ -225,6 +225,66 @@ public class ServiceTest {
     }
 
     @Test
+    @DisplayName("이미지 삭제 테스트 -> (성공)")
+    public void deleteImageSuccess() throws IOException {
+        //given
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
+        MockMultipartFile newImage = new MockMultipartFile(
+                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
+        );
+        recipeInfo.addRecipeImage("C:/upload/testImage.png"); // 테스트를 위해 임의의 문자열값을 저장
+        File file = new File(recipeInfo.getRecipeImage());
+        newImage.transferTo(file);
+        assertThat(file.exists()).isTrue();
+
+        //when
+        recipeInfoService.deleteImage(1l);
+
+        //then
+        verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
+        verify(recipeInfoRepository,times(1)).findById(any(Long.class));
+        assertThat(file.exists()).isFalse();
+        assertThat(recipeInfo.getRecipeImage()).isEqualTo(null);
+    }
+
+    @Test
+    @DisplayName("이미지 삭제 테스트 -> (실패 : 존재하지 않는 레시피)")
+    public void deleteImageFail1(){
+        //given
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.empty());
+
+        //when,then
+        try{
+            recipeInfoService.deleteImage(1l);
+            fail("예외가 발생하지 않음");
+        }catch (CommondException ex){
+            //then
+            verify(recipeInfoRepository,times(1)).findById(any(Long.class));
+            verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
+            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_RECIPEINFO);
+        }
+    }
+
+    @Test
+    @DisplayName("이미지 삭제 테스트 -> (실패 : 삭제할 파일 없음)")
+    public void deleteImageFail2(){
+        //given
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
+
+        //when,then
+        try{
+            recipeInfoService.deleteImage(1l);
+            fail("예외가 발생하지 않음");
+        }catch (CommondException ex){
+            //then
+            verify(recipeInfoRepository,times(1)).findById(any(Long.class));
+            verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
+            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_FILE);
+        }
+
+    }
+
+    @Test
     @DisplayName("DTO와 엔티티간 변환 테스트")
     public void toEntityAndToDtoTest(){
         RecipeInfo recipeInfo = AddRecipeReqDTO.toRecipeInfoEntity(addRecipeReqDTO,user);

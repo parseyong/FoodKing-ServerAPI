@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 @RestController
 @Validated
@@ -38,5 +37,12 @@ public class RecipeInfoController {
 
         recipeInfoService.addImage(recipeImage,recipeInfoId);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("이미지 등록완료",null));
+    }
+
+    @DeleteMapping ("/recipes/images/{recipeInfoId}")
+    public ResponseEntity<CommonResDTO> deleteImage(@PathVariable Long recipeInfoId) {
+
+        recipeInfoService.deleteImage(recipeInfoId);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이미지 삭제완료",null));
     }
 }

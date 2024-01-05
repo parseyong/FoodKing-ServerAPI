@@ -89,6 +89,9 @@ public class RecipeInfo extends TimeEntity {
     public void addRecipeImage(String recipeImage){
         this.recipeImage=recipeImage;
     }
+    public void deleteRecipeImage(){
+        this.recipeImage=null;
+    }
     public void changeRecipeTip(String recipeTip){
         this.recipeTip=recipeTip;
     }

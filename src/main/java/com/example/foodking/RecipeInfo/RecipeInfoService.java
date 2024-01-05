@@ -86,4 +86,18 @@ public class RecipeInfoService {
         recipeInfoRepository.save(recipeInfo);
         return savedPath;
     }
+
+    @Transactional
+    public void deleteImage(Long recipeInfoId){
+        RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+
+        if(recipeInfo.getRecipeImage() ==null){
+            throw new CommondException(ExceptionCode.NOT_EXIST_FILE);
+        }
+        File file = new File(recipeInfo.getRecipeImage());
+        file.delete();
+        recipeInfo.deleteRecipeImage();
+        recipeInfoRepository.save(recipeInfo);
+    }
 }
