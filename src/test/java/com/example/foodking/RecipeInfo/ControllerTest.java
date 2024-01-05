@@ -1,5 +1,6 @@
 package com.example.foodking.RecipeInfo;
 
+import com.example.foodking.Auth.CustomUserDetailsService;
 import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Config.SecurityConfig;
 import com.example.foodking.Exception.CommondException;
@@ -17,12 +18,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,13 +38,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = RecipeInfoController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtProvider.class})
 public class ControllerTest {
 
     @MockBean
-    private JwtProvider jwtProvider;
-    @MockBean
     private RecipeInfoService recipeInfoService;
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
     @Autowired
     private MockMvc mockMvc;
     private List<AddIngredientReqDTO> addIngredientReqDTOList;
@@ -84,13 +87,13 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("레시피 등록테스트 -> (성공)")
     public void addRecipeInfoSuccess() throws Exception {
         //given
+        makeAuthentication();
         Gson gson = new Gson();
         String requestBody = gson.toJson(addRecipeReqDTO);
-        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -100,18 +103,16 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("레시피 등록완료"))
                 .andDo(print());
 
-        verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
         verify(recipeInfoService,times(1)).addRecipeInfo(any(AddRecipeReqDTO.class),any(Long.class));
     }
 
     @Test
-    @WithAnonymousUser
+    //@WithAnonymousUser
     @DisplayName("레시피 등록테스트 -> (실패 : 인증실패)")
     public void addRecipeInfoFail() throws Exception {
         //given
         Gson gson = new Gson();
         String requestBody = gson.toJson(addRecipeReqDTO);
-        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -121,22 +122,21 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
 
-        verify(jwtProvider,times(0)).readUserIdByToken(any(HttpServletRequest.class));
         verify(recipeInfoService,times(0)).addRecipeInfo(any(AddRecipeReqDTO.class),any(Long.class));
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("레시피 등록테스트 -> (실패 : 입력값 공백)")
     public void addRecipeInfoFai2() throws Exception {
         //given
+        makeAuthentication();
         AddRecipeReqDTO addRecipeReqDTO = AddRecipeReqDTO.builder()
                 .addIngredientReqDTOList(addIngredientReqDTOList)
                 .addRecipeWayInfoReqDTOList(addRecipeWayInfoReqDTOList)
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(addRecipeReqDTO);
-        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -146,18 +146,17 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
 
-        verify(jwtProvider,times(0)).readUserIdByToken(any(HttpServletRequest.class));
         verify(recipeInfoService,times(0)).addRecipeInfo(any(AddRecipeReqDTO.class),any(Long.class));
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("레시피 등록테스트 -> (실패 : 존재하지 않는 유저)")
     public void addRecipeInfoFai3() throws Exception {
         //given
+        makeAuthentication();
         Gson gson = new Gson();
         String requestBody = gson.toJson(addRecipeReqDTO);
-        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(recipeInfoService).addRecipeInfo(any(AddRecipeReqDTO.class),any(Long.class));
 
         //when, then
@@ -168,15 +167,15 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
 
-        verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
         verify(recipeInfoService,times(1)).addRecipeInfo(any(AddRecipeReqDTO.class),any(Long.class));
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("레시피 이미지 등록테스트 -> (성공)")
     public void addImageSuccess() throws Exception {
         //given
+        makeAuthentication();
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
@@ -193,7 +192,7 @@ public class ControllerTest {
     }
 
     @Test
-    @WithAnonymousUser
+    //@WithAnonymousUser
     @DisplayName("레시피 이미지 등록테스트 -> (실패 : 인증실패)")
     public void addImageFail1() throws Exception {
         //given
@@ -213,10 +212,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("레시피 이미지 등록테스트 -> (실패 : pathVariable 타입예외)")
     public void addImageFail2() throws Exception {
         //given
+        makeAuthentication();
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
@@ -235,10 +235,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("레시피 이미지 등록테스트 -> (실패 : pathVariable값 공백)")
     public void addImageFail3() throws Exception {
         //given
+        makeAuthentication();
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
@@ -255,10 +256,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("레시피 이미지 등록테스트 -> (실패 : IOException)")
     public void addImageFail4() throws Exception {
         //given
+        makeAuthentication();
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
@@ -277,10 +279,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("레시피 이미지 등록테스트 -> (실패 : 파일이 없거나 저장할 수 없는파일)")
     public void addImageFail5() throws Exception {
         //given
+        makeAuthentication();
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
@@ -299,10 +302,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("레시피 이미지 등록테스트 -> (실패 : 존재하지 않는 레시피)")
     public void addImageFail6() throws Exception {
         //given
+        makeAuthentication();
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
@@ -321,10 +325,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("이미지 삭제 테스트 -> (성공)")
     public void deleteImageSuccess() throws Exception {
         //when, then
+        makeAuthentication();
         this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1l)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -334,7 +339,7 @@ public class ControllerTest {
     }
 
     @Test
-    @WithAnonymousUser
+    //@WithAnonymousUser
     @DisplayName("이미지 삭제 테스트 -> (실패 : 인증되지 않은 유저)")
     public void deleteImageFail1() throws Exception {
         //when, then
@@ -347,10 +352,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("이미지 삭제 테스트 -> (실패 : 존재하지 않는 레시피)")
     public void deleteImageFail2() throws Exception {
         //given
+        makeAuthentication();
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO)).when(recipeInfoService).deleteImage(any(Long.class));
 
         //when, then
@@ -363,10 +369,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("이미지 삭제 테스트 -> (실패 : 삭제할 파일이 없음)")
     public void deleteImageFail3() throws Exception {
         //given
+        makeAuthentication();
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_FILE)).when(recipeInfoService).deleteImage(any(Long.class));
 
         //when, then
@@ -379,10 +386,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("이미지 삭제 테스트 -> (실패 : pathVariable 타입예외)")
     public void deleteImageFail4() throws Exception {
         //when, then
+        makeAuthentication();
         this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}","ㅎㅇ")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -395,10 +403,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("이미지 삭제 테스트 -> (실패 : pathVariable 공백)")
     public void deleteImageFail5() throws Exception {
         //when, then
+        makeAuthentication();
         this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}"," ")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -406,5 +415,13 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipeInfoService,times(0)).deleteImage(any(Long.class));
+    }
+
+    public void makeAuthentication(){
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(1l,"1234",authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

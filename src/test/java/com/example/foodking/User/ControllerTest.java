@@ -1,5 +1,6 @@
 package com.example.foodking.User;
 
+import com.example.foodking.Auth.CustomUserDetailsService;
 import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Config.SecurityConfig;
 import com.example.foodking.CoolSms.CoolSmsService;
@@ -15,11 +16,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -30,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = UserController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtProvider.class})
 public class ControllerTest {
 
     @MockBean
@@ -38,9 +43,10 @@ public class ControllerTest {
     @MockBean
     private CoolSmsService coolSmsService;
     @MockBean
-    private JwtProvider jwtProvider;
+    private CustomUserDetailsService customUserDetailsService;
     @Autowired
     private MockMvc mockMvc;
+
 
     @Test
     @DisplayName("로그인 테스트 -> (로그인성공)")
@@ -700,17 +706,17 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("유저정보 조회 테스트 -> (조회 성공)")
     public void readUserInfoSuccess() throws Exception {
         //given
+        makeAuthentication();
         ReadUserInfoResDTO readUserInfoResDTO = ReadUserInfoResDTO.builder()
                 .nickName("nickName")
                 .phoneNum("01056962173")
                 .email("test@google.com")
                 .build();
 
-        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
         given(userService.readUserInfo(any(Long.class))).willReturn(readUserInfoResDTO);
 
         //when,then
@@ -722,12 +728,11 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.nickName").value("nickName"))
                 .andExpect(jsonPath("$.data.phoneNum").value("01056962173"))
                 .andDo(print());
-        verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
         verify(userService,times(1)).readUserInfo(any(Long.class));
     }
 
     @Test
-    @WithAnonymousUser
+    //@WithAnonymousUser
     @DisplayName("유저정보 조회 테스트 -> (조회 실패 : 인증 실패)")
     public void readUserInfoFail1() throws Exception {
         //given
@@ -745,15 +750,15 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
-        verify(jwtProvider,times(0)).readUserIdByToken(any(HttpServletRequest.class));
         verify(userService,times(0)).readUserInfo(any(Long.class));
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("유저정보 조회 테스트 -> (조회 실패 : 존재하지 않는 유저)")
     public void readUserInfoFail2() throws Exception {
         //given
+        makeAuthentication();
         ReadUserInfoResDTO readUserInfoResDTO = ReadUserInfoResDTO.builder()
                 .nickName("nickName")
                 .phoneNum("01056962173")
@@ -768,15 +773,15 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
-        verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
         verify(userService,times(1)).readUserInfo(any(Long.class));
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("유저정보 수정테스트 -> (수정 성공)")
     public void updateUserInfoSuccess() throws Exception {
         //given
+        makeAuthentication();
         UpdateUserInfoReqDTO updateUserInfoReqDTO = UpdateUserInfoReqDTO.builder()
                 .phoneNum("01056962173")
                 .oldPassword("1234")
@@ -785,7 +790,6 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(updateUserInfoReqDTO);
-        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -794,12 +798,11 @@ public class ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("유저정보 변경 성공"))
                 .andDo(print());
-        verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
         verify(userService,times(1)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
-    @WithAnonymousUser
+    //@WithAnonymousUser
     @DisplayName("유저정보 수정테스트 -> (수정 실패 : 인증 실패)")
     public void updateUserInfoFail1() throws Exception {
         //given
@@ -811,7 +814,6 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(updateUserInfoReqDTO);
-        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -820,15 +822,15 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
-        verify(jwtProvider,times(0)).readUserIdByToken(any(HttpServletRequest.class));
         verify(userService,times(0)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("유저정보 수정테스트 -> (수정 실패 : 요청값 공백)")
     public void updateUserInfoFail2() throws Exception {
         //given
+        makeAuthentication();
         UpdateUserInfoReqDTO updateUserInfoReqDTO = UpdateUserInfoReqDTO.builder()
                 .phoneNum("")
                 .oldPassword("")
@@ -837,7 +839,6 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(updateUserInfoReqDTO);
-        given(jwtProvider.readUserIdByToken(any(HttpServletRequest.class))).willReturn(1l);
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -846,15 +847,15 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
-        verify(jwtProvider,times(0)).readUserIdByToken(any(HttpServletRequest.class));
         verify(userService,times(0)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("유저정보 수정테스트 -> (수정 실패 : 비밀번호 불일치)")
     public void updateUserInfoFail3() throws Exception {
         //given
+        makeAuthentication();
         UpdateUserInfoReqDTO updateUserInfoReqDTO = UpdateUserInfoReqDTO.builder()
                 .phoneNum("01056962173")
                 .oldPassword("1234")
@@ -873,15 +874,15 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("비밀번호가 일치하지 않습니다."))
                 .andExpect(jsonPath("$.data.password").value("비밀번호가 일치하지 않습니다."))
                 .andDo(print());
-        verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
         verify(userService,times(1)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("유저정보 수정테스트 -> (수정 실패 : 존재하지 않는 유저)")
     public void updateUserInfoFail4() throws Exception {
         //given
+        makeAuthentication();
         UpdateUserInfoReqDTO updateUserInfoReqDTO = UpdateUserInfoReqDTO.builder()
                 .phoneNum("01056962173")
                 .oldPassword("1234")
@@ -899,15 +900,15 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
-        verify(jwtProvider,times(1)).readUserIdByToken(any(HttpServletRequest.class));
         verify(userService,times(1)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("유저 삭제테스트 -> (유저삭제 성공)")
     public void deleteUserInfoSuccess() throws Exception {
         //given
+        makeAuthentication();
         DeleteUserReqDTO deleteUserReqDTO = DeleteUserReqDTO.builder()
                 .email("test@google.com")
                 .password("1234")
@@ -927,7 +928,7 @@ public class ControllerTest {
     }
 
     @Test
-    @WithAnonymousUser
+    //@WithAnonymousUser
     @DisplayName("유저 삭제테스트 -> (유저삭제 실패 : 인증실패)")
     public void deleteUserInfoFail1() throws Exception {
         //given
@@ -950,10 +951,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("유저 삭제테스트 -> (유저삭제 실패 : 비밀번호 불일치)")
     public void deleteUserInfoFail2() throws Exception {
         //given
+        makeAuthentication();
         DeleteUserReqDTO deleteUserReqDTO = DeleteUserReqDTO.builder()
                 .email("test@google.com")
                 .password("1234")
@@ -975,10 +977,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("유저 삭제테스트 -> (유저삭제 실패 : 존재하지 않는 유저)")
     public void deleteUserInfoFail3() throws Exception {
         //given
+        makeAuthentication();
         DeleteUserReqDTO deleteUserReqDTO = DeleteUserReqDTO.builder()
                 .email("test@google.com")
                 .password("1234")
@@ -999,10 +1002,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("유저 삭제테스트 -> (유저삭제 실패 : 요청값 공백)")
     public void deleteUserInfoFail4() throws Exception {
         //given
+        makeAuthentication();
         DeleteUserReqDTO deleteUserReqDTO = DeleteUserReqDTO.builder()
                 .email("")
                 .password("")
@@ -1022,10 +1026,11 @@ public class ControllerTest {
     }
 
     @Test
-    @WithMockUser
+    //@WithMockUser
     @DisplayName("유저 삭제테스트 -> (유저삭제 실패 : 이메일 형식예외)")
     public void deleteUserInfoFail5() throws Exception {
         //given
+        makeAuthentication();
         DeleteUserReqDTO deleteUserReqDTO = DeleteUserReqDTO.builder()
                 .email("testgoogle.com")
                 .password("1234")
@@ -1042,5 +1047,13 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
         verify(userService,times(0)).deleteUser(any(DeleteUserReqDTO.class));
+    }
+
+    public void makeAuthentication(){
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(1l,"1234",authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

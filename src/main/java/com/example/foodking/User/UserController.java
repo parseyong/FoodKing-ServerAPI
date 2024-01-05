@@ -7,12 +7,12 @@ import com.example.foodking.CoolSms.DTO.PhoneAuthReqDTO;
 import com.example.foodking.User.DTO.*;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -21,11 +21,11 @@ import javax.validation.constraints.NotBlank;
 @Validated
 @RequiredArgsConstructor
 @Api(tags = "USER")
+@Log4j2
 public class UserController {
 
     private final UserService userService;
     private final CoolSmsService coolSmsService;
-    private final JwtProvider jwtProvider;
 
     @PostMapping("/login")
     public ResponseEntity<CommonResDTO> login(@RequestBody @Valid LoginReqDTO loginReqDTO){
@@ -78,17 +78,17 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<CommonResDTO> readUserInfo(HttpServletRequest servletRequest){
+    public ResponseEntity<CommonResDTO> readUserInfo(){
 
-        Long userId = jwtProvider.readUserIdByToken(servletRequest);
+        Long userId = JwtProvider.getUserId();
         ReadUserInfoResDTO readUserInfoResDTO = userService.readUserInfo(userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 조회 성공",readUserInfoResDTO));
     }
 
     @PatchMapping("/users")
-    public ResponseEntity<CommonResDTO> changeUserInfo(@RequestBody @Valid UpdateUserInfoReqDTO updateUserInfoReqDTO, HttpServletRequest servletRequest){
+    public ResponseEntity<CommonResDTO> changeUserInfo(@RequestBody @Valid UpdateUserInfoReqDTO updateUserInfoReqDTO){
 
-        Long userId = jwtProvider.readUserIdByToken(servletRequest);
+        Long userId = JwtProvider.getUserId();
         userService.updateUserInfo(updateUserInfoReqDTO,userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 변경 성공",null));
 
@@ -100,4 +100,5 @@ public class UserController {
         userService.deleteUser(deleteUserReqDTO);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저 삭제완료",null));
     }
+
 }

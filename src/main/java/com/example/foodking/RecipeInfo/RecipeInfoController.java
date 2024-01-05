@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -21,12 +20,12 @@ import javax.validation.Valid;
 public class RecipeInfoController {
 
     private final RecipeInfoService recipeInfoService;
-    private final JwtProvider jwtProvider;
+
 
     @PostMapping("/recipes")
-    public ResponseEntity<CommonResDTO> addRecipe(@RequestBody @Valid AddRecipeReqDTO addRecipeReqDTO, HttpServletRequest servletRequest){
+    public ResponseEntity<CommonResDTO> addRecipe(@RequestBody @Valid AddRecipeReqDTO addRecipeReqDTO){
 
-        Long userId = jwtProvider.readUserIdByToken(servletRequest);
+        Long userId = JwtProvider.getUserId();
         Long recipeInfoId = recipeInfoService.addRecipeInfo(addRecipeReqDTO,userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("레시피 등록완료",recipeInfoId));
     }
