@@ -96,4 +96,5 @@ public class UserService {
         if(!passwordEncoder.matches(password1,password2))
             throw new CommondException(exceptionCode);
     }
+
 }

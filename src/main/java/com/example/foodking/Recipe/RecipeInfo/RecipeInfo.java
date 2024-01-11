@@ -95,7 +95,7 @@ public class RecipeInfo extends TimeEntity {
     public void changeRecipeTip(String recipeTip){
         this.recipeTip=recipeTip;
     }
-    public void changeRecipeOrderList(List<RecipeWayInfo> recipeWayInfoList){
+    public void changeRecipeWayInfoList(List<RecipeWayInfo> recipeWayInfoList){
         this.recipeWayInfoList=recipeWayInfoList;
     }
     public void changeIngredientList(List<Ingredient> ingredientList){

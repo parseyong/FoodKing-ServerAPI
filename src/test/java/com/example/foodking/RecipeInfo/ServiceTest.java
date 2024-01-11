@@ -101,6 +101,9 @@ public class ServiceTest {
         this.recipeInfo = RecipeInfo.builder()
                 .user(user)
                 .build();
+
+        recipeInfo.changeRecipeWayInfoList(SaveRecipeReqDTO.toRecipeWayInfoListEntity(saveRecipeWayInfoReqDTOList,recipeInfo));
+        recipeInfo.changeIngredientList(SaveRecipeReqDTO.toIngredientListEntity(saveIngredientReqDTOList,recipeInfo));
     }
 
     @Test
@@ -285,7 +288,55 @@ public class ServiceTest {
             verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_FILE);
         }
+    }
 
+    @Test
+    @DisplayName("레시피 수정 테스트 -> (성공)")
+    public void updateRecipeSuccess(){
+        //given
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
+
+        //when
+        recipeService.updateRecipe(saveRecipeReqDTO,1l,1l);
+
+        //then
+        verify(recipeInfoRepository,times(1)).findById(any(Long.class));
+        verify(userRepository,times(1)).findById(any(Long.class));
+        verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
+        verify(ingredientRepository,times(1)).saveAll(any(List.class));
+        verify(recipeWayInfoRepository,times(1)).saveAll(any(List.class));
+    }
+
+    @Test
+    @DisplayName("레시피 삭제 테스트 -> (성공)")
+    public void deleteRecipeSuccess(){
+        //given
+        given(userRepository.findById(any())).willReturn(Optional.ofNullable(user));
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
+
+        //when
+        recipeService.deleteRecipe(null,1l);
+
+        //then
+        verify(recipeInfoRepository,times(1)).delete(recipeInfo);
+    }
+
+    @Test
+    @DisplayName("레시피 삭제 테스트 -> (실패 : 내가 쓴 레시피가 아님)")
+    public void deleteRecipeFail1(){
+        //given
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
+
+        // when,then
+        try {
+            recipeService.deleteRecipe(1l, 1l);
+            fail("예외전환이 안됨");
+        }catch (CommondException ex){
+            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.ACCESS_FAIL_RECIPE);
+            verify(recipeInfoRepository,times(0)).delete(recipeInfo);
+        }
     }
 
     @Test

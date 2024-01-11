@@ -51,4 +51,10 @@ public class RecipeController {
         recipeService.updateRecipe(saveRecipeReqDTO,JwtProvider.getUserId(),recipeInfoId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("레시피 수정완료",null));
     }
+
+    @DeleteMapping("/recipes/{recipeInfoId}")
+    public ResponseEntity<CommonResDTO> deleteRecipe(@PathVariable Long recipeInfoId){
+        recipeService.deleteRecipe(JwtProvider.getUserId(),recipeInfoId);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("레시피 삭제완료",null));
+    }
 }

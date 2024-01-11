@@ -16,7 +16,8 @@ public enum ExceptionCode {
     NOT_EXIST_RECIPEINFO(HttpStatus.BAD_REQUEST,"존재하지 않는 레시피입니다","recipeInfoId"),
     INVALID_SAVE_FILE(HttpStatus.BAD_REQUEST,"등록할 파일이 존재하지 않습니다. 파일을 추가해주세요.","recipeImage"),
     FILE_IOEXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"파일 저장중 문제가 발생했습니다.","recipeImage"),
-    NOT_EXIST_FILE(HttpStatus.BAD_REQUEST,"파일이 존재하지 않습니다",null);
+    NOT_EXIST_FILE(HttpStatus.BAD_REQUEST,"파일이 존재하지 않습니다",null),
+    ACCESS_FAIL_RECIPE(HttpStatus.BAD_REQUEST,"해당 레시피에 대해 권한이 없습니다",null);
 
     private final HttpStatus status;
     private final String field;

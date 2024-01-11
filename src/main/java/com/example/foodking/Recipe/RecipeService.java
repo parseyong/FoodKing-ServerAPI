@@ -76,6 +76,20 @@ public class RecipeService {
     }
 
     @Transactional
+    public void deleteRecipe(Long userId, Long recipeInfoId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+
+        RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+
+        if (recipeInfo.getUser().getUserId() != userId)
+            throw new CommondException(ExceptionCode.ACCESS_FAIL_RECIPE);
+
+        recipeInfoRepository.delete(recipeInfo);
+    }
+
+    @Transactional
     public String addImage(MultipartFile recipeImage,Long recipeInfoId) {
         RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
@@ -171,7 +185,7 @@ public class RecipeService {
             ingredientList.set(i,changeIngredient(saveIngredientReqDTOList.get(i),ingredientList.get(i)));
         }
 
-        // 조리순서가 추가된 경우
+        // 재료가 추가된 경우
         if(saveIngredientReqDTOList.size() > ingredientList.size()){
             for(; i< saveIngredientReqDTOList.size();i++){
                 Ingredient ingredient = SaveIngredientReqDTO.toEntity(saveIngredientReqDTOList.get(i),recipeInfo);
@@ -179,7 +193,7 @@ public class RecipeService {
             }
         }
 
-        // 조리순서가 줄어든 경우
+        // 재료가 줄어든 경우
         if(saveIngredientReqDTOList.size() < ingredientList.size()){
             int size = ingredientList.size();
             for(; i< size;i++){
