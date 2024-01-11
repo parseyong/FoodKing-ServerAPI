@@ -52,10 +52,10 @@ public class RecipeInfo extends TimeEntity {
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<RecipeWayInfo> recipeWayInfoList;
 
-    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<Ingredient> ingredientList;
 
     @Builder

@@ -71,8 +71,7 @@ public class RecipeService {
         changeIngredientList(saveRecipeReqDTO.getSaveIngredientReqDTOList(),ingredientList,recipeInfo);
 
         recipeInfoRepository.save(recipeInfo);
-        ingredientRepository.saveAll(ingredientList);
-        recipeWayInfoRepository.saveAll(recipeWayInfoList);
+
     }
 
     @Transactional
@@ -152,10 +151,11 @@ public class RecipeService {
 
     public void changeRecipeWayInfoList(List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList , List<RecipeWayInfo> recipeWayInfoList,
                                                RecipeInfo recipeInfo){
+        log.info(recipeWayInfoList.toString());
         int i=0;
         int indx = Math.min(saveRecipeWayInfoReqDTOList.size(), recipeWayInfoList.size());
         for(; i<indx;i++){
-            recipeWayInfoList.set(i,changeRecipeWayInfo(saveRecipeWayInfoReqDTOList.get(i),recipeWayInfoList.get(i)));
+            changeRecipeWayInfo(saveRecipeWayInfoReqDTOList.get(i),recipeWayInfoList.get(i));
         }
 
         // 조리순서가 추가된 경우
@@ -170,7 +170,6 @@ public class RecipeService {
         if(saveRecipeWayInfoReqDTOList.size() < recipeWayInfoList.size()){
             int size = recipeWayInfoList.size();
             for(; i< size;i++){
-                recipeWayInfoRepository.delete(recipeWayInfoList.get(indx));
                 recipeWayInfoList.remove(indx);
             }
         }
@@ -182,7 +181,7 @@ public class RecipeService {
         int i=0;
         int indx = Math.min(saveIngredientReqDTOList.size(), ingredientList.size());
         for(; i<indx;i++){
-            ingredientList.set(i,changeIngredient(saveIngredientReqDTOList.get(i),ingredientList.get(i)));
+            changeIngredient(saveIngredientReqDTOList.get(i),ingredientList.get(i));
         }
 
         // 재료가 추가된 경우
@@ -197,20 +196,17 @@ public class RecipeService {
         if(saveIngredientReqDTOList.size() < ingredientList.size()){
             int size = ingredientList.size();
             for(; i< size;i++){
-                ingredientRepository.delete(ingredientList.get(indx));
                 ingredientList.remove(indx);
             }
         }
     }
 
-    public Ingredient changeIngredient(SaveIngredientReqDTO newInfo,Ingredient ingredient){
+    public void changeIngredient(SaveIngredientReqDTO newInfo,Ingredient ingredient){
         ingredient.changeIngredientName(newInfo.getIngredientName());
         ingredient.changeIngredientAmount(newInfo.getIngredientAmount());
-        return ingredient;
     }
 
-    public RecipeWayInfo changeRecipeWayInfo(SaveRecipeWayInfoReqDTO newInfo, RecipeWayInfo recipeWayInfo){
+    public void changeRecipeWayInfo(SaveRecipeWayInfoReqDTO newInfo, RecipeWayInfo recipeWayInfo){
         recipeWayInfo.changeRecipeWay(newInfo.getRecipeWay());
-        return recipeWayInfo;
     }
 }
