@@ -1,7 +1,7 @@
-package com.example.foodking.RecipeWayInfo.DTO;
+package com.example.foodking.Recipe.RecipeWayInfo.DTO;
 
-import com.example.foodking.RecipeInfo.RecipeInfo;
-import com.example.foodking.RecipeWayInfo.RecipeWayInfo;
+import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
+import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,17 +14,17 @@ import javax.validation.constraints.NotNull;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddRecipeWayInfoReqDTO {
+public class SaveRecipeWayInfoReqDTO {
 
     @NotBlank(message = "현재 순서의 조리법을 입력해주세요")
     private String recipeWay;
     @NotNull(message = "해당 조리법의 순서를 입력해주세요")
     private Long recipeOrder;
 
-    public static RecipeWayInfo toEntity(AddRecipeWayInfoReqDTO addRecipeWayInfoReqDTO, RecipeInfo recipeInfo){
+    public static RecipeWayInfo toEntity(SaveRecipeWayInfoReqDTO saveRecipeWayInfoReqDTO, RecipeInfo recipeInfo){
         return RecipeWayInfo.builder()
-                .recipeWay(addRecipeWayInfoReqDTO.getRecipeWay())
-                .recipeOrder(addRecipeWayInfoReqDTO.getRecipeOrder())
+                .recipeWay(saveRecipeWayInfoReqDTO.getRecipeWay())
+                .recipeOrder(saveRecipeWayInfoReqDTO.getRecipeOrder())
                 .recipeInfo(recipeInfo)
                 .build();
     }

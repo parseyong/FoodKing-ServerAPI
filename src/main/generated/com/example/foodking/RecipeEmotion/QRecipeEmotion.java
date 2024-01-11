@@ -26,7 +26,7 @@ public class QRecipeEmotion extends EntityPathBase<RecipeEmotion> {
 
     public final NumberPath<Long> recipeEmotionId = createNumber("recipeEmotionId", Long.class);
 
-    public final com.example.foodking.RecipeInfo.QRecipeInfo recipeInfo;
+    public final com.example.foodking.Recipe.RecipeInfo.QRecipeInfo recipeInfo;
 
     public final com.example.foodking.User.QUser user;
 
@@ -48,7 +48,7 @@ public class QRecipeEmotion extends EntityPathBase<RecipeEmotion> {
 
     public QRecipeEmotion(Class<? extends RecipeEmotion> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.recipeInfo = inits.isInitialized("recipeInfo") ? new com.example.foodking.RecipeInfo.QRecipeInfo(forProperty("recipeInfo"), inits.get("recipeInfo")) : null;
+        this.recipeInfo = inits.isInitialized("recipeInfo") ? new com.example.foodking.Recipe.RecipeInfo.QRecipeInfo(forProperty("recipeInfo"), inits.get("recipeInfo")) : null;
         this.user = inits.isInitialized("user") ? new com.example.foodking.User.QUser(forProperty("user")) : null;
     }
 

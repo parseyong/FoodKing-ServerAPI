@@ -1,6 +1,6 @@
-package com.example.foodking.RecipeWayInfo;
+package com.example.foodking.Recipe.RecipeWayInfo;
 
-import com.example.foodking.RecipeInfo.RecipeInfo;
+import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

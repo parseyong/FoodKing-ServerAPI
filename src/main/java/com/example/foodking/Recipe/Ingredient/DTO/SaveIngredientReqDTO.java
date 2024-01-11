@@ -1,7 +1,7 @@
-package com.example.foodking.Ingredient.DTO;
+package com.example.foodking.Recipe.Ingredient.DTO;
 
-import com.example.foodking.Ingredient.Ingredient;
-import com.example.foodking.RecipeInfo.RecipeInfo;
+import com.example.foodking.Recipe.Ingredient.Ingredient;
+import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,18 +13,19 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddIngredientReqDTO {
+public class SaveIngredientReqDTO {
 
     @NotBlank(message = "재료명을 입력해주세요")
     private String ingredientName;
     @NotBlank(message = "재료의 양을 입력해주세요")
     private String ingredientAmount;
 
-    public static Ingredient toEntity(AddIngredientReqDTO addIngredientReqDTO, RecipeInfo recipeInfo){
+    public static Ingredient toEntity(SaveIngredientReqDTO saveIngredientReqDTO, RecipeInfo recipeInfo){
         return Ingredient.builder()
-                .ingredientName(addIngredientReqDTO.getIngredientName())
-                .ingredientAmount(addIngredientReqDTO.getIngredientAmount())
+                .ingredientName(saveIngredientReqDTO.getIngredientName())
+                .ingredientAmount(saveIngredientReqDTO.getIngredientAmount())
                 .recipeInfo(recipeInfo)
                 .build();
     }
+
 }

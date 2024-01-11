@@ -1,4 +1,4 @@
-package com.example.foodking.RecipeInfo;
+package com.example.foodking.Recipe.RecipeInfo;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
-    private static final long serialVersionUID = 609083142L;
+    private static final long serialVersionUID = -223919082L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
@@ -30,7 +30,7 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final NumberPath<Long> ingredientCost = createNumber("ingredientCost", Long.class);
 
-    public final ListPath<com.example.foodking.Ingredient.Ingredient, com.example.foodking.Ingredient.QIngredient> ingredientList = this.<com.example.foodking.Ingredient.Ingredient, com.example.foodking.Ingredient.QIngredient>createList("ingredientList", com.example.foodking.Ingredient.Ingredient.class, com.example.foodking.Ingredient.QIngredient.class, PathInits.DIRECT2);
+    public final ListPath<com.example.foodking.Recipe.Ingredient.Ingredient, com.example.foodking.Recipe.Ingredient.QIngredient> ingredientList = this.<com.example.foodking.Recipe.Ingredient.Ingredient, com.example.foodking.Recipe.Ingredient.QIngredient>createList("ingredientList", com.example.foodking.Recipe.Ingredient.Ingredient.class, com.example.foodking.Recipe.Ingredient.QIngredient.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modDate = _super.modDate;
@@ -45,7 +45,7 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final StringPath recipeTip = createString("recipeTip");
 
-    public final ListPath<com.example.foodking.RecipeWayInfo.RecipeWayInfo, com.example.foodking.RecipeWayInfo.QRecipeWayInfo> recipeWayInfoList = this.<com.example.foodking.RecipeWayInfo.RecipeWayInfo, com.example.foodking.RecipeWayInfo.QRecipeWayInfo>createList("recipeWayInfoList", com.example.foodking.RecipeWayInfo.RecipeWayInfo.class, com.example.foodking.RecipeWayInfo.QRecipeWayInfo.class, PathInits.DIRECT2);
+    public final ListPath<com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo, com.example.foodking.Recipe.RecipeWayInfo.QRecipeWayInfo> recipeWayInfoList = this.<com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo, com.example.foodking.Recipe.RecipeWayInfo.QRecipeWayInfo>createList("recipeWayInfoList", com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo.class, com.example.foodking.Recipe.RecipeWayInfo.QRecipeWayInfo.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> regDate = _super.regDate;

@@ -1,4 +1,4 @@
-package com.example.foodking.RecipeInfo;
+package com.example.foodking.Recipe.RecipeInfo;
 
 public enum RecipeInfoType {
     KOREAN,

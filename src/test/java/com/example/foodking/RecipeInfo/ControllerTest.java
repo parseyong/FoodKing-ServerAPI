@@ -5,9 +5,12 @@ import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Config.SecurityConfig;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
-import com.example.foodking.Ingredient.DTO.AddIngredientReqDTO;
-import com.example.foodking.RecipeInfo.DTO.AddRecipeReqDTO;
-import com.example.foodking.RecipeWayInfo.DTO.AddRecipeWayInfoReqDTO;
+import com.example.foodking.Recipe.DTO.SaveRecipeReqDTO;
+import com.example.foodking.Recipe.Ingredient.DTO.SaveIngredientReqDTO;
+import com.example.foodking.Recipe.RecipeController;
+import com.example.foodking.Recipe.RecipeInfo.RecipeInfoType;
+import com.example.foodking.Recipe.RecipeService;
+import com.example.foodking.Recipe.RecipeWayInfo.DTO.SaveRecipeWayInfoReqDTO;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,52 +40,52 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(value = RecipeInfoController.class)
+@WebMvcTest(value = RecipeController.class)
 @Import({SecurityConfig.class, JwtProvider.class})
 public class ControllerTest {
 
     @MockBean
-    private RecipeInfoService recipeInfoService;
+    private RecipeService recipeService;
     @MockBean
     private CustomUserDetailsService customUserDetailsService;
     @Autowired
     private MockMvc mockMvc;
-    private List<AddIngredientReqDTO> addIngredientReqDTOList;
-    private List<AddRecipeWayInfoReqDTO> addRecipeWayInfoReqDTOList;
-    private AddRecipeReqDTO addRecipeReqDTO;
+    private List<SaveIngredientReqDTO> saveIngredientReqDTOList;
+    private List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList;
+    private SaveRecipeReqDTO saveRecipeReqDTO;
 
     @BeforeEach
     void beforeEach(){
-        AddIngredientReqDTO addIngredientReqDTO1 = AddIngredientReqDTO.builder()
+        SaveIngredientReqDTO saveIngredientReqDTO1 = SaveIngredientReqDTO.builder()
                 .ingredientName("재료명1")
                 .ingredientAmount("재료 수량1")
                 .build();
-        AddIngredientReqDTO addIngredientReqDTO2 = AddIngredientReqDTO.builder()
+        SaveIngredientReqDTO saveIngredientReqDTO2 = SaveIngredientReqDTO.builder()
                 .ingredientName("재료명2")
                 .ingredientAmount("재료 수량2")
                 .build();
 
-        this.addIngredientReqDTOList = new ArrayList<>(List.of(addIngredientReqDTO1, addIngredientReqDTO2));
+        this.saveIngredientReqDTOList = new ArrayList<>(List.of(saveIngredientReqDTO1, saveIngredientReqDTO2));
 
-        AddRecipeWayInfoReqDTO addRecipeWayInfoReqDTO1 = AddRecipeWayInfoReqDTO.builder()
+        SaveRecipeWayInfoReqDTO saveRecipeWayInfoReqDTO1 = SaveRecipeWayInfoReqDTO.builder()
                 .recipeOrder(1l)
                 .recipeWay("조리법 1")
                 .build();
-        AddRecipeWayInfoReqDTO addRecipeWayInfoReqDTO2 = AddRecipeWayInfoReqDTO.builder()
+        SaveRecipeWayInfoReqDTO saveRecipeWayInfoReqDTO2 = SaveRecipeWayInfoReqDTO.builder()
                 .recipeOrder(2l)
                 .recipeWay("조리법 2")
                 .build();
-        this.addRecipeWayInfoReqDTOList = new ArrayList<>(List.of(addRecipeWayInfoReqDTO1,addRecipeWayInfoReqDTO2));
+        this.saveRecipeWayInfoReqDTOList = new ArrayList<>(List.of(saveRecipeWayInfoReqDTO1, saveRecipeWayInfoReqDTO2));
 
-        this.addRecipeReqDTO = AddRecipeReqDTO.builder()
+        this.saveRecipeReqDTO = SaveRecipeReqDTO.builder()
                 .recipeInfoType(RecipeInfoType.KOREAN)
                 .recipeName("테스트레시피 이름")
                 .recipeTip("테스트 레시피 팁")
                 .calogy(10l)
                 .cookingTime(20l)
                 .ingredentCost(30l)
-                .addIngredientReqDTOList(addIngredientReqDTOList)
-                .addRecipeWayInfoReqDTOList(addRecipeWayInfoReqDTOList)
+                .saveIngredientReqDTOList(saveIngredientReqDTOList)
+                .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
                 .build();
     }
 
@@ -93,7 +96,7 @@ public class ControllerTest {
         //given
         makeAuthentication();
         Gson gson = new Gson();
-        String requestBody = gson.toJson(addRecipeReqDTO);
+        String requestBody = gson.toJson(saveRecipeReqDTO);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -103,7 +106,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("레시피 등록완료"))
                 .andDo(print());
 
-        verify(recipeInfoService,times(1)).addRecipeInfo(any(AddRecipeReqDTO.class),any(Long.class));
+        verify(recipeService,times(1)).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -112,7 +115,7 @@ public class ControllerTest {
     public void addRecipeInfoFail() throws Exception {
         //given
         Gson gson = new Gson();
-        String requestBody = gson.toJson(addRecipeReqDTO);
+        String requestBody = gson.toJson(saveRecipeReqDTO);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -122,7 +125,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
 
-        verify(recipeInfoService,times(0)).addRecipeInfo(any(AddRecipeReqDTO.class),any(Long.class));
+        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -131,12 +134,12 @@ public class ControllerTest {
     public void addRecipeInfoFai2() throws Exception {
         //given
         makeAuthentication();
-        AddRecipeReqDTO addRecipeReqDTO = AddRecipeReqDTO.builder()
-                .addIngredientReqDTOList(addIngredientReqDTOList)
-                .addRecipeWayInfoReqDTOList(addRecipeWayInfoReqDTOList)
+        SaveRecipeReqDTO saveRecipeReqDTO = SaveRecipeReqDTO.builder()
+                .saveIngredientReqDTOList(saveIngredientReqDTOList)
+                .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
                 .build();
         Gson gson = new Gson();
-        String requestBody = gson.toJson(addRecipeReqDTO);
+        String requestBody = gson.toJson(saveRecipeReqDTO);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -146,7 +149,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
 
-        verify(recipeInfoService,times(0)).addRecipeInfo(any(AddRecipeReqDTO.class),any(Long.class));
+        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -156,8 +159,8 @@ public class ControllerTest {
         //given
         makeAuthentication();
         Gson gson = new Gson();
-        String requestBody = gson.toJson(addRecipeReqDTO);
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(recipeInfoService).addRecipeInfo(any(AddRecipeReqDTO.class),any(Long.class));
+        String requestBody = gson.toJson(saveRecipeReqDTO);
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(recipeService).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -167,7 +170,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
 
-        verify(recipeInfoService,times(1)).addRecipeInfo(any(AddRecipeReqDTO.class),any(Long.class));
+        verify(recipeService,times(1)).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -188,7 +191,7 @@ public class ControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("이미지 등록완료"));
 
-        verify(recipeInfoService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
+        verify(recipeService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
     }
 
     @Test
@@ -208,7 +211,7 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"));
 
-        verify(recipeInfoService,times(0)).addImage(any(MultipartFile.class),any(Long.class));
+        verify(recipeService,times(0)).addImage(any(MultipartFile.class),any(Long.class));
     }
 
     @Test
@@ -231,7 +234,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.fieldName").value("recipeInfoId"))
                 .andExpect(jsonPath("$.data.requiredType").value("Long"));
 
-        verify(recipeInfoService,times(0)).addImage(any(MultipartFile.class),any(Long.class));
+        verify(recipeService,times(0)).addImage(any(MultipartFile.class),any(Long.class));
     }
 
     @Test
@@ -252,7 +255,7 @@ public class ControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
 
-        verify(recipeInfoService,times(0)).addImage(any(MultipartFile.class),any(Long.class));
+        verify(recipeService,times(0)).addImage(any(MultipartFile.class),any(Long.class));
     }
 
     @Test
@@ -264,7 +267,7 @@ public class ControllerTest {
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
-        given(recipeInfoService.addImage(any(MultipartFile.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.FILE_IOEXCEPTION));
+        given(recipeService.addImage(any(MultipartFile.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.FILE_IOEXCEPTION));
 
         //when, then
         this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
@@ -275,7 +278,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("파일 저장중 문제가 발생했습니다."))
                 .andExpect(jsonPath("$.data.recipeImage").value("파일 저장중 문제가 발생했습니다."));
 
-        verify(recipeInfoService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
+        verify(recipeService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
     }
 
     @Test
@@ -287,7 +290,7 @@ public class ControllerTest {
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
-        given(recipeInfoService.addImage(any(MultipartFile.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.INVALID_SAVE_FILE));
+        given(recipeService.addImage(any(MultipartFile.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.INVALID_SAVE_FILE));
 
         //when, then
         this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
@@ -298,7 +301,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("등록할 파일이 존재하지 않습니다. 파일을 추가해주세요."))
                 .andExpect(jsonPath("$.data.recipeImage").value("등록할 파일이 존재하지 않습니다. 파일을 추가해주세요."));
 
-        verify(recipeInfoService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
+        verify(recipeService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
     }
 
     @Test
@@ -310,7 +313,7 @@ public class ControllerTest {
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
-        given(recipeInfoService.addImage(any(MultipartFile.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+        given(recipeService.addImage(any(MultipartFile.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
 
         //when, then
         this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
@@ -321,7 +324,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
                 .andExpect(jsonPath("$.data.recipeInfoId").value("존재하지 않는 레시피입니다"));
 
-        verify(recipeInfoService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
+        verify(recipeService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
     }
 
     @Test
@@ -335,7 +338,7 @@ public class ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("이미지 삭제완료"))
                 .andDo(print());
-        verify(recipeInfoService,times(1)).deleteImage(any(Long.class));
+        verify(recipeService,times(1)).deleteImage(any(Long.class));
     }
 
     @Test
@@ -348,7 +351,7 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
-        verify(recipeInfoService,times(0)).deleteImage(any(Long.class));
+        verify(recipeService,times(0)).deleteImage(any(Long.class));
     }
 
     @Test
@@ -357,7 +360,7 @@ public class ControllerTest {
     public void deleteImageFail2() throws Exception {
         //given
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO)).when(recipeInfoService).deleteImage(any(Long.class));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO)).when(recipeService).deleteImage(any(Long.class));
 
         //when, then
         this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1l)
@@ -365,7 +368,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
                 .andDo(print());
-        verify(recipeInfoService,times(1)).deleteImage(any(Long.class));
+        verify(recipeService,times(1)).deleteImage(any(Long.class));
     }
 
     @Test
@@ -374,7 +377,7 @@ public class ControllerTest {
     public void deleteImageFail3() throws Exception {
         //given
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_FILE)).when(recipeInfoService).deleteImage(any(Long.class));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_FILE)).when(recipeService).deleteImage(any(Long.class));
 
         //when, then
         this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1l)
@@ -382,7 +385,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("파일이 존재하지 않습니다"))
                 .andDo(print());
-        verify(recipeInfoService,times(1)).deleteImage(any(Long.class));
+        verify(recipeService,times(1)).deleteImage(any(Long.class));
     }
 
     @Test
@@ -399,7 +402,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.requiredType").value("Long"))
                 .andDo(print());
 
-        verify(recipeInfoService,times(0)).deleteImage(any(Long.class));
+        verify(recipeService,times(0)).deleteImage(any(Long.class));
     }
 
     @Test
@@ -414,7 +417,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."))
                 .andDo(print());
 
-        verify(recipeInfoService,times(0)).deleteImage(any(Long.class));
+        verify(recipeService,times(0)).deleteImage(any(Long.class));
     }
 
     public void makeAuthentication(){

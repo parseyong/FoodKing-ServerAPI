@@ -29,7 +29,7 @@ public class QReply extends EntityPathBase<Reply> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modDate = _super.modDate;
 
-    public final com.example.foodking.RecipeInfo.QRecipeInfo recipeInfo;
+    public final com.example.foodking.Recipe.RecipeInfo.QRecipeInfo recipeInfo;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> regDate = _super.regDate;
@@ -56,7 +56,7 @@ public class QReply extends EntityPathBase<Reply> {
 
     public QReply(Class<? extends Reply> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.recipeInfo = inits.isInitialized("recipeInfo") ? new com.example.foodking.RecipeInfo.QRecipeInfo(forProperty("recipeInfo"), inits.get("recipeInfo")) : null;
+        this.recipeInfo = inits.isInitialized("recipeInfo") ? new com.example.foodking.Recipe.RecipeInfo.QRecipeInfo(forProperty("recipeInfo"), inits.get("recipeInfo")) : null;
         this.user = inits.isInitialized("user") ? new com.example.foodking.User.QUser(forProperty("user")) : null;
     }
 

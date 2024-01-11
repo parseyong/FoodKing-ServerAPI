@@ -1,8 +1,8 @@
-package com.example.foodking.RecipeInfo;
+package com.example.foodking.Recipe;
 
 import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Common.CommonResDTO;
-import com.example.foodking.RecipeInfo.DTO.AddRecipeReqDTO;
+import com.example.foodking.Recipe.DTO.SaveRecipeReqDTO;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,16 +17,16 @@ import javax.validation.Valid;
 @Validated
 @RequiredArgsConstructor
 @Api(value = "RecipeInfo")
-public class RecipeInfoController {
+public class RecipeController {
 
-    private final RecipeInfoService recipeInfoService;
+    private final RecipeService recipeService;
 
 
     @PostMapping("/recipes")
-    public ResponseEntity<CommonResDTO> addRecipe(@RequestBody @Valid AddRecipeReqDTO addRecipeReqDTO){
+    public ResponseEntity<CommonResDTO> addRecipe(@RequestBody @Valid SaveRecipeReqDTO saveRecipeReqDTO){
 
         Long userId = JwtProvider.getUserId();
-        Long recipeInfoId = recipeInfoService.addRecipeInfo(addRecipeReqDTO,userId);
+        Long recipeInfoId = recipeService.addRecipe(saveRecipeReqDTO,userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("레시피 등록완료",recipeInfoId));
     }
 
@@ -34,14 +34,21 @@ public class RecipeInfoController {
     public ResponseEntity<CommonResDTO> addImage(@RequestParam(name = "recipeImage") MultipartFile recipeImage,
                                                  @PathVariable Long recipeInfoId) {
 
-        recipeInfoService.addImage(recipeImage,recipeInfoId);
+        recipeService.addImage(recipeImage,recipeInfoId);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("이미지 등록완료",null));
     }
 
     @DeleteMapping ("/recipes/images/{recipeInfoId}")
     public ResponseEntity<CommonResDTO> deleteImage(@PathVariable Long recipeInfoId) {
 
-        recipeInfoService.deleteImage(recipeInfoId);
+        recipeService.deleteImage(recipeInfoId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이미지 삭제완료",null));
+    }
+
+    @PatchMapping("/recipes/{recipeInfoId}")
+    public ResponseEntity<CommonResDTO> updateRecipe(@RequestBody @Valid SaveRecipeReqDTO saveRecipeReqDTO ,@PathVariable Long recipeInfoId){
+
+        recipeService.updateRecipe(saveRecipeReqDTO,JwtProvider.getUserId(),recipeInfoId);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("레시피 수정완료",null));
     }
 }

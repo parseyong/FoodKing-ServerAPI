@@ -1,8 +1,8 @@
-package com.example.foodking.RecipeInfo;
+package com.example.foodking.Recipe.RecipeInfo;
 
 import com.example.foodking.Common.TimeEntity;
-import com.example.foodking.Ingredient.Ingredient;
-import com.example.foodking.RecipeWayInfo.RecipeWayInfo;
+import com.example.foodking.Recipe.Ingredient.Ingredient;
+import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo;
 import com.example.foodking.Reply.Reply;
 import com.example.foodking.User.User;
 import lombok.AccessLevel;
@@ -74,7 +74,7 @@ public class RecipeInfo extends TimeEntity {
     public void changeRecipeName(String recipeName){
         this.recipeName = recipeName;
     }
-    public void changeRecipeType(RecipeInfoType recipeInfoType){
+    public void changeRecipeInfoType(RecipeInfoType recipeInfoType){
         this.recipeInfoType = recipeInfoType;
     }
     public void changeIngredientCost(Long ingredientCost){

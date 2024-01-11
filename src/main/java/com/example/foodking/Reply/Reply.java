@@ -1,7 +1,7 @@
 package com.example.foodking.Reply;
 
 import com.example.foodking.Common.TimeEntity;
-import com.example.foodking.RecipeInfo.RecipeInfo;
+import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
 import com.example.foodking.User.User;
 import lombok.AccessLevel;
 import lombok.Builder;
