@@ -60,6 +60,9 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
                 fieldName="recipeInfoId";
             else if(fieldName.contains("recipeImage"))
                 fieldName="recipeImage";
+            else if(fieldName.contains("content"))
+                fieldName="content";
+
             String message = violation.getMessage();
             errors.put(fieldName,message);
         }
