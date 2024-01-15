@@ -62,15 +62,13 @@ public class UserService {
     }
 
     public ReadUserInfoResDTO readUserInfo(Long userId){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+        User user = findUserById(userId);
 
         return ReadUserInfoResDTO.toDTO(user);
     }
     @Transactional
     public User updateUserInfo(UpdateUserInfoReqDTO updateUserInfoReqDTO,Long userId){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+        User user = findUserById(userId);
 
         isMatchPassword(updateUserInfoReqDTO.getOldPassword(),user.getPassword()
                 ,ExceptionCode.PASSWORD_NOT_COLLECT);
@@ -95,6 +93,10 @@ public class UserService {
 
         if(!passwordEncoder.matches(password1,password2))
             throw new CommondException(exceptionCode);
+    }
+    public User findUserById(Long userId){
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
     }
 
 }

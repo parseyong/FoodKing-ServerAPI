@@ -14,7 +14,7 @@ import com.example.foodking.Recipe.RecipeWayInfo.DTO.SaveRecipeWayInfoReqDTO;
 import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo;
 import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfoRepository;
 import com.example.foodking.User.User;
-import com.example.foodking.User.UserRepository;
+import com.example.foodking.User.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ public class ServiceTest {
     @InjectMocks
     private RecipeService recipeService;
     @Mock
-    private UserRepository userRepository;
+    private UserService userService;
     @Mock
     private RecipeInfoRepository recipeInfoRepository;
     @Mock
@@ -110,7 +110,6 @@ public class ServiceTest {
     @DisplayName("레시피 등록테스트 -> (성공)")
     public void addRecipeInfoSuccess(){
         //given
-        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
 
         //when
         recipeService.addRecipe(saveRecipeReqDTO,1l);
@@ -119,24 +118,6 @@ public class ServiceTest {
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
         verify(ingredientRepository,times(1)).saveAll(any(List.class));
         verify(recipeWayInfoRepository,times(1)).saveAll(any(List.class));
-    }
-
-    @Test
-    @DisplayName("레시피 등록테스트 -> (실패 : 존재하지 않는 유저)")
-    public void addRecipeInfoFail1(){
-        //given
-        given(userRepository.findById(any(Long.class))).willReturn(Optional.empty());
-
-        //when, then
-        try{
-            recipeService.addRecipe(saveRecipeReqDTO,1l);
-            fail("예외가 발생하지 않음");
-        }catch (CommondException ex){
-            verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
-            verify(ingredientRepository,times(0)).saveAll(any(List.class));
-            verify(recipeWayInfoRepository,times(0)).saveAll(any(List.class));
-            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
-        }
     }
 
     /*
@@ -294,7 +275,6 @@ public class ServiceTest {
     @DisplayName("레시피 수정 테스트 -> (성공)")
     public void updateRecipeSuccess(){
         //given
-        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         //when
@@ -302,17 +282,13 @@ public class ServiceTest {
 
         //then
         verify(recipeInfoRepository,times(1)).findById(any(Long.class));
-        verify(userRepository,times(1)).findById(any(Long.class));
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
-        verify(ingredientRepository,times(1)).saveAll(any(List.class));
-        verify(recipeWayInfoRepository,times(1)).saveAll(any(List.class));
     }
 
     @Test
     @DisplayName("레시피 삭제 테스트 -> (성공)")
     public void deleteRecipeSuccess(){
         //given
-        given(userRepository.findById(any())).willReturn(Optional.ofNullable(user));
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         //when
@@ -326,7 +302,6 @@ public class ServiceTest {
     @DisplayName("레시피 삭제 테스트 -> (실패 : 내가 쓴 레시피가 아님)")
     public void deleteRecipeFail1(){
         //given
-        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         // when,then

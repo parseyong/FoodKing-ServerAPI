@@ -12,7 +12,7 @@ import com.example.foodking.Recipe.RecipeWayInfo.DTO.SaveRecipeWayInfoReqDTO;
 import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo;
 import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfoRepository;
 import com.example.foodking.User.User;
-import com.example.foodking.User.UserRepository;
+import com.example.foodking.User.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +34,7 @@ public class RecipeService {
     @Value("${file.dir}")
     private String fileDir;
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final RecipeInfoRepository recipeInfoRepository;
     private final IngredientRepository ingredientRepository;
     private final RecipeWayInfoRepository recipeWayInfoRepository;
@@ -42,8 +42,7 @@ public class RecipeService {
     @Transactional
     public Long addRecipe(SaveRecipeReqDTO saveRecipeReqDTO, Long userId){
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+        User user = userService.findUserById(userId);
 
         RecipeInfo recipeInfo = SaveRecipeReqDTO.toRecipeInfoEntity(saveRecipeReqDTO,user);
         List<Ingredient> ingredientList = SaveRecipeReqDTO.toIngredientListEntity(saveRecipeReqDTO.getSaveIngredientReqDTOList(),recipeInfo);
@@ -57,11 +56,9 @@ public class RecipeService {
 
     @Transactional
     public void updateRecipe(SaveRecipeReqDTO saveRecipeReqDTO, Long userId,Long recipeInfoId){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+        User user = userService.findUserById(userId);
 
-        RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+        RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
 
         List<Ingredient> ingredientList = recipeInfo.getIngredientList();
         List<RecipeWayInfo> recipeWayInfoList = recipeInfo.getRecipeWayInfoList();
@@ -76,11 +73,9 @@ public class RecipeService {
 
     @Transactional
     public void deleteRecipe(Long userId, Long recipeInfoId){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+        User user = userService.findUserById(userId);
 
-        RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+        RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
 
         if (recipeInfo.getUser().getUserId() != userId)
             throw new CommondException(ExceptionCode.ACCESS_FAIL_RECIPE);
@@ -90,8 +85,7 @@ public class RecipeService {
 
     @Transactional
     public String addImage(MultipartFile recipeImage,Long recipeInfoId) {
-        RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+        RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
 
         if(recipeImage == null)
             throw new CommondException(ExceptionCode.INVALID_SAVE_FILE);
@@ -128,8 +122,7 @@ public class RecipeService {
 
     @Transactional
     public void deleteImage(Long recipeInfoId){
-        RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+        RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
 
         if(recipeInfo.getRecipeImage() ==null){
             throw new CommondException(ExceptionCode.NOT_EXIST_FILE);
@@ -208,5 +201,10 @@ public class RecipeService {
 
     public void changeRecipeWayInfo(SaveRecipeWayInfoReqDTO newInfo, RecipeWayInfo recipeWayInfo){
         recipeWayInfo.changeRecipeWay(newInfo.getRecipeWay());
+    }
+
+    public RecipeInfo findRecipeInfoById(Long recipeInfoId){
+        return recipeInfoRepository.findById(recipeInfoId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
     }
 }
