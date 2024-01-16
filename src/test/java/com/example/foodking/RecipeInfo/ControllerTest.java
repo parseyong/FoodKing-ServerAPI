@@ -526,26 +526,6 @@ public class ControllerTest {
     }
 
     @Test
-    @DisplayName("레시피 수정 테스트 -> (실패 : 존재하지 않는 유저)")
-    public void updateRecipeFail5() throws Exception {
-        //given
-        Gson gson = new Gson();
-        String requestbody = gson.toJson(saveRecipeReqDTO);
-        makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(recipeService).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
-
-        //when, then
-        this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1l)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestbody))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
-                .andDo(print());
-
-        verify(recipeService,times(1)).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
-    }
-
-    @Test
     @DisplayName("레시피 수정 테스트 -> (실패 : 존재하지 않는 레시피)")
     public void updateRecipeFail6() throws Exception {
         //given
@@ -627,24 +607,6 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipeService,times(0)).deleteRecipe(any(Long.class),any(Long.class));
-    }
-
-
-    @Test
-    @DisplayName("레시피 삭제 테스트 -> (실패 : 존재하지 않는 유저)")
-    public void deleteRecipeFail4() throws Exception {
-        //given
-        makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(recipeService).deleteRecipe(any(Long.class),any(Long.class));
-
-        //when, then
-        this.mockMvc.perform(delete("/recipes/{recipeInfoId}",1l)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
-                .andDo(print());
-
-        verify(recipeService,times(1)).deleteRecipe(any(Long.class),any(Long.class));
     }
 
     @Test

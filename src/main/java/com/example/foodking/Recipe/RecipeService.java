@@ -56,7 +56,6 @@ public class RecipeService {
 
     @Transactional
     public void updateRecipe(SaveRecipeReqDTO saveRecipeReqDTO, Long userId,Long recipeInfoId){
-        User user = userService.findUserById(userId);
 
         RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
 
@@ -73,7 +72,6 @@ public class RecipeService {
 
     @Transactional
     public void deleteRecipe(Long userId, Long recipeInfoId){
-        User user = userService.findUserById(userId);
 
         RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
 
