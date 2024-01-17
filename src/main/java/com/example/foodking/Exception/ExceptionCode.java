@@ -19,7 +19,8 @@ public enum ExceptionCode {
     NOT_EXIST_FILE(HttpStatus.BAD_REQUEST,"파일이 존재하지 않습니다",null),
     ACCESS_FAIL_RECIPE(HttpStatus.BAD_REQUEST,"해당 레시피에 대해 권한이 없습니다",null),
     NOT_EXIST_REPLY(HttpStatus.BAD_REQUEST,"존재하지 않는 댓글입니다","replyId"),
-    ACCESS_FAIL_REPLY(HttpStatus.BAD_REQUEST,"해당 댓글에 대한 권한이 없습니다",null);
+    ACCESS_FAIL_REPLY(HttpStatus.BAD_REQUEST,"해당 댓글에 대한 권한이 없습니다",null),
+    EXIST_LIKE(HttpStatus.BAD_REQUEST,"이미 좋아요를 눌렀습니다.",null);
 
     private final HttpStatus status;
     private final String field;

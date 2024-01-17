@@ -43,7 +43,7 @@ public class SaveRecipeReqDTO {
     private List<@Valid SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList;
 
     public static RecipeInfo toRecipeInfoEntity(SaveRecipeReqDTO saveRecipeReqDTO, User user){
-        return com.example.foodking.Recipe.RecipeInfo.RecipeInfo.builder()
+        return RecipeInfo.builder()
                 .calogy(saveRecipeReqDTO.getCalogy())
                 .cookingTime(saveRecipeReqDTO.getCookingTime())
                 .ingredientCost(saveRecipeReqDTO.getIngredentCost())

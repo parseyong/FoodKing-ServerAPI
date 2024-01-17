@@ -1,4 +1,4 @@
-package com.example.foodking.RecipeEmotion;
+package com.example.foodking.Emotion.RecipeEmotion;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -16,13 +16,13 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QRecipeEmotion extends EntityPathBase<RecipeEmotion> {
 
-    private static final long serialVersionUID = -1274330812L;
+    private static final long serialVersionUID = -353657327L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
     public static final QRecipeEmotion recipeEmotion = new QRecipeEmotion("recipeEmotion");
 
-    public final EnumPath<com.example.foodking.Common.EmotionType> emotionType = createEnum("emotionType", com.example.foodking.Common.EmotionType.class);
+    public final EnumPath<com.example.foodking.Emotion.EmotionType> emotionType = createEnum("emotionType", com.example.foodking.Emotion.EmotionType.class);
 
     public final NumberPath<Long> recipeEmotionId = createNumber("recipeEmotionId", Long.class);
 

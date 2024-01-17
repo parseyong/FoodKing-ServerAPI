@@ -1,7 +1,7 @@
-package com.example.foodking.RecipeEmotion;
+package com.example.foodking.Emotion.ReplyEmotion;
 
-import com.example.foodking.Common.EmotionType;
-import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
+import com.example.foodking.Emotion.EmotionType;
+import com.example.foodking.Reply.Reply;
 import com.example.foodking.User.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,12 +15,12 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RecipeEmotion {
+public class ReplyEmotion {
 
     @Id
-    @Column(name = "recipe_emotion_id")
+    @Column(name = "reply_emotion_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long recipeEmotionId;
+    private Long replyEmotionId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "emotion_status")
@@ -33,12 +33,12 @@ public class RecipeEmotion {
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "recipe_info_id",nullable = false)
-    private RecipeInfo recipeInfo;
+    @JoinColumn(name = "reply_id",nullable = false)
+    private Reply reply;
     @Builder
-    public RecipeEmotion(EmotionType emotionType,User user, RecipeInfo recipeInfo){
+    public ReplyEmotion(EmotionType emotionType, User user, Reply reply){
         this.emotionType=emotionType;
-        this.recipeInfo=recipeInfo;
+        this.reply=reply;
         this.user=user;
     }
 }

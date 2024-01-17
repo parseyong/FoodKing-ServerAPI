@@ -369,7 +369,7 @@ public class ControllerTest {
         this.mockMvc.perform(delete("/replys/{replyId}",1l)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("존재하지 않는 댓글입니다"));
+                .andExpect(jsonPath("$.message").value("해당 댓글에 대한 권한이 없습니다"));
 
         verify(replyService,times(1)).deleteReply(any(Long.class),any(Long.class));
     }

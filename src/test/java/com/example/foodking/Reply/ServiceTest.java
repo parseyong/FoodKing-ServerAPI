@@ -3,9 +3,9 @@ package com.example.foodking.Reply;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
-import com.example.foodking.Recipe.RecipeService;
+import com.example.foodking.Recipe.RecipeInfo.RecipeInfoRepository;
 import com.example.foodking.User.User;
-import com.example.foodking.User.UserService;
+import com.example.foodking.User.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,9 +31,9 @@ public class ServiceTest {
     @Mock
     private ReplyRepository replyRepository;
     @Mock
-    private UserService userService;
+    private UserRepository userRepository;
     @Mock
-    private RecipeService recipeService;
+    private RecipeInfoRepository recipeInfoRepository;
 
     private User user;
     private RecipeInfo recipeInfo;
@@ -63,16 +63,16 @@ public class ServiceTest {
     @DisplayName("댓글 등록 테스트 -> 성공")
     public void addReplySuccess(){
         //given
-        given(userService.findUserById(any(Long.class))).willReturn(this.user);
-        given(recipeService.findRecipeInfoById(any(Long.class))).willReturn(this.recipeInfo);
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(this.user));
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(this.recipeInfo));
         given(replyRepository.save(any(Reply.class))).willReturn(reply);
 
         //when
         replyService.addReply(1l,1l,"댓글테스트");
 
         //then
-        verify(userService,times(1)).findUserById(any(Long.class));
-        verify(recipeService,times(1)).findRecipeInfoById(any(Long.class));
+        verify(userRepository,times(1)).findById(any(Long.class));
+        verify(recipeInfoRepository,times(1)).findById(any(Long.class));
         verify(replyRepository,times(1)).save(any(Reply.class));
     }
 
