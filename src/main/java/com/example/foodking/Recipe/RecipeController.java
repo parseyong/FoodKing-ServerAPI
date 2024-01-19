@@ -3,6 +3,7 @@ package com.example.foodking.Recipe;
 import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Common.CommonResDTO;
 import com.example.foodking.Recipe.DTO.SaveRecipeReqDTO;
+import com.example.foodking.User.UserService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,13 +21,13 @@ import javax.validation.Valid;
 public class RecipeController {
 
     private final RecipeService recipeService;
-
+    private final UserService userService;
 
     @PostMapping("/recipes")
     public ResponseEntity<CommonResDTO> addRecipe(@RequestBody @Valid SaveRecipeReqDTO saveRecipeReqDTO){
 
         Long userId = JwtProvider.getUserId();
-        Long recipeInfoId = recipeService.addRecipe(saveRecipeReqDTO,userId);
+        Long recipeInfoId = recipeService.addRecipe(saveRecipeReqDTO,userService.findUserById(userId));
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("레시피 등록완료",recipeInfoId));
     }
 

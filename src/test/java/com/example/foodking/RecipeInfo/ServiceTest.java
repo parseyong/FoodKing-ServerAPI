@@ -14,7 +14,6 @@ import com.example.foodking.Recipe.RecipeWayInfo.DTO.SaveRecipeWayInfoReqDTO;
 import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo;
 import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfoRepository;
 import com.example.foodking.User.User;
-import com.example.foodking.User.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,8 +41,6 @@ public class ServiceTest {
 
     @InjectMocks
     private RecipeService recipeService;
-    @Mock
-    private UserRepository userRepository;
     @Mock
     private RecipeInfoRepository recipeInfoRepository;
     @Mock
@@ -110,10 +107,9 @@ public class ServiceTest {
     @DisplayName("레시피 등록테스트 -> (성공)")
     public void addRecipeInfoSuccess(){
         //given
-        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(this.user));
 
         //when
-        recipeService.addRecipe(saveRecipeReqDTO,1l);
+        recipeService.addRecipe(saveRecipeReqDTO,user);
 
         //then
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));

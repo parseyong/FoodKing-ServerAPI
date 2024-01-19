@@ -5,6 +5,11 @@ import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Config.SecurityConfig;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
+import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
+import com.example.foodking.Recipe.RecipeService;
+import com.example.foodking.User.User;
+import com.example.foodking.User.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -36,15 +42,37 @@ public class ControllerTest {
     @MockBean
     private ReplyService replyService;
     @MockBean
+    private UserService userService;
+    @MockBean
+    private RecipeService recipeService;
+    @MockBean
     private CustomUserDetailsService customUserDetailsService;
     @Autowired
     private MockMvc mockMvc;
+
+    private User user;
+    private RecipeInfo recipeInfo;
+    @BeforeEach
+    void beforEach(){
+        this.user = User.builder()
+                .email("test@google.com")
+                .nickName("test")
+                .password("1234")
+                .phoneNum("01011111111")
+                .build();
+
+        this.recipeInfo = RecipeInfo.builder()
+                .user(user)
+                .build();
+    }
 
     @Test
     @DisplayName("댓글 등록 테스트 -> 성공")
     public void addReplySuccess() throws Exception {
         //given
         makeAuthentication();
+        given(userService.findUserById(any(Long.class))).willReturn(user);
+        given(recipeService.findRecipeInfoById(any(Long.class))).willReturn(recipeInfo);
 
         //when,then
         this.mockMvc.perform(post("/{recipeInfoId}/replys",1l)
@@ -54,7 +82,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("댓글 등록완료"))
                 .andDo(print());
 
-        verify(replyService,times(1)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(1)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
     @Test
@@ -70,7 +98,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
 
-        verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
     @Test
@@ -88,7 +116,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.content").value("내용을 입력해주세요"))
                 .andDo(print());
 
-        verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
     @Test
@@ -104,7 +132,7 @@ public class ControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
 
-        verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
     @Test
@@ -122,7 +150,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.fieldName").value("recipeInfoId"))
                 .andExpect(jsonPath("$.data.requiredType").value("Long"));
 
-        verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
     @Test
@@ -130,7 +158,7 @@ public class ControllerTest {
     public void addReplyFail5() throws Exception {
         //given
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(userService).findUserById(any(Long.class));
 
         //when,then
         this.mockMvc.perform(post("/{recipeInfoId}/replys",1l)
@@ -140,7 +168,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
 
-        verify(replyService,times(1)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
     @Test
@@ -148,7 +176,8 @@ public class ControllerTest {
     public void addReplyFail6() throws Exception {
         //given
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO)).when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO)).when(recipeService).findRecipeInfoById(any(Long.class));
+        given(userService.findUserById(any(Long.class))).willReturn(user);
 
         //when,then
         this.mockMvc.perform(post("/{recipeInfoId}/replys",1l)
@@ -158,7 +187,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
                 .andDo(print());
 
-        verify(replyService,times(1)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
     @Test

@@ -11,6 +11,8 @@ import com.example.foodking.Recipe.RecipeController;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfoType;
 import com.example.foodking.Recipe.RecipeService;
 import com.example.foodking.Recipe.RecipeWayInfo.DTO.SaveRecipeWayInfoReqDTO;
+import com.example.foodking.User.User;
+import com.example.foodking.User.UserService;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,15 +49,25 @@ public class ControllerTest {
     @MockBean
     private RecipeService recipeService;
     @MockBean
+    private UserService userService;
+    @MockBean
     private CustomUserDetailsService customUserDetailsService;
     @Autowired
     private MockMvc mockMvc;
     private List<SaveIngredientReqDTO> saveIngredientReqDTOList;
     private List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList;
     private SaveRecipeReqDTO saveRecipeReqDTO;
+    private User user;
 
     @BeforeEach
     void beforeEach(){
+        this.user= User.builder()
+                .email("test@google.com")
+                .password("1234")
+                .phoneNum("01056962173")
+                .nickName("nickName")
+                .build();
+
         SaveIngredientReqDTO saveIngredientReqDTO1 = SaveIngredientReqDTO.builder()
                 .ingredientName("재료명1")
                 .ingredientAmount("재료 수량1")
@@ -97,6 +109,7 @@ public class ControllerTest {
         makeAuthentication();
         Gson gson = new Gson();
         String requestBody = gson.toJson(saveRecipeReqDTO);
+        given(userService.findUserById(any(Long.class))).willReturn(this.user);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -106,7 +119,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("레시피 등록완료"))
                 .andDo(print());
 
-        verify(recipeService,times(1)).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
+        verify(recipeService,times(1)).addRecipe(any(SaveRecipeReqDTO.class),any(User.class));
     }
 
     @Test
@@ -116,6 +129,7 @@ public class ControllerTest {
         //given
         Gson gson = new Gson();
         String requestBody = gson.toJson(saveRecipeReqDTO);
+        given(userService.findUserById(any(Long.class))).willReturn(this.user);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -125,7 +139,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
 
-        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
+        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReqDTO.class),any(User.class));
     }
 
     @Test
@@ -149,7 +163,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
 
-        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
+        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReqDTO.class),any(User.class));
     }
 
     @Test
@@ -160,7 +174,7 @@ public class ControllerTest {
         makeAuthentication();
         Gson gson = new Gson();
         String requestBody = gson.toJson(saveRecipeReqDTO);
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(recipeService).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(userService).findUserById(any(Long.class));
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -170,7 +184,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
 
-        verify(recipeService,times(1)).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
+        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReqDTO.class),any(User.class));
     }
 
     @Test

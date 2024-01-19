@@ -12,8 +12,6 @@ import com.example.foodking.Recipe.RecipeWayInfo.DTO.SaveRecipeWayInfoReqDTO;
 import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo;
 import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfoRepository;
 import com.example.foodking.User.User;
-import com.example.foodking.User.UserRepository;
-import com.example.foodking.User.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,15 +33,12 @@ public class RecipeService {
     @Value("${file.dir}")
     private String fileDir;
 
-    private final UserRepository userRepository;
     private final RecipeInfoRepository recipeInfoRepository;
     private final IngredientRepository ingredientRepository;
     private final RecipeWayInfoRepository recipeWayInfoRepository;
 
     @Transactional
-    public Long addRecipe(SaveRecipeReqDTO saveRecipeReqDTO, Long userId){
-
-        User user = UserService.findUserById(userId,userRepository);
+    public Long addRecipe(SaveRecipeReqDTO saveRecipeReqDTO, User user){
 
         RecipeInfo recipeInfo = SaveRecipeReqDTO.toRecipeInfoEntity(saveRecipeReqDTO,user);
         List<Ingredient> ingredientList = SaveRecipeReqDTO.toIngredientListEntity(saveRecipeReqDTO.getSaveIngredientReqDTOList(),recipeInfo);
@@ -206,7 +201,7 @@ public class RecipeService {
         recipeWayInfo.changeRecipeWay(newInfo.getRecipeWay());
     }
 
-    public static RecipeInfo findRecipeInfoById(Long recipeInfoId, RecipeInfoRepository recipeInfoRepository){
+    public RecipeInfo findRecipeInfoById(Long recipeInfoId){
         return recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
     }

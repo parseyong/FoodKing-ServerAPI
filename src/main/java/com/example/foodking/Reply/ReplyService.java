@@ -6,8 +6,6 @@ import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfoRepository;
 import com.example.foodking.Recipe.RecipeService;
 import com.example.foodking.User.User;
-import com.example.foodking.User.UserRepository;
-import com.example.foodking.User.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,14 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReplyService {
 
     private final ReplyRepository replyRepository;
-    private final UserRepository userRepository;
-    private final RecipeInfoRepository recipeInfoRepository;
 
     @Transactional
-    public Long addReply(Long userId, Long recipeInfoId, String content){
-        User user = UserService.findUserById(userId,userRepository);
-        RecipeInfo recipeInfo = RecipeService.findRecipeInfoById(recipeInfoId,recipeInfoRepository);
-
+    public Long addReply(User user, RecipeInfo recipeInfo, String content){
         Reply reply = Reply.builder()
                 .content(content)
                 .user(user)
@@ -52,7 +45,7 @@ public class ReplyService {
         replyRepository.save(reply);
     }
 
-    public static Reply findReplyById(Long replyId,ReplyRepository replyRepository){
+    public Reply findReplyById(Long replyId){
         return replyRepository.findById(replyId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_REPLY));
     }

@@ -96,7 +96,7 @@ public class UserService {
         if(!passwordEncoder.matches(password1,password2))
             throw new CommondException(exceptionCode);
     }
-    public static User findUserById(Long userId,UserRepository userRepository){
+    public User findUserById(Long userId){
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
     }
