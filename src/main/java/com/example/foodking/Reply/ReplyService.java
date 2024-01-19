@@ -3,8 +3,6 @@ package com.example.foodking.Reply;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
-import com.example.foodking.Recipe.RecipeInfo.RecipeInfoRepository;
-import com.example.foodking.Recipe.RecipeService;
 import com.example.foodking.User.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -302,7 +302,7 @@ public class ControllerTest {
         this.mockMvc.perform(patch("/replys/{replyId}",1l)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글 수정테스트"))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 댓글에 대한 권한이 없습니다"));
 
         verify(replyService,times(1)).updateReply(any(Long.class),any(Long.class),any(String.class));
@@ -397,7 +397,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(delete("/replys/{replyId}",1l)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 댓글에 대한 권한이 없습니다"));
 
         verify(replyService,times(1)).deleteReply(any(Long.class),any(Long.class));

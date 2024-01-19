@@ -3,7 +3,6 @@ package com.example.foodking.Reply;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
-import com.example.foodking.Recipe.RecipeInfo.RecipeInfoRepository;
 import com.example.foodking.User.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

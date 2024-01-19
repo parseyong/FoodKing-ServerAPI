@@ -336,7 +336,7 @@ public class ControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
-                .andExpect(jsonPath("$.data.recipeInfoId").value("존재하지 않는 레시피입니다"));
+                .andExpect(jsonPath("$.data").isEmpty());
 
         verify(recipeService,times(1)).addImage(any(MultipartFile.class),any(Long.class));
     }
@@ -650,7 +650,7 @@ public class ControllerTest {
         //when, then
         this.mockMvc.perform(delete("/recipes/{recipeInfoId}",1l)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 레시피에 대해 권한이 없습니다"))
                 .andDo(print());
 

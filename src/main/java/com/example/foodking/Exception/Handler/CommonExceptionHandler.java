@@ -14,7 +14,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -120,9 +119,9 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers,
                                                                   HttpStatus status,
                                                                   WebRequest request) {
-        String message = "서버 내부에 에러가 발생했습니다. : 올바른 ENUM타입이 아닙니다. 관리자에게 문의하세요";
+        String message = "올바른 ENUM타입이 아닙니다. 관리자에게 문의하세요";
         log.error(message+":"+ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResDTO.of(message,null));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of(message,null));
     }
 
     // @PathVariable로 입력받은 값의 타입이 올바르지 않을 때
@@ -140,7 +139,6 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<CommonResDTO> handleException(Exception ex) {
 
         String message = "서버 내부에 에러가 발생했습니다.";
