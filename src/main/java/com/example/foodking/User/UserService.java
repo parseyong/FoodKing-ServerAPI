@@ -21,7 +21,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public String login(LoginReqDTO loginReqDTO){
-
         User user = userRepository.findUserByEmail(loginReqDTO.getEmail())
                 .orElseThrow(() -> new CommondException(ExceptionCode.LOGIN_FAIL));
 
@@ -30,7 +29,6 @@ public class UserService {
     }
     @Transactional
     public void addUser(AddUserReqDTO addUserReqDTO){
-
         if(emailDuplicatedChecking(addUserReqDTO.getEmail()))
            throw new CommondException(ExceptionCode.EMAIL_DUPLICATED);
         if(nickNameDuplicatedChecking(addUserReqDTO.getNickName()))
@@ -38,6 +36,7 @@ public class UserService {
         if(!addUserReqDTO.getPassword().equals(addUserReqDTO.getPasswordRepeat()))
             throw new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT);
 
+        // passwordEncoder를 통한 비밀번호 암호화 및 salt처리
         addUserReqDTO.setPassword(passwordEncoder.encode(addUserReqDTO.getPassword()));
         User user = AddUserReqDTO.toEntity(addUserReqDTO);
         userRepository.save(user);
@@ -61,26 +60,24 @@ public class UserService {
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
     }
 
-    public ReadUserInfoResDTO readUserInfo(Long userId){
+    public ReadUserInfoResDTO readUser(Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         return ReadUserInfoResDTO.toDTO(user);
     }
     @Transactional
-    public User updateUserInfo(UpdateUserInfoReqDTO updateUserInfoReqDTO,Long userId){
+    public void updateUser(UpdateUserInfoReqDTO updateUserInfoReqDTO, Long userId){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
 
-        isMatchPassword(updateUserInfoReqDTO.getOldPassword(),user.getPassword()
-                ,ExceptionCode.PASSWORD_NOT_COLLECT);
-
+        isMatchPassword(updateUserInfoReqDTO.getOldPassword(),user.getPassword(),ExceptionCode.PASSWORD_NOT_COLLECT);
         user.changeNickName(updateUserInfoReqDTO.getNickName());
         user.changePhoneNum(updateUserInfoReqDTO.getPhoneNum());
         user.changePassword(passwordEncoder.encode(updateUserInfoReqDTO.getNewPassword()));
         userRepository.save(user);
-        return user;
     }
+
     @Transactional
     public void deleteUser(DeleteUserReqDTO deleteUserReqDTO){
         User user = userRepository.findUserByEmail(deleteUserReqDTO.getEmail())
@@ -90,12 +87,13 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    //password1에는 인코딩 되지않은 값을, password2에는 인코딩이 되어있는 값을 넣어야한다.
-    public void isMatchPassword(String password1, String password2, ExceptionCode exceptionCode){
+    //rawPassword에는 인코딩 되지않은 값을, encodedPassword에는 인코딩이 되어있는 값을 넣어야한다.
+    public void isMatchPassword(String rawPassword, String encodedPassword, ExceptionCode exceptionCode){
 
-        if(!passwordEncoder.matches(password1,password2))
+        if(!passwordEncoder.matches(rawPassword,encodedPassword))
             throw new CommondException(exceptionCode);
     }
+
     public User findUserById(Long userId){
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));

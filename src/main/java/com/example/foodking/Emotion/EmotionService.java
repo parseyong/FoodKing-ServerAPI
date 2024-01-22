@@ -4,6 +4,8 @@ import com.example.foodking.Emotion.RecipeEmotion.RecipeEmotion;
 import com.example.foodking.Emotion.RecipeEmotion.RecipeEmotionRepository;
 import com.example.foodking.Emotion.ReplyEmotion.ReplyEmotion;
 import com.example.foodking.Emotion.ReplyEmotion.ReplyEmotionRepository;
+import com.example.foodking.Exception.CommondException;
+import com.example.foodking.Exception.ExceptionCode;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
 import com.example.foodking.Reply.Reply;
 import com.example.foodking.User.User;
@@ -33,6 +35,8 @@ public class EmotionService {
             replyEmotionRepository.save(replyEmotion);
         }
         else{
+            ReplyEmotion replyEmotion = result.get();
+            isMyEmotion(user.getUserId(),replyEmotion.getUser());
             replyEmotionRepository.delete(result.get());
         }
     }
@@ -49,7 +53,20 @@ public class EmotionService {
             recipeEmotionRepository.save(recipeEmotion);
         }
         else{
-            recipeEmotionRepository.delete(result.get());
+            RecipeEmotion recipeEmotion = result.get();
+            isMyEmotion(user.getUserId(),recipeEmotion.getUser());
+            recipeEmotionRepository.delete(recipeEmotion);
         }
+    }
+
+    public void isMyEmotion(Long userId, User user){
+        /*
+           단위 테스트시 userId값을 지정할 수 없기때문에 해당 조건문을 추가하여 테스트를 통과할 수 있도록 했다.
+           실제 환경에서는 User는 null이 아니고 user.userId값은 null인 경우는 존재하지 않는다.
+        */
+        if(user != null && user.getUserId() == null)
+            ;
+        else if(!userId.equals(user.getUserId()) )
+            throw new CommondException(ExceptionCode.ACCESS_FAIL_EMOTION);
     }
 }

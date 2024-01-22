@@ -717,7 +717,7 @@ public class ControllerTest {
                 .email("test@google.com")
                 .build();
 
-        given(userService.readUserInfo(any(Long.class))).willReturn(readUserInfoResDTO);
+        given(userService.readUser(any(Long.class))).willReturn(readUserInfoResDTO);
 
         //when,then
         this.mockMvc.perform(get("/users")
@@ -728,7 +728,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.nickName").value("nickName"))
                 .andExpect(jsonPath("$.data.phoneNum").value("01056962173"))
                 .andDo(print());
-        verify(userService,times(1)).readUserInfo(any(Long.class));
+        verify(userService,times(1)).readUser(any(Long.class));
     }
 
     @Test
@@ -742,7 +742,7 @@ public class ControllerTest {
                 .email("test@google.com")
                 .build();
 
-        given(userService.readUserInfo(any(Long.class))).willReturn(readUserInfoResDTO);
+        given(userService.readUser(any(Long.class))).willReturn(readUserInfoResDTO);
 
         //when,then
         this.mockMvc.perform(get("/users")
@@ -750,7 +750,7 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
-        verify(userService,times(0)).readUserInfo(any(Long.class));
+        verify(userService,times(0)).readUser(any(Long.class));
     }
 
     @Test
@@ -765,7 +765,7 @@ public class ControllerTest {
                 .email("test@google.com")
                 .build();
 
-        given(userService.readUserInfo(any(Long.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
+        given(userService.readUser(any(Long.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         //when,then
         this.mockMvc.perform(get("/users")
@@ -773,7 +773,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
-        verify(userService,times(1)).readUserInfo(any(Long.class));
+        verify(userService,times(1)).readUser(any(Long.class));
     }
 
     @Test
@@ -798,7 +798,7 @@ public class ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("유저정보 변경 성공"))
                 .andDo(print());
-        verify(userService,times(1)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
+        verify(userService,times(1)).updateUser(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -822,7 +822,7 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
-        verify(userService,times(0)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
+        verify(userService,times(0)).updateUser(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -847,7 +847,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
-        verify(userService,times(0)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
+        verify(userService,times(0)).updateUser(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -864,7 +864,7 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(updateUserInfoReqDTO);
-        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT)).when(userService).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
+        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT)).when(userService).updateUser(any(UpdateUserInfoReqDTO.class),any(Long.class));
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -874,7 +874,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("비밀번호가 일치하지 않습니다."))
                 .andExpect(jsonPath("$.data.password").value("비밀번호가 일치하지 않습니다."))
                 .andDo(print());
-        verify(userService,times(1)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
+        verify(userService,times(1)).updateUser(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test
@@ -891,7 +891,7 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(updateUserInfoReqDTO);
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(userService).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(userService).updateUser(any(UpdateUserInfoReqDTO.class),any(Long.class));
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -900,7 +900,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
-        verify(userService,times(1)).updateUserInfo(any(UpdateUserInfoReqDTO.class),any(Long.class));
+        verify(userService,times(1)).updateUser(any(UpdateUserInfoReqDTO.class),any(Long.class));
     }
 
     @Test

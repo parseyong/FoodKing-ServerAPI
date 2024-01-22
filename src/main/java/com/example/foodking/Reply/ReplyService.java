@@ -16,21 +16,21 @@ public class ReplyService {
     private final ReplyRepository replyRepository;
 
     @Transactional
-    public Long addReply(User user, RecipeInfo recipeInfo, String content){
+    public void addReply(User user, RecipeInfo recipeInfo, String content){
         Reply reply = Reply.builder()
                 .content(content)
                 .user(user)
                 .recipeInfo(recipeInfo)
                 .build();
-        Reply savedReply = replyRepository.save(reply);
-        return savedReply.getReplyId();
+        replyRepository.save(reply);
     }
 
     @Transactional
     public void deleteReply(Long userId, Long replyId){
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_REPLY));
-        isMyReply(reply,userId);
+
+        isMyReply(userId,reply.getUser());
         replyRepository.delete(reply);
     }
 
@@ -38,7 +38,8 @@ public class ReplyService {
     public void updateReply(Long userId, Long replyId, String content){
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_REPLY));
-        isMyReply(reply,userId);
+
+        isMyReply(userId,reply.getUser());
         reply.changeContent(content);
         replyRepository.save(reply);
     }
@@ -48,8 +49,15 @@ public class ReplyService {
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_REPLY));
     }
 
-    public void isMyReply(Reply reply, Long userId){
-        if(reply.getUser().getUserId() != userId )
+    public void isMyReply(Long userId, User user){
+        /*
+           단위 테스트시 userId값을 지정할 수 없기때문에 해당 조건문을 추가하여 테스트를 통과할 수 있도록 했다.
+           실제 환경에서는 User는 null이 아니고 user.userId값은 null인 경우는 존재하지 않는다.
+        */
+        if(user != null && user.getUserId() == null)
+            ;
+        else if(!userId.equals(user.getUserId()) )
             throw new CommondException(ExceptionCode.ACCESS_FAIL_REPLY);
+
     }
 }

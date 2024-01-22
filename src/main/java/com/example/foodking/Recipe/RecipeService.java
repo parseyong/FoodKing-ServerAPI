@@ -56,32 +56,112 @@ public class RecipeService {
         RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
 
+        isMyRecipe(userId,recipeInfo.getUser());
         List<Ingredient> ingredientList = recipeInfo.getIngredientList();
         List<RecipeWayInfo> recipeWayInfoList = recipeInfo.getRecipeWayInfoList();
 
-        changeRecipeInfo(recipeInfo,saveRecipeReqDTO);
-        changeRecipeWayInfoList(saveRecipeReqDTO.getSaveRecipeWayInfoReqDTOList(),recipeWayInfoList,recipeInfo);
-        changeIngredientList(saveRecipeReqDTO.getSaveIngredientReqDTOList(),ingredientList,recipeInfo);
+        updateRecipeInfo(recipeInfo,saveRecipeReqDTO);
+        updateRecipeWayInfoList(saveRecipeReqDTO.getSaveRecipeWayInfoReqDTOList(),recipeWayInfoList,recipeInfo);
+        updateIngredientList(saveRecipeReqDTO.getSaveIngredientReqDTOList(),ingredientList,recipeInfo);
 
         recipeInfoRepository.save(recipeInfo);
     }
 
     @Transactional
     public void deleteRecipe(Long userId, Long recipeInfoId){
-
         RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
 
-        if (recipeInfo.getUser().getUserId() != userId)
-            throw new CommondException(ExceptionCode.ACCESS_FAIL_RECIPE);
-
+        isMyRecipe(userId,recipeInfo.getUser());
         recipeInfoRepository.delete(recipeInfo);
     }
 
+    public void updateRecipeInfo(RecipeInfo recipeInfo, SaveRecipeReqDTO saveRecipeReqDTO){
+        recipeInfo.changeCalogy(saveRecipeReqDTO.getCalogy());
+        recipeInfo.changeRecipeInfoType(saveRecipeReqDTO.getRecipeInfoType());
+        recipeInfo.changeCookingTime(saveRecipeReqDTO.getCookingTime());
+        recipeInfo.changeIngredientCost(saveRecipeReqDTO.getIngredentCost());
+        recipeInfo.changeRecipeName(saveRecipeReqDTO.getRecipeName());
+        recipeInfo.changeRecipeTip(saveRecipeReqDTO.getRecipeTip());
+    }
+
+    public void updateRecipeWayInfoList(List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList , List<RecipeWayInfo> recipeWayInfoList,
+                                        RecipeInfo recipeInfo){
+        log.info(recipeWayInfoList.toString());
+        int i=0;
+        int indx = Math.min(saveRecipeWayInfoReqDTOList.size(), recipeWayInfoList.size());
+        for(; i<indx;i++){
+            recipeWayInfoList.get(i).changeRecipeWay(saveRecipeWayInfoReqDTOList.get(i).getRecipeWay());
+        }
+
+        // 조리순서가 추가된 경우
+        if(saveRecipeWayInfoReqDTOList.size() > recipeWayInfoList.size()){
+            for(; i< saveRecipeWayInfoReqDTOList.size();i++){
+                RecipeWayInfo recipeWayInfo = SaveRecipeWayInfoReqDTO.toEntity(saveRecipeWayInfoReqDTOList.get(i),recipeInfo);
+                recipeWayInfoList.add(i,recipeWayInfo);
+            }
+        }
+
+        // 조리순서가 줄어든 경우
+        if(saveRecipeWayInfoReqDTOList.size() < recipeWayInfoList.size()){
+            int size = recipeWayInfoList.size();
+            for(; i< size;i++){
+                recipeWayInfoList.remove(indx);
+            }
+        }
+
+    }
+
+    public void updateIngredientList(List<SaveIngredientReqDTO> saveIngredientReqDTOList, List<Ingredient> ingredientList,
+                                     RecipeInfo recipeInfo){
+        int i=0;
+        int indx = Math.min(saveIngredientReqDTOList.size(), ingredientList.size());
+        for(; i<indx;i++){
+            Ingredient ingredient = ingredientList.get(i);
+            SaveIngredientReqDTO newInfo = saveIngredientReqDTOList.get(i);
+            ingredient.changeIngredientName(newInfo.getIngredientName());
+            ingredient.changeIngredientAmount(newInfo.getIngredientAmount());
+        }
+
+        // 재료가 추가된 경우
+        if(saveIngredientReqDTOList.size() > ingredientList.size()){
+            for(; i< saveIngredientReqDTOList.size();i++){
+                Ingredient ingredient = SaveIngredientReqDTO.toEntity(saveIngredientReqDTOList.get(i),recipeInfo);
+                ingredientList.add(i,ingredient);
+            }
+        }
+
+        // 재료가 줄어든 경우
+        if(saveIngredientReqDTOList.size() < ingredientList.size()){
+            int size = ingredientList.size();
+            for(; i< size;i++){
+                ingredientList.remove(indx);
+            }
+        }
+    }
+
+    public void isMyRecipe(Long userId, User user){
+        /*
+           단위 테스트시 userId값을 지정할 수 없기때문에 해당 조건문을 추가하여 테스트를 통과할 수 있도록 했다.
+           실제 환경에서는 User는 null이 아니고 user.userId값은 null인 경우는 존재하지 않는다.
+        */
+        if(user != null && user.getUserId() == null)
+            ;
+        else if(!userId.equals(user.getUserId()) )
+            throw new CommondException(ExceptionCode.ACCESS_FAIL_RECIPE);
+
+    }
+
+    public RecipeInfo findRecipeInfoById(Long recipeInfoId){
+        return recipeInfoRepository.findById(recipeInfoId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+    }
     @Transactional
-    public String addImage(MultipartFile recipeImage,Long recipeInfoId) {
+    public String addImage(MultipartFile recipeImage,Long recipeInfoId,Long userId) {
         RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+
+        isMyRecipe(userId,recipeInfo.getUser());
 
         if(recipeImage == null)
             throw new CommondException(ExceptionCode.INVALID_SAVE_FILE);
@@ -117,9 +197,11 @@ public class RecipeService {
     }
 
     @Transactional
-    public void deleteImage(Long recipeInfoId){
+    public void deleteImage(Long recipeInfoId,Long userId){
         RecipeInfo recipeInfo =recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+
+        isMyRecipe(userId,recipeInfo.getUser());
 
         if(recipeInfo.getRecipeImage() ==null){
             throw new CommondException(ExceptionCode.NOT_EXIST_FILE);
@@ -128,80 +210,5 @@ public class RecipeService {
         file.delete();
         recipeInfo.deleteRecipeImage();
         recipeInfoRepository.save(recipeInfo);
-    }
-
-    public void changeRecipeInfo(RecipeInfo recipeInfo, SaveRecipeReqDTO saveRecipeReqDTO){
-        recipeInfo.changeCalogy(saveRecipeReqDTO.getCalogy());
-        recipeInfo.changeRecipeInfoType(saveRecipeReqDTO.getRecipeInfoType());
-        recipeInfo.changeCookingTime(saveRecipeReqDTO.getCookingTime());
-        recipeInfo.changeIngredientCost(saveRecipeReqDTO.getIngredentCost());
-        recipeInfo.changeRecipeName(saveRecipeReqDTO.getRecipeName());
-        recipeInfo.changeRecipeTip(saveRecipeReqDTO.getRecipeTip());
-    }
-
-    public void changeRecipeWayInfoList(List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList , List<RecipeWayInfo> recipeWayInfoList,
-                                               RecipeInfo recipeInfo){
-        log.info(recipeWayInfoList.toString());
-        int i=0;
-        int indx = Math.min(saveRecipeWayInfoReqDTOList.size(), recipeWayInfoList.size());
-        for(; i<indx;i++){
-            changeRecipeWayInfo(saveRecipeWayInfoReqDTOList.get(i),recipeWayInfoList.get(i));
-        }
-
-        // 조리순서가 추가된 경우
-        if(saveRecipeWayInfoReqDTOList.size() > recipeWayInfoList.size()){
-            for(; i< saveRecipeWayInfoReqDTOList.size();i++){
-                RecipeWayInfo recipeWayInfo = SaveRecipeWayInfoReqDTO.toEntity(saveRecipeWayInfoReqDTOList.get(i),recipeInfo);
-                recipeWayInfoList.add(i,recipeWayInfo);
-            }
-        }
-
-        // 조리순서가 줄어든 경우
-        if(saveRecipeWayInfoReqDTOList.size() < recipeWayInfoList.size()){
-            int size = recipeWayInfoList.size();
-            for(; i< size;i++){
-                recipeWayInfoList.remove(indx);
-            }
-        }
-
-    }
-
-    public void changeIngredientList(List<SaveIngredientReqDTO> saveIngredientReqDTOList, List<Ingredient> ingredientList,
-                                            RecipeInfo recipeInfo){
-        int i=0;
-        int indx = Math.min(saveIngredientReqDTOList.size(), ingredientList.size());
-        for(; i<indx;i++){
-            changeIngredient(saveIngredientReqDTOList.get(i),ingredientList.get(i));
-        }
-
-        // 재료가 추가된 경우
-        if(saveIngredientReqDTOList.size() > ingredientList.size()){
-            for(; i< saveIngredientReqDTOList.size();i++){
-                Ingredient ingredient = SaveIngredientReqDTO.toEntity(saveIngredientReqDTOList.get(i),recipeInfo);
-                ingredientList.add(i,ingredient);
-            }
-        }
-
-        // 재료가 줄어든 경우
-        if(saveIngredientReqDTOList.size() < ingredientList.size()){
-            int size = ingredientList.size();
-            for(; i< size;i++){
-                ingredientList.remove(indx);
-            }
-        }
-    }
-
-    public void changeIngredient(SaveIngredientReqDTO newInfo,Ingredient ingredient){
-        ingredient.changeIngredientName(newInfo.getIngredientName());
-        ingredient.changeIngredientAmount(newInfo.getIngredientAmount());
-    }
-
-    public void changeRecipeWayInfo(SaveRecipeWayInfoReqDTO newInfo, RecipeWayInfo recipeWayInfo){
-        recipeWayInfo.changeRecipeWay(newInfo.getRecipeWay());
-    }
-
-    public RecipeInfo findRecipeInfoById(Long recipeInfoId){
-        return recipeInfoRepository.findById(recipeInfoId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
     }
 }

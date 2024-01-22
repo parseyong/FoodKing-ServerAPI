@@ -259,7 +259,7 @@ public class ServiceTest {
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
 
         //when
-        ReadUserInfoResDTO readUserInfoResDTO = userService.readUserInfo(1l);
+        ReadUserInfoResDTO readUserInfoResDTO = userService.readUser(1l);
 
         //then
         assertThat(readUserInfoResDTO.getEmail()).isEqualTo("test@google.com");
@@ -275,7 +275,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            userService.readUserInfo(1l);
+            userService.readUser(1l);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
@@ -291,12 +291,12 @@ public class ServiceTest {
         given(passwordEncoder.matches(any(String.class),any(String.class))).willReturn(true);
 
         //when
-        User updatedUser = userService.updateUserInfo(updateUserInfoReqDTO,1l);
+        userService.updateUser(updateUserInfoReqDTO,1l);
 
         //then
-        assertThat(updatedUser.getNickName()).isEqualTo("newNickName");
-        assertThat(updatedUser.getPassword()).isEqualTo("encodedPassword");
-        assertThat(updatedUser.getPhoneNum()).isEqualTo("01056962174");
+        assertThat(user.getNickName()).isEqualTo("newNickName");
+        assertThat(user.getPassword()).isEqualTo("encodedPassword");
+        assertThat(user.getPhoneNum()).isEqualTo("01056962174");
         verify(passwordEncoder,times(1)).encode(any(String.class));
         verify(passwordEncoder,times(1)).matches(any(String.class),any(String.class));
         verify(userRepository,times(1)).save(any(User.class));
@@ -310,7 +310,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            userService.updateUserInfo(updateUserInfoReqDTO,1l);
+            userService.updateUser(updateUserInfoReqDTO,1l);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
@@ -329,7 +329,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            userService.updateUserInfo(updateUserInfoReqDTO,1l);
+            userService.updateUser(updateUserInfoReqDTO,1l);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.PASSWORD_NOT_COLLECT);

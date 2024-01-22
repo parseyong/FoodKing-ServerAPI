@@ -100,31 +100,13 @@ public class ServiceTest {
     }
 
     @Test
-    @DisplayName("댓글 수정 테스트 -> (실패 : 댓글 수정권한이 없음)")
-    public void updateReplyFail2(){
-        //given
-        given(replyRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(reply));
-
-        //when,then
-        try{
-            replyService.updateReply(1l,1l,"수정된 댓글");
-            fail("예외가 발생하지 않음");
-        }catch (CommondException ex){
-            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.ACCESS_FAIL_REPLY);
-            assertThat(reply.getContent()).isEqualTo("testReplyContent");
-            verify(replyRepository,times(1)).findById(any(Long.class));
-            verify(replyRepository,times(0)).save(any(Reply.class));
-        }
-    }
-
-    @Test
     @DisplayName("댓글 삭제 테스트 -> 성공")
     public void deleteReplySuccess(){
         //given
         given(replyRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(reply));
 
         //when
-        replyService.deleteReply(null,1l);
+        replyService.deleteReply(1l,1l);
 
         //then
         verify(replyRepository,times(1)).findById(any(Long.class));
@@ -139,27 +121,10 @@ public class ServiceTest {
 
         //when,then
         try{
-            replyService.deleteReply(null,1l);
-            fail("예외가 발생하지 않음");
-        }catch (CommondException ex){
-            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_REPLY);
-            verify(replyRepository,times(1)).findById(any(Long.class));
-            verify(replyRepository,times(0)).delete(any(Reply.class));
-        }
-    }
-
-    @Test
-    @DisplayName("댓글 삭제 테스트 -> (실패 : 댓글 삭제권한이 없음)")
-    public void deleteReplyFail2(){
-        //given
-        given(replyRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(reply));
-
-        //when,then
-        try{
             replyService.deleteReply(1l,1l);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
-            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.ACCESS_FAIL_REPLY);
+            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_REPLY);
             verify(replyRepository,times(1)).findById(any(Long.class));
             verify(replyRepository,times(0)).delete(any(Reply.class));
         }

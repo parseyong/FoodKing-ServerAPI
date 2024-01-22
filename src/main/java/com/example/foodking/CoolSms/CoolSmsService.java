@@ -46,7 +46,7 @@ public class CoolSmsService {
         coolSms = new  Message(apiKey,apiSecret);
     }
 
-
+    // 입력된 전화번호에 인증번호를 발급한다.
     public String sendMessage(String phoneNum){
 
         if(phoneNum.length() > 12 || phoneNum.length() < 8 || !Pattern.matches("\\d+", phoneNum))
@@ -63,7 +63,8 @@ public class CoolSmsService {
 
         try {
             coolSms.send(params);
-            authenticationNumberMap.put(phoneNum, String.valueOf(authenticationNumber)); //인증번호 확인을 위한 저장.
+            //인증번호 확인을 위해 발급된 인증번호를 key-value(전화번호-인증번호)형태로 저장
+            authenticationNumberMap.put(phoneNum, String.valueOf(authenticationNumber));
         } catch (CoolsmsException e) {
             System.out.println(e.getCode()+":"+e.getMessage());
             log.error(e.getCode()+":"+e.getMessage());
@@ -71,6 +72,11 @@ public class CoolSmsService {
         }
         return String.valueOf(authenticationNumber);
     }
+
+    /*
+        해당 전화번호에 발급된 인증번호에 대한 인증을 실행하는 메소드
+        인증에 성공하면 authenticationedPhoneNumset에 전화번호를 저장한다.
+    */
     public void authNumCheck(PhoneAuthReqDTO phoneAuthReqDTO) {
 
         String authenticationNum = authenticationNumberMap.get(phoneAuthReqDTO.getPhoneNum());
@@ -82,6 +88,8 @@ public class CoolSmsService {
 
         authenticationedPhoneNumSet.add(phoneAuthReqDTO.getPhoneNum());
     }
+    
+    // 해당 전화번호가 인증이 완료된 전화번호인지 체크 즉, authenticationedPhoneNumset에 전화번호가 존재하는지 체크한다.
     public boolean isAuthenticatedNum(String phoneNum){
 
         log.info(authenticationNumberMap.toString() + "isAuth");
@@ -92,7 +100,11 @@ public class CoolSmsService {
         }
         return true;
     }
-    // isAuthenticatedNum에서 통과된 후 다른 부분에서 예외발생 시 인증된 번호정보가 사라지기때문에 연산 마지막에 해당 메소드를 실행한다.
+
+    /*
+        회원가입이 완료된 후 제일 마지막에 수행되는 메소드
+        인증로직 완료 후 삭제해 버리면 로그인로직에서 예외 발생시 전화번호 인증을 다시해야하기때문에 회원가입이 완료된 후 삭제한다.
+    */
     public void deleteAuthInfo(String phoneNum){
         authenticationedPhoneNumSet.remove(phoneNum);
         authenticationNumberMap.remove(phoneNum);

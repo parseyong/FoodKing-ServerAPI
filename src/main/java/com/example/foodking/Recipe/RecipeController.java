@@ -34,15 +34,15 @@ public class RecipeController {
     @PostMapping("/recipes/images/{recipeInfoId}")
     public ResponseEntity<CommonResDTO> addImage(@RequestParam(name = "recipeImage") MultipartFile recipeImage,
                                                  @PathVariable Long recipeInfoId) {
-
-        recipeService.addImage(recipeImage,recipeInfoId);
+        Long userId = JwtProvider.getUserId();
+        recipeService.addImage(recipeImage,recipeInfoId,userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("이미지 등록완료",null));
     }
 
     @DeleteMapping ("/recipes/images/{recipeInfoId}")
     public ResponseEntity<CommonResDTO> deleteImage(@PathVariable Long recipeInfoId) {
-
-        recipeService.deleteImage(recipeInfoId);
+        Long userId = JwtProvider.getUserId();
+        recipeService.deleteImage(recipeInfoId,userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이미지 삭제완료",null));
     }
 

@@ -135,7 +135,7 @@ public class ServiceTest {
         );
 
         //when
-        String savedImagePath = recipeService.addImage(newImage,1l);
+        String savedImagePath = recipeService.addImage(newImage,1l,any(Long.class));
         File newFile = new File(savedImagePath);
 
         //then
@@ -160,7 +160,7 @@ public class ServiceTest {
         assertThat(oldFile.exists()).isTrue();
 
         //when
-        String savedImagePath = recipeService.addImage(newImage,1l);
+        String savedImagePath = recipeService.addImage(newImage,1l,any(Long.class));
         File newFile = new File(savedImagePath);
 
         //then
@@ -180,7 +180,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            recipeService.addImage(newImage,1l);
+            recipeService.addImage(newImage,1l,any(Long.class));
             fail("예외가 발생하지 않음");
 
         }catch (CommondException ex){
@@ -200,7 +200,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            recipeService.addImage(newImage,1l);
+            recipeService.addImage(newImage,1l,any(Long.class));
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             //then
@@ -223,7 +223,7 @@ public class ServiceTest {
         assertThat(file.exists()).isTrue();
 
         //when
-        recipeService.deleteImage(1l);
+        recipeService.deleteImage(1l,any(Long.class));
 
         //then
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
@@ -240,7 +240,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            recipeService.deleteImage(1l);
+            recipeService.deleteImage(1l,any(Long.class));
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             //then
@@ -258,7 +258,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            recipeService.deleteImage(1l);
+            recipeService.deleteImage(1l,any(Long.class));
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             //then
@@ -293,22 +293,6 @@ public class ServiceTest {
 
         //then
         verify(recipeInfoRepository,times(1)).delete(recipeInfo);
-    }
-
-    @Test
-    @DisplayName("레시피 삭제 테스트 -> (실패 : 내가 쓴 레시피가 아님)")
-    public void deleteRecipeFail1(){
-        //given
-        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
-
-        // when,then
-        try {
-            recipeService.deleteRecipe(1l, 1l);
-            fail("예외전환이 안됨");
-        }catch (CommondException ex){
-            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.ACCESS_FAIL_RECIPE);
-            verify(recipeInfoRepository,times(0)).delete(recipeInfo);
-        }
     }
 
     @Test

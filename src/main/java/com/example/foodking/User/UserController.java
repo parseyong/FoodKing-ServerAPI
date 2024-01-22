@@ -78,24 +78,24 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<CommonResDTO> readUserInfo(){
+    public ResponseEntity<CommonResDTO> readUser(){
 
         Long userId = JwtProvider.getUserId();
-        ReadUserInfoResDTO readUserInfoResDTO = userService.readUserInfo(userId);
+        ReadUserInfoResDTO readUserInfoResDTO = userService.readUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 조회 성공",readUserInfoResDTO));
     }
 
     @PatchMapping("/users")
-    public ResponseEntity<CommonResDTO> changeUserInfo(@RequestBody @Valid UpdateUserInfoReqDTO updateUserInfoReqDTO){
+    public ResponseEntity<CommonResDTO> updateUser(@RequestBody @Valid UpdateUserInfoReqDTO updateUserInfoReqDTO){
 
         Long userId = JwtProvider.getUserId();
-        userService.updateUserInfo(updateUserInfoReqDTO,userId);
+        userService.updateUser(updateUserInfoReqDTO,userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 변경 성공",null));
 
     }
 
     @DeleteMapping("/users")
-    public ResponseEntity<CommonResDTO> deleteUserInfo(@RequestBody @Valid DeleteUserReqDTO deleteUserReqDTO){
+    public ResponseEntity<CommonResDTO> deleteUser(@RequestBody @Valid DeleteUserReqDTO deleteUserReqDTO){
 
         userService.deleteUser(deleteUserReqDTO);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저 삭제완료",null));

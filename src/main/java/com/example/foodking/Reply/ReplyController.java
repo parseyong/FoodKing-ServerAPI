@@ -27,8 +27,8 @@ public class ReplyController {
     public ResponseEntity<CommonResDTO> addReply(@PathVariable Long recipeInfoId,
                                                   @RequestParam(name = "content") @NotBlank(message = "내용을 입력해주세요") String content){
         Long userId = JwtProvider.getUserId();
-        Long savedReplyId = replyService.addReply(userService.findUserById(userId),recipeService.findRecipeInfoById(recipeInfoId),content);
-        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("댓글 등록완료",savedReplyId));
+        replyService.addReply(userService.findUserById(userId),recipeService.findRecipeInfoById(recipeInfoId),content);
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("댓글 등록완료",null));
     }
 
     @PatchMapping("/replys/{replyId}")

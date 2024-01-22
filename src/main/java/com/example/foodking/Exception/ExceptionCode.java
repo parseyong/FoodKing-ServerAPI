@@ -34,7 +34,7 @@ public enum ExceptionCode {
 
     //EMOTION EXCEPTION
     EXIST_LIKE(HttpStatus.BAD_REQUEST,"이미 좋아요를 눌렀습니다.",null),
-    ACCESS_FAIL_LIKE(HttpStatus.FORBIDDEN,"해당 이모션에 대한 권한이 없습니다",null);
+    ACCESS_FAIL_EMOTION(HttpStatus.FORBIDDEN,"해당 이모션에 대한 권한이 없습니다",null);
 
     private final HttpStatus status;
     private final String field;
