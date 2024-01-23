@@ -1,16 +1,13 @@
 package com.example.foodking.User.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
-@Builder
+@Builder // 테스트를 위한 빌더추가
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UpdateUserInfoReqDTO {
     
     @NotBlank(message = "비밀번호를 입력해주세요")

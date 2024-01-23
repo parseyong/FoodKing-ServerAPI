@@ -2,17 +2,14 @@ package com.example.foodking.Recipe.Ingredient.DTO;
 
 import com.example.foodking.Recipe.Ingredient.Ingredient;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
-@Builder
+@Builder // 테스트를 위한 빌더추가
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SaveIngredientReqDTO {
 
     @NotBlank(message = "재료명을 입력해주세요")

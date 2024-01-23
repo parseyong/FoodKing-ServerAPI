@@ -113,15 +113,21 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(CommonResDTO.of(ex.getExceptionCode().getMessage(),errors));
     }
     
-    // enum타입에 대한 역직렬화과정에서 발생하는 예외처리
+    // 역직렬화 과정에서 dto필드의 타입이 맞지 않아 발생하는 예외
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
                                                                   HttpHeaders headers,
                                                                   HttpStatus status,
                                                                   WebRequest request) {
-        String message = "올바른 ENUM타입이 아닙니다. 관리자에게 문의하세요";
-        log.error(message+":"+ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of(message,null));
+        String errorMessage = ex.getMessage();
+        if(errorMessage.contains("java.lang.Long"))
+            errorMessage = ": Long타입 예외";
+        else if(errorMessage.contains("Enum"))
+            errorMessage = ": ENUM타입 예외";
+
+        String message = "올바른 요청타입이 아닙니다. 관리자에게 문의하세요";
+        log.error(message+errorMessage+":"+ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of(message+errorMessage,null));
     }
 
     // @PathVariable로 입력받은 값의 타입이 올바르지 않을 때

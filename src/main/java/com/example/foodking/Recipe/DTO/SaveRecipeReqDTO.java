@@ -7,22 +7,19 @@ import com.example.foodking.Recipe.RecipeInfo.RecipeInfoType;
 import com.example.foodking.Recipe.RecipeWayInfo.DTO.SaveRecipeWayInfoReqDTO;
 import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo;
 import com.example.foodking.User.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
-@Builder
+@Builder // 테스트를 위한 빌더추가
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SaveRecipeReqDTO {
 
     @NotBlank(message = "레시피 이름을 입력해주세요")
@@ -56,22 +53,15 @@ public class SaveRecipeReqDTO {
 
     public static List<Ingredient> toIngredientListEntity(List<SaveIngredientReqDTO> saveIngredientReqDTOList,
                                                           RecipeInfo recipeInfo){
-        List<Ingredient> ingredientList = new ArrayList<>();
-        for( SaveIngredientReqDTO saveIngredientReqDTO : saveIngredientReqDTOList){
-            ingredientList.add(SaveIngredientReqDTO.toEntity(saveIngredientReqDTO,recipeInfo));
-        }
-
-        return ingredientList;
+        return saveIngredientReqDTOList.stream()
+                .map(dto -> SaveIngredientReqDTO.toEntity(dto, recipeInfo))
+                .collect(Collectors.toList());
     }
 
     public static List<RecipeWayInfo> toRecipeWayInfoListEntity(List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList,
                                                                 RecipeInfo recipeInfo){
-        List<RecipeWayInfo> recipeWayInfoList = new ArrayList<>();
-        for( SaveRecipeWayInfoReqDTO saveRecipeWayInfoReqDTO : saveRecipeWayInfoReqDTOList){
-            recipeWayInfoList.add(SaveRecipeWayInfoReqDTO.toEntity(saveRecipeWayInfoReqDTO,recipeInfo));
-        }
-
-        return recipeWayInfoList;
+        return saveRecipeWayInfoReqDTOList.stream()
+                .map(dto -> SaveRecipeWayInfoReqDTO.toEntity(dto,recipeInfo))
+                .collect(Collectors.toList());
     }
-
 }

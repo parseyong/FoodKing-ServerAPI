@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -87,57 +88,47 @@ public class RecipeService {
 
     public void updateRecipeWayInfoList(List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList , List<RecipeWayInfo> recipeWayInfoList,
                                         RecipeInfo recipeInfo){
-        log.info(recipeWayInfoList.toString());
-        int i=0;
-        int indx = Math.min(saveRecipeWayInfoReqDTOList.size(), recipeWayInfoList.size());
-        for(; i<indx;i++){
-            recipeWayInfoList.get(i).changeRecipeWay(saveRecipeWayInfoReqDTOList.get(i).getRecipeWay());
-        }
+        int minSize = Math.min(saveRecipeWayInfoReqDTOList.size(), recipeWayInfoList.size());
+
+        // 기존 조리순서 업데이트
+        IntStream.range(0, minSize)
+                .forEach(i -> recipeWayInfoList.get(i).changeRecipeWay(saveRecipeWayInfoReqDTOList.get(i).getRecipeWay()));
 
         // 조리순서가 추가된 경우
-        if(saveRecipeWayInfoReqDTOList.size() > recipeWayInfoList.size()){
-            for(; i< saveRecipeWayInfoReqDTOList.size();i++){
-                RecipeWayInfo recipeWayInfo = SaveRecipeWayInfoReqDTO.toEntity(saveRecipeWayInfoReqDTOList.get(i),recipeInfo);
-                recipeWayInfoList.add(i,recipeWayInfo);
-            }
-        }
+        IntStream.range(minSize, saveRecipeWayInfoReqDTOList.size())
+                .forEach(i -> recipeWayInfoList.add(SaveRecipeWayInfoReqDTO.toEntity(saveRecipeWayInfoReqDTOList.get(i), recipeInfo)));
 
         // 조리순서가 줄어든 경우
-        if(saveRecipeWayInfoReqDTOList.size() < recipeWayInfoList.size()){
-            int size = recipeWayInfoList.size();
-            for(; i< size;i++){
-                recipeWayInfoList.remove(indx);
-            }
-        }
+        IntStream.range(saveRecipeWayInfoReqDTOList.size(), recipeWayInfoList.size())
+                .forEach(i -> recipeWayInfoList.remove(minSize));
 
     }
 
     public void updateIngredientList(List<SaveIngredientReqDTO> saveIngredientReqDTOList, List<Ingredient> ingredientList,
                                      RecipeInfo recipeInfo){
-        int i=0;
-        int indx = Math.min(saveIngredientReqDTOList.size(), ingredientList.size());
-        for(; i<indx;i++){
-            Ingredient ingredient = ingredientList.get(i);
-            SaveIngredientReqDTO newInfo = saveIngredientReqDTOList.get(i);
-            ingredient.changeIngredientName(newInfo.getIngredientName());
-            ingredient.changeIngredientAmount(newInfo.getIngredientAmount());
-        }
+        int minSize = Math.min(saveIngredientReqDTOList.size(), ingredientList.size());
+
+        // 기존 재료 업데이트
+        IntStream.range(0,minSize)
+                .forEach(i ->{
+                    Ingredient ingredient = ingredientList.get(i);
+                    SaveIngredientReqDTO newInfo = saveIngredientReqDTOList.get(i);
+                    ingredient.changeIngredientName(newInfo.getIngredientName());
+                    ingredient.changeIngredientAmount(newInfo.getIngredientAmount());
+                });
 
         // 재료가 추가된 경우
-        if(saveIngredientReqDTOList.size() > ingredientList.size()){
-            for(; i< saveIngredientReqDTOList.size();i++){
-                Ingredient ingredient = SaveIngredientReqDTO.toEntity(saveIngredientReqDTOList.get(i),recipeInfo);
-                ingredientList.add(i,ingredient);
-            }
-        }
+        IntStream.range(minSize,saveIngredientReqDTOList.size())
+                .forEach(i -> {
+                    Ingredient ingredient = SaveIngredientReqDTO.toEntity(saveIngredientReqDTOList.get(i),recipeInfo);
+                    ingredientList.add(ingredient);
+                });
 
         // 재료가 줄어든 경우
-        if(saveIngredientReqDTOList.size() < ingredientList.size()){
-            int size = ingredientList.size();
-            for(; i< size;i++){
-                ingredientList.remove(indx);
-            }
-        }
+        IntStream.range(saveIngredientReqDTOList.size(),ingredientList.size())
+                .forEach(i -> {
+                    ingredientList.remove(minSize);
+                });
     }
 
     public void isMyRecipe(Long userId, User user){

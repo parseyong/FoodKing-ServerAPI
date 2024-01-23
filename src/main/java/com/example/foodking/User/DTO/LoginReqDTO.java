@@ -1,17 +1,14 @@
 package com.example.foodking.User.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 @Getter
-@Builder
+@Builder // 테스트를 위한 빌더추가
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoginReqDTO {
 
     @Email(message = "이메일 형식이 올바르지 않습니다")

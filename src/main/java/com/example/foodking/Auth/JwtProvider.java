@@ -34,7 +34,8 @@ public class JwtProvider {
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
-
+    
+    // 로그인 성공 시 토큰을 생성해서 반환하는 메소드
     public String createToken(Long userId, Collection<? extends GrantedAuthority> roleList) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
         claims.put("roleList", roleList);
@@ -48,6 +49,7 @@ public class JwtProvider {
                 .compact();
     }
 
+    // 토큰에서 인증객체를 추출하는 메소드
     public Authentication getAuthentication(String token) {
         User user = (User) customUserDetailsService.loadUserByUsername(this.getUserId(token));
         return new UsernamePasswordAuthenticationToken(user.getUserId(),user.getPassword(),user.getAuthorities());
@@ -58,6 +60,7 @@ public class JwtProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
+    // 토큰의 유효성을 검증하는 메소드
     public boolean validateToken(String token) {
         try {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
@@ -67,11 +70,13 @@ public class JwtProvider {
         }
     }
 
+    // Http헤더에서 인증토큰을 가져오는 메소드
     public String resolveToken(HttpServletRequest request) {
 
         return request.getHeader("Auth");
     }
 
+    // SecurityContextHolder에 저장된 인증정보 중 Principal(userId)값을 반환하는 정적메소드
     public static Long getUserId(){
         return (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
