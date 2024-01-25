@@ -70,7 +70,7 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<CommonResDTO> readUser(){
 
-        Long userId = JwtProvider.getUserId();
+        final Long userId = JwtProvider.getUserId();
         ReadUserInfoResDTO readUserInfoResDTO = userService.readUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 조회 성공",readUserInfoResDTO));
     }
@@ -78,7 +78,7 @@ public class UserController {
     @PatchMapping("/users")
     public ResponseEntity<CommonResDTO> updateUser(@RequestBody @Valid UpdateUserInfoReqDTO updateUserInfoReqDTO){
 
-        Long userId = JwtProvider.getUserId();
+        final Long userId = JwtProvider.getUserId();
         userService.updateUser(updateUserInfoReqDTO,userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 변경 성공",null));
     }

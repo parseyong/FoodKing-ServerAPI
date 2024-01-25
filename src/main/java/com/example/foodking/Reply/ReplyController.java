@@ -24,24 +24,24 @@ public class ReplyController {
     private final RecipeService recipeService;
 
     @PostMapping("/{recipeInfoId}/replys")
-    public ResponseEntity<CommonResDTO> addReply(@PathVariable Long recipeInfoId,
+    public ResponseEntity<CommonResDTO> addReply(@PathVariable final Long recipeInfoId,
                                                   @RequestParam(name = "content") @NotBlank(message = "내용을 입력해주세요") String content){
-        Long userId = JwtProvider.getUserId();
+        final Long userId = JwtProvider.getUserId();
         replyService.addReply(userService.findUserById(userId),recipeService.findRecipeInfoById(recipeInfoId),content);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("댓글 등록완료",null));
     }
 
     @PatchMapping("/replys/{replyId}")
-    public ResponseEntity<CommonResDTO> updateReply(@PathVariable Long replyId,
+    public ResponseEntity<CommonResDTO> updateReply(@PathVariable final Long replyId,
                                                     @RequestParam(name = "content") @NotBlank(message = "내용을 입력해주세요") String content){
-        Long userId = JwtProvider.getUserId();
+        final Long userId = JwtProvider.getUserId();
         replyService.updateReply(userId,replyId,content);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("댓글 수정완료",null));
     }
 
     @DeleteMapping ("/replys/{replyId}")
-    public ResponseEntity<CommonResDTO> deleteReply(@PathVariable Long replyId){
-        Long userId = JwtProvider.getUserId();
+    public ResponseEntity<CommonResDTO> deleteReply(@PathVariable final Long replyId){
+        final Long userId = JwtProvider.getUserId();
         replyService.deleteReply(userId,replyId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("댓글 삭제완료",null));
     }
