@@ -1,8 +1,9 @@
 package com.example.foodking.CoolSms;
 
-import com.example.foodking.CoolSms.DTO.PhoneAuthReqDTO;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
+import com.example.foodking.User.CoolSmsService;
+import com.example.foodking.User.DTO.PhoneAuthReqDTO;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.json.simple.JSONObject;

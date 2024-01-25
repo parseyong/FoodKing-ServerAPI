@@ -1,7 +1,7 @@
-package com.example.foodking.CoolSms;
+package com.example.foodking.User;
 
 import com.example.foodking.Common.CommonResDTO;
-import com.example.foodking.CoolSms.DTO.PhoneAuthReqDTO;
+import com.example.foodking.User.DTO.PhoneAuthReqDTO;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

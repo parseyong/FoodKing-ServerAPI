@@ -2,8 +2,6 @@ package com.example.foodking.User;
 
 import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Common.CommonResDTO;
-import com.example.foodking.CoolSms.CoolSmsService;
-import com.example.foodking.CoolSms.DTO.PhoneAuthReqDTO;
 import com.example.foodking.User.DTO.*;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,6 @@ import javax.validation.constraints.NotBlank;
 public class UserController {
 
     private final UserService userService;
-    private final CoolSmsService coolSmsService;
 
     @PostMapping("/login")
     public ResponseEntity<CommonResDTO> login(@RequestBody @Valid LoginReqDTO loginReqDTO){
@@ -37,9 +34,7 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<CommonResDTO> addUser(@RequestBody @Valid AddUserReqDTO addUserReqDTO){
 
-        coolSmsService.isAuthenticatedNum(addUserReqDTO.getPhoneNum());
         userService.addUser(addUserReqDTO);
-        coolSmsService.deleteAuthInfo(addUserReqDTO.getPhoneNum());
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("회원가입 완료",null));
     }
 
@@ -61,19 +56,14 @@ public class UserController {
     @GetMapping("/email/find")
     public ResponseEntity<CommonResDTO> findEmail(@RequestBody @Valid PhoneAuthReqDTO phoneAuthReqDTO){
 
-        coolSmsService.authNumCheck(phoneAuthReqDTO);
-        String email = userService.findEmail(phoneAuthReqDTO.getPhoneNum());
+        String email = userService.findEmail(phoneAuthReqDTO.getPhoneNum(), phoneAuthReqDTO);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이메일 찾기 성공",email));
     }
 
     @GetMapping("/password/find")
     public ResponseEntity<CommonResDTO> findPassword(@RequestBody @Valid FindPwdReqDTO findPwdReqDTO){
 
-        coolSmsService.authNumCheck(PhoneAuthReqDTO.builder()
-                        .phoneNum(findPwdReqDTO.getPhoneNum())
-                        .authenticationNumber(findPwdReqDTO.getAuthenticationNumber())
-                        .build());
-        String password = userService.findPassword(findPwdReqDTO.getEmail());
+        String password = userService.findPassword(findPwdReqDTO);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("비밀번호 찾기성공",password));
     }
 
@@ -91,7 +81,6 @@ public class UserController {
         Long userId = JwtProvider.getUserId();
         userService.updateUser(updateUserInfoReqDTO,userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 변경 성공",null));
-
     }
 
     @DeleteMapping("/users")

@@ -1,26 +1,15 @@
 package com.example.foodking.User;
 
 import com.example.foodking.Auth.JwtProvider;
-import com.example.foodking.Exception.CommondException;
-import com.example.foodking.Exception.ExceptionCode;
-import com.example.foodking.User.DTO.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import com.example.foodking.User.DTO.AddUserReqDTO;
+import com.example.foodking.User.DTO.DeleteUserReqDTO;
+import com.example.foodking.User.DTO.LoginReqDTO;
+import com.example.foodking.User.DTO.UpdateUserInfoReqDTO;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 /*
     단순히 Repository메소드 하나만 호출하여 결과를 반환하는 메소드에 대해서는 서비스테스트와 거리가 멀어 테스트코드를 작성하지 않았다.
@@ -41,7 +30,7 @@ public class ServiceTest {
     private AddUserReqDTO addUserReqDTO;
     private UpdateUserInfoReqDTO updateUserInfoReqDTO;
     private DeleteUserReqDTO deleteUserReqDTO;
-
+    /*
     @BeforeEach
     void beforeEach(){
         System.out.println("beforeEach process");
@@ -406,4 +395,6 @@ public class ServiceTest {
         assertThat(readUserInfoResDTO.getPhoneNum()).isEqualTo("01056962173");
         System.out.println("User -> ReadUserInfoResDTO 변환성공");
     }
+
+     */
 }

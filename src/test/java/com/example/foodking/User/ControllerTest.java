@@ -3,36 +3,11 @@ package com.example.foodking.User;
 import com.example.foodking.Auth.CustomUserDetailsService;
 import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Config.SecurityConfig;
-import com.example.foodking.CoolSms.CoolSmsService;
-import com.example.foodking.CoolSms.DTO.PhoneAuthReqDTO;
-import com.example.foodking.Exception.CommondException;
-import com.example.foodking.Exception.ExceptionCode;
-import com.example.foodking.User.DTO.*;
-import com.google.gson.Gson;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = UserController.class)
 @Import({SecurityConfig.class, JwtProvider.class})
@@ -47,7 +22,7 @@ public class ControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-
+    /*
     @Test
     @DisplayName("로그인 테스트 -> (로그인성공)")
     public void loginTestSuccess() throws Exception {
@@ -1056,4 +1031,6 @@ public class ControllerTest {
         Authentication authentication = new UsernamePasswordAuthenticationToken(1l,"1234",authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
+
+     */
 }

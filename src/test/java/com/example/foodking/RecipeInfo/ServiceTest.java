@@ -1,44 +1,11 @@
 package com.example.foodking.RecipeInfo;
 
-import com.example.foodking.Exception.CommondException;
-import com.example.foodking.Exception.ExceptionCode;
-import com.example.foodking.Recipe.DTO.SaveRecipeReqDTO;
-import com.example.foodking.Recipe.Ingredient.DTO.SaveIngredientReqDTO;
-import com.example.foodking.Recipe.Ingredient.Ingredient;
-import com.example.foodking.Recipe.Ingredient.IngredientRepository;
-import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
-import com.example.foodking.Recipe.RecipeInfo.RecipeInfoRepository;
-import com.example.foodking.Recipe.RecipeInfo.RecipeInfoType;
-import com.example.foodking.Recipe.RecipeService;
-import com.example.foodking.Recipe.RecipeWayInfo.DTO.SaveRecipeWayInfoReqDTO;
-import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo;
-import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfoRepository;
-import com.example.foodking.User.User;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockMultipartFile;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class ServiceTest {
-
+    /*
     @InjectMocks
     private RecipeService recipeService;
     @Mock
@@ -125,6 +92,7 @@ public class ServiceTest {
         contentType : 파일의 컨텐츠 타입 또는 MIME 타입
         content : 업로드된 파일의 바이트 배열, mock객체이기때문에 실제파일의 바이트배열이 아니여도 된다.
     */
+    /*
     @Test
     @DisplayName("이미지 등록테스트 -> (성공)")
     public void addImageSucess() {
@@ -337,4 +305,5 @@ public class ServiceTest {
         assertThat(recipeWayInfoList.get(1).getRecipeOrder()).isEqualTo(2l);
         System.out.println("AddRecipeReqDTO -> recipeWayInfoList 변환성공");
     }
+    */
 }

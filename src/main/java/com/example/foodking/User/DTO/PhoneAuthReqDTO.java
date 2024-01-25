@@ -1,4 +1,4 @@
-package com.example.foodking.CoolSms.DTO;
+package com.example.foodking.User.DTO;
 
 import lombok.*;
 

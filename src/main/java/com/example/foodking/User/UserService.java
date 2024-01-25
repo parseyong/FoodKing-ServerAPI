@@ -20,6 +20,8 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final CoolSmsService coolSmsService;
+
     public String login(LoginReqDTO loginReqDTO){
         User user = userRepository.findUserByEmail(loginReqDTO.getEmail())
                 .orElseThrow(() -> new CommondException(ExceptionCode.LOGIN_FAIL));
@@ -29,6 +31,8 @@ public class UserService {
     }
     @Transactional
     public void addUser(AddUserReqDTO addUserReqDTO){
+
+        coolSmsService.isAuthenticatedNum(addUserReqDTO.getPhoneNum());
         if(emailDuplicatedChecking(addUserReqDTO.getEmail()))
            throw new CommondException(ExceptionCode.EMAIL_DUPLICATED);
         if(nickNameDuplicatedChecking(addUserReqDTO.getNickName()))
@@ -39,6 +43,7 @@ public class UserService {
         // passwordEncoder를 통한 비밀번호 암호화 및 salt처리
         addUserReqDTO.setPassword(passwordEncoder.encode(addUserReqDTO.getPassword()));
         User user = AddUserReqDTO.toEntity(addUserReqDTO);
+        coolSmsService.deleteAuthInfo(addUserReqDTO.getPhoneNum());
         userRepository.save(user);
     }
 
@@ -50,13 +55,19 @@ public class UserService {
         return userRepository.existsByNickName(nickName);
     }
 
-    public String findEmail(String phoneNum){
+    public String findEmail(String phoneNum, PhoneAuthReqDTO phoneAuthReqDTO){
+        coolSmsService.authNumCheck(phoneAuthReqDTO);
         return userRepository.findEmailByPhoneNum(phoneNum)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
     }
 
-    public String findPassword(String email){
-        return userRepository.findPasswordByEmail(email)
+    public String findPassword(FindPwdReqDTO findPwdReqDTO){
+        coolSmsService.authNumCheck(PhoneAuthReqDTO.builder()
+                .phoneNum(findPwdReqDTO.getPhoneNum())
+                .authenticationNumber(findPwdReqDTO.getAuthenticationNumber())
+                .build());
+
+        return userRepository.findPasswordByEmail(findPwdReqDTO.getEmail())
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
     }
 

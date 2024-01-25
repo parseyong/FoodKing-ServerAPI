@@ -1,7 +1,7 @@
-package com.example.foodking.CoolSms;
+package com.example.foodking.User;
 
-import com.example.foodking.CoolSms.DTO.PhoneAuthReqDTO;
 import com.example.foodking.Exception.CommondException;
+import com.example.foodking.User.DTO.PhoneAuthReqDTO;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.java_sdk.api.Message;
