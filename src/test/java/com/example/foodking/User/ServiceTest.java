@@ -1,15 +1,27 @@
 package com.example.foodking.User;
 
 import com.example.foodking.Auth.JwtProvider;
-import com.example.foodking.User.DTO.AddUserReqDTO;
-import com.example.foodking.User.DTO.DeleteUserReqDTO;
-import com.example.foodking.User.DTO.LoginReqDTO;
-import com.example.foodking.User.DTO.UpdateUserInfoReqDTO;
+import com.example.foodking.Exception.CommondException;
+import com.example.foodking.Exception.ExceptionCode;
+import com.example.foodking.User.DTO.Request.*;
+import com.example.foodking.User.DTO.Response.ReadUserInfoResDTO;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.util.AssertionErrors.fail;
 
 /*
     단순히 Repository메소드 하나만 호출하여 결과를 반환하는 메소드에 대해서는 서비스테스트와 거리가 멀어 테스트코드를 작성하지 않았다.
@@ -25,15 +37,19 @@ public class ServiceTest {
     private UserRepository userRepository;
     @Mock
     private JwtProvider jwtProvider;
+    @Mock
+    private CoolSmsService coolSmsService;
+
     private User user;
     private LoginReqDTO loginReqDTO;
     private AddUserReqDTO addUserReqDTO;
     private UpdateUserInfoReqDTO updateUserInfoReqDTO;
     private DeleteUserReqDTO deleteUserReqDTO;
-    /*
+    private PhoneAuthReqDTO phoneAuthReqDTO;
+    private FindPwdReqDTO findPwdReqDTO;
+
     @BeforeEach
     void beforeEach(){
-        System.out.println("beforeEach process");
         this.user = User.builder()
                 .email("test@google.com")
                 .password("1234")
@@ -60,6 +76,15 @@ public class ServiceTest {
         this.deleteUserReqDTO = DeleteUserReqDTO.builder()
                 .email("test@google.com")
                 .password("1234")
+                .build();
+        this.phoneAuthReqDTO = PhoneAuthReqDTO.builder()
+                .phoneNum("01056962173")
+                .authenticationNumber("1234")
+                .build();
+        this.findPwdReqDTO = FindPwdReqDTO.builder()
+                .email("test@google.com")
+                .authenticationNumber("1234")
+                .phoneNum("01056962173")
                 .build();
     }
 
@@ -91,6 +116,7 @@ public class ServiceTest {
             userService.login(loginReqDTO);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
+            verify(userRepository,times(1)).findUserByEmail(any(String.class));
             verify(passwordEncoder,times(0)).matches(any(String.class),any(String.class));
             verify(jwtProvider,times(0)).createToken(any(),any());
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.LOGIN_FAIL);
@@ -102,12 +128,14 @@ public class ServiceTest {
     public void loginFail2(){
         //given
         given(userRepository.findUserByEmail(any(String.class))).willReturn(Optional.ofNullable(user));
+        given(passwordEncoder.matches(any(String.class),any(String.class))).willReturn(false);
 
         // when, then
         try{
             userService.login(loginReqDTO);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
+            verify(userRepository,times(1)).findUserByEmail(any(String.class));
             verify(passwordEncoder,times(1)).matches(any(String.class),any(String.class));
             verify(jwtProvider,times(0)).createToken(any(),any());
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.LOGIN_FAIL);
@@ -120,13 +148,17 @@ public class ServiceTest {
         //given
         given(userRepository.existsByEmail(any(String.class))).willReturn(false);
         given(userRepository.existsByNickName(any(String.class))).willReturn(false);
-        given(passwordEncoder.encode(any(String.class))).willReturn("encodedPassword");
 
         //when
         userService.addUser(addUserReqDTO);
 
         //then
         verify(userRepository,times(1)).save(any(User.class));
+        verify(coolSmsService,times(1)).isAuthenticatedNum(any(String.class));
+        verify(coolSmsService,times(1)).deleteAuthInfo(any(String.class));
+        verify(userRepository,times(1)).existsByNickName(any(String.class));
+        verify(userRepository,times(1)).existsByEmail(any(String.class));
+        verify(passwordEncoder,times(1)).encode(any(String.class));
     }
 
     @Test
@@ -140,8 +172,12 @@ public class ServiceTest {
             userService.addUser(addUserReqDTO);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
-            verify(passwordEncoder,times(0)).encode(any(String.class));
             verify(userRepository,times(0)).save(any(User.class));
+            verify(coolSmsService,times(1)).isAuthenticatedNum(any(String.class));
+            verify(coolSmsService,times(0)).deleteAuthInfo(any(String.class));
+            verify(userRepository,times(0)).existsByNickName(any(String.class));
+            verify(userRepository,times(1)).existsByEmail(any(String.class));
+            verify(passwordEncoder,times(0)).encode(any(String.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.EMAIL_DUPLICATED);
         }
     }
@@ -158,8 +194,12 @@ public class ServiceTest {
             userService.addUser(addUserReqDTO);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
-            verify(passwordEncoder,times(0)).encode(any(String.class));
             verify(userRepository,times(0)).save(any(User.class));
+            verify(coolSmsService,times(1)).isAuthenticatedNum(any(String.class));
+            verify(coolSmsService,times(0)).deleteAuthInfo(any(String.class));
+            verify(userRepository,times(1)).existsByNickName(any(String.class));
+            verify(userRepository,times(1)).existsByEmail(any(String.class));
+            verify(passwordEncoder,times(0)).encode(any(String.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NICKNAME_DUPLICATED);
         }
     }
@@ -177,8 +217,12 @@ public class ServiceTest {
             userService.addUser(addUserReqDTO);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
-            verify(passwordEncoder,times(0)).encode(any(String.class));
             verify(userRepository,times(0)).save(any(User.class));
+            verify(coolSmsService,times(1)).isAuthenticatedNum(any(String.class));
+            verify(coolSmsService,times(0)).deleteAuthInfo(any(String.class));
+            verify(userRepository,times(1)).existsByNickName(any(String.class));
+            verify(userRepository,times(1)).existsByEmail(any(String.class));
+            verify(passwordEncoder,times(0)).encode(any(String.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.PASSWORD_NOT_COLLECT);
         }
     }
@@ -191,23 +235,27 @@ public class ServiceTest {
         given(userRepository.findEmailByPhoneNum(any(String.class))).willReturn(emailInfo.describeConstable());
 
         //when
-        String result = userService.findEmail("01056962173");
+        String result = userService.findEmail(phoneAuthReqDTO);
 
         //then
+        verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
+        verify(userRepository,times(1)).findEmailByPhoneNum(any(String.class));
         assertThat(result).isEqualTo(emailInfo);
     }
 
     @Test
-    @DisplayName("이메일 찾기테스트 -> (실패 : 존재하지 않는 유저)")
+    @DisplayName("이메일 찾기테스트 -> (실패 : 존재하지 않는 이메일)")
     public void findEmailTestFail1(){
         //given
         given(userRepository.findEmailByPhoneNum(any(String.class))).willReturn(Optional.empty());
 
         // when, then
         try{
-            String result = userService.findEmail("01056962173");
+            userService.findEmail(phoneAuthReqDTO);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
+            verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
+            verify(userRepository,times(1)).findEmailByPhoneNum(any(String.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
         }
     }
@@ -216,28 +264,57 @@ public class ServiceTest {
     @DisplayName("비밀번호 찾기테스트 -> (성공)")
     public void findPasswordTestSuccess(){
         //given
-        String passwordInfo = "1234";
-        given(userRepository.findPasswordByEmail(any(String.class))).willReturn(passwordInfo.describeConstable());
+        given(userRepository.findUserByEmail(any(String.class))).willReturn(Optional.ofNullable(user));
+        given(passwordEncoder.encode(any(String.class))).willReturn("encodedNewPassword");
 
         //when
-        String result = userService.findPassword("Test@google.com");
+        String result = userService.findPassword(findPwdReqDTO);
 
         //then
-        assertThat(result).isEqualTo(passwordInfo);
+        verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
+        verify(userRepository,times(1)).findUserByEmail(any(String.class));
+        verify(passwordEncoder,times(1)).encode(any(String.class));
     }
 
     @Test
     @DisplayName("비밀번호 찾기테스트 -> (실패 : 존재하지 않는 유저)")
     public void findPasswordTestFail1(){
         //given
-        given(userRepository.findPasswordByEmail(any(String.class))).willReturn(Optional.empty());
+        given(userRepository.findUserByEmail(any(String.class))).willReturn(Optional.empty());
 
         // when, then
         try{
-            String result = userService.findPassword("Test@google.com");
+            userService.findPassword(findPwdReqDTO);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
+            verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
+            verify(userRepository,times(1)).findUserByEmail(any(String.class));
+            verify(passwordEncoder,times(0)).encode(any(String.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
+        }
+    }
+
+    @Test
+    @DisplayName("비밀번호 찾기테스트 -> (실패 : 유저에 권한없음.)")
+    public void findPasswordTestFail2(){
+        //given
+        User user = User.builder()
+                .email("test@google.com")
+                .password("1234")
+                .nickName("nickName")
+                .phoneNum("01011111111")
+                .build();
+        given(userRepository.findUserByEmail(any(String.class))).willReturn(Optional.ofNullable(user));
+
+        // when, then
+        try{
+            userService.findPassword(findPwdReqDTO);
+            fail("예외가 발생하지 않음");
+        }catch (CommondException ex){
+            verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
+            verify(userRepository,times(1)).findUserByEmail(any(String.class));
+            verify(passwordEncoder,times(0)).encode(any(String.class));
+            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.ACCESS_FAIL_USER);
         }
     }
 
@@ -254,6 +331,7 @@ public class ServiceTest {
         assertThat(readUserInfoResDTO.getEmail()).isEqualTo("test@google.com");
         assertThat(readUserInfoResDTO.getNickName()).isEqualTo("nickName");
         assertThat(readUserInfoResDTO.getPhoneNum()).isEqualTo("01056962173");
+        verify(userRepository,times(1)).findById(any(Long.class));
     }
 
     @Test
@@ -267,6 +345,7 @@ public class ServiceTest {
             userService.readUser(1l);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
+            verify(userRepository,times(1)).findById(any(Long.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
         }
     }
@@ -288,6 +367,7 @@ public class ServiceTest {
         assertThat(user.getPhoneNum()).isEqualTo("01056962174");
         verify(passwordEncoder,times(1)).encode(any(String.class));
         verify(passwordEncoder,times(1)).matches(any(String.class),any(String.class));
+        verify(userRepository,times(1)).findById(any(Long.class));
         verify(userRepository,times(1)).save(any(User.class));
     }
     
@@ -306,6 +386,7 @@ public class ServiceTest {
             verify(passwordEncoder,times(0)).encode(any(String.class));
             verify(passwordEncoder,times(0)).matches(any(String.class),any(String.class));
             verify(userRepository,times(0)).save(any(User.class));
+            verify(userRepository,times(1)).findById(any(Long.class));
         }
     }
 
@@ -325,6 +406,7 @@ public class ServiceTest {
             verify(passwordEncoder,times(0)).encode(any(String.class));
             verify(passwordEncoder,times(1)).matches(any(String.class),any(String.class));
             verify(userRepository,times(0)).save(any(User.class));
+            verify(userRepository,times(1)).findById(any(Long.class));
         }
     }
 
@@ -341,6 +423,7 @@ public class ServiceTest {
         //then
         verify(userRepository,times(1)).delete(any(User.class));
         verify(passwordEncoder,times(1)).matches(any(String.class),any(String.class));
+        verify(userRepository,times(1)).findUserByEmail(any(String.class));
     }
     
     @Test
@@ -357,6 +440,7 @@ public class ServiceTest {
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
             verify(userRepository,times(0)).delete(any(User.class));
             verify(passwordEncoder,times(0)).matches(any(String.class),any(String.class));
+            verify(userRepository,times(1)).findUserByEmail(any(String.class));
         }
     }
 
@@ -375,9 +459,9 @@ public class ServiceTest {
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.PASSWORD_NOT_COLLECT);
             verify(userRepository,times(0)).delete(any(User.class));
             verify(passwordEncoder,times(1)).matches(any(String.class),any(String.class));
+            verify(userRepository,times(1)).findUserByEmail(any(String.class));
         }
     }
-    //isMatchPassword()메소드는 위 테스트에서 실행이 되어 테스트가 같이 진행되므로 작성하지 않음.
 
     @Test
     @DisplayName("DTO와 엔티티간 변환 테스트")
@@ -395,6 +479,4 @@ public class ServiceTest {
         assertThat(readUserInfoResDTO.getPhoneNum()).isEqualTo("01056962173");
         System.out.println("User -> ReadUserInfoResDTO 변환성공");
     }
-
-     */
 }

@@ -3,11 +3,15 @@ package com.example.foodking.User;
 import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
-import com.example.foodking.User.DTO.*;
+import com.example.foodking.User.DTO.Request.*;
+import com.example.foodking.User.DTO.Response.ReadUserInfoResDTO;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -55,20 +59,28 @@ public class UserService {
         return userRepository.existsByNickName(nickName);
     }
 
-    public String findEmail(String phoneNum, PhoneAuthReqDTO phoneAuthReqDTO){
+    public String findEmail(PhoneAuthReqDTO phoneAuthReqDTO){
         coolSmsService.authNumCheck(phoneAuthReqDTO);
-        return userRepository.findEmailByPhoneNum(phoneNum)
+        return userRepository.findEmailByPhoneNum(phoneAuthReqDTO.getPhoneNum())
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
     }
 
+    @Transactional
+    // passwordEncoder는 단방향 해시이기때문에 인코딩된 데이터의 원래값을 역추적하기 어렵다. 따라서 새로운 비밀번호를 생성하고 반환한다.
     public String findPassword(FindPwdReqDTO findPwdReqDTO){
         coolSmsService.authNumCheck(PhoneAuthReqDTO.builder()
                 .phoneNum(findPwdReqDTO.getPhoneNum())
                 .authenticationNumber(findPwdReqDTO.getAuthenticationNumber())
                 .build());
-
-        return userRepository.findPasswordByEmail(findPwdReqDTO.getEmail())
+        User user = userRepository.findUserByEmail(findPwdReqDTO.getEmail())
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+
+        if(user.getPhoneNum() != findPwdReqDTO.getPhoneNum())
+            throw new CommondException(ExceptionCode.ACCESS_FAIL_USER);
+
+        String tmpPassword = RandomStringUtils.randomAlphanumeric(15);
+        user.changePassword(passwordEncoder.encode(tmpPassword));
+        return tmpPassword;
     }
 
     public ReadUserInfoResDTO readUser(Long userId){

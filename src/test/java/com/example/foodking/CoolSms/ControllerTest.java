@@ -6,7 +6,7 @@ import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
 import com.example.foodking.User.CoolSmsController;
 import com.example.foodking.User.CoolSmsService;
-import com.example.foodking.User.DTO.PhoneAuthReqDTO;
+import com.example.foodking.User.DTO.Request.PhoneAuthReqDTO;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

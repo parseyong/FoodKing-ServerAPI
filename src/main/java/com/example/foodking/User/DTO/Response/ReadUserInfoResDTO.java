@@ -1,4 +1,4 @@
-package com.example.foodking.User.DTO;
+package com.example.foodking.User.DTO.Response;
 
 import com.example.foodking.User.User;
 import lombok.AllArgsConstructor;

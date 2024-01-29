@@ -1,4 +1,4 @@
-package com.example.foodking.User.DTO;
+package com.example.foodking.User.DTO.Request;
 
 import lombok.*;
 

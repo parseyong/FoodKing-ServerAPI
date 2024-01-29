@@ -1,4 +1,4 @@
-package com.example.foodking.User.DTO;
+package com.example.foodking.User.DTO.Request;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 @Builder // 테스트를 위한 빌더추가
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DeleteUserReqDTO {
+public class LoginReqDTO {
 
     @Email(message = "이메일 형식이 올바르지 않습니다")
     @NotBlank(message = "이메일 정보를 입력해주세요")
@@ -17,5 +17,4 @@ public class DeleteUserReqDTO {
 
     @NotBlank(message = "비밀번호를 입력해주세요")
     private String password;
-
 }

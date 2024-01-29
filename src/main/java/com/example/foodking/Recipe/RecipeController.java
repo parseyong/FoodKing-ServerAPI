@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -22,7 +21,6 @@ public class RecipeController {
 
     private final RecipeService recipeService;
     private final UserService userService;
-    private final RecipeImageService recipeImageService;
 
     @PostMapping("/recipes")
     public ResponseEntity<CommonResDTO> addRecipe(@RequestBody @Valid SaveRecipeReqDTO saveRecipeReqDTO){
@@ -30,21 +28,6 @@ public class RecipeController {
         final Long userId = JwtProvider.getUserId();
         Long recipeInfoId = recipeService.addRecipe(saveRecipeReqDTO,userService.findUserById(userId));
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("레시피 등록완료",recipeInfoId));
-    }
-
-    @PostMapping("/recipes/images/{recipeInfoId}")
-    public ResponseEntity<CommonResDTO> addImage(@RequestParam(name = "recipeImage") MultipartFile recipeImage,
-                                                 @PathVariable final Long recipeInfoId) {
-        final Long userId = JwtProvider.getUserId();
-        recipeImageService.addImage(recipeImage,recipeInfoId,userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("이미지 등록완료",null));
-    }
-
-    @DeleteMapping ("/recipes/images/{recipeInfoId}")
-    public ResponseEntity<CommonResDTO> deleteImage(@PathVariable final Long recipeInfoId) {
-        final Long userId = JwtProvider.getUserId();
-        recipeImageService.deleteImage(recipeInfoId,userId);
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이미지 삭제완료",null));
     }
 
     @PatchMapping("/recipes/{recipeInfoId}")

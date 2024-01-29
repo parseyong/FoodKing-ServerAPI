@@ -2,7 +2,8 @@ package com.example.foodking.User;
 
 import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Common.CommonResDTO;
-import com.example.foodking.User.DTO.*;
+import com.example.foodking.User.DTO.Request.*;
+import com.example.foodking.User.DTO.Response.ReadUserInfoResDTO;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -56,7 +57,7 @@ public class UserController {
     @GetMapping("/email/find")
     public ResponseEntity<CommonResDTO> findEmail(@RequestBody @Valid PhoneAuthReqDTO phoneAuthReqDTO){
 
-        String email = userService.findEmail(phoneAuthReqDTO.getPhoneNum(), phoneAuthReqDTO);
+        String email = userService.findEmail(phoneAuthReqDTO);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이메일 찾기 성공",email));
     }
 
@@ -69,7 +70,6 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity<CommonResDTO> readUser(){
-
         final Long userId = JwtProvider.getUserId();
         ReadUserInfoResDTO readUserInfoResDTO = userService.readUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 조회 성공",readUserInfoResDTO));
@@ -77,7 +77,6 @@ public class UserController {
 
     @PatchMapping("/users")
     public ResponseEntity<CommonResDTO> updateUser(@RequestBody @Valid UpdateUserInfoReqDTO updateUserInfoReqDTO){
-
         final Long userId = JwtProvider.getUserId();
         userService.updateUser(updateUserInfoReqDTO,userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 변경 성공",null));
@@ -85,7 +84,6 @@ public class UserController {
 
     @DeleteMapping("/users")
     public ResponseEntity<CommonResDTO> deleteUser(@RequestBody @Valid DeleteUserReqDTO deleteUserReqDTO){
-
         userService.deleteUser(deleteUserReqDTO);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저 삭제완료",null));
     }
