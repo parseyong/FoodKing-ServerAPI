@@ -49,7 +49,7 @@ public class RecipeService {
         RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
 
-        isMyRecipe(userId,recipeInfo.getUser());
+        isMyRecipe(userId,recipeInfo.getUser(),ExceptionCode.ACCESS_FAIL_RECIPE);
         List<Ingredient> ingredientList = recipeInfo.getIngredientList();
         List<RecipeWayInfo> recipeWayInfoList = recipeInfo.getRecipeWayInfoList();
 
@@ -65,7 +65,7 @@ public class RecipeService {
         RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
 
-        isMyRecipe(userId,recipeInfo.getUser());
+        isMyRecipe(userId,recipeInfo.getUser(),ExceptionCode.ACCESS_FAIL_RECIPE);
         recipeInfoRepository.delete(recipeInfo);
     }
 
@@ -128,15 +128,15 @@ public class RecipeService {
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
     }
 
-    public static void isMyRecipe(Long userId, User user){
+    public static void isMyRecipe(Long userId, User user, ExceptionCode exceptionCode){
         /*
            단위 테스트시 userId값을 지정할 수 없기때문에 해당 조건문을 추가하여 테스트를 통과할 수 있도록 했다.
            실제 환경에서는 User는 null이 아니고 user.userId값은 null인 경우는 존재하지 않는다.
         */
         if(user != null && user.getUserId() == null)
             ;
-        else if(!userId.equals(user.getUserId()) )
-            throw new CommondException(ExceptionCode.ACCESS_FAIL_RECIPE);
+        else if( user ==null || !userId.equals(user.getUserId()) )
+            throw new CommondException(exceptionCode);
 
     }
 }

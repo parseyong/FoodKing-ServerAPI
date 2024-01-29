@@ -19,10 +19,10 @@ public class RecipeImageController {
     private final RecipeImageService recipeImageService;
 
     @PostMapping("/recipes/images/{recipeInfoId}")
-    public ResponseEntity<CommonResDTO> addImage(@RequestParam(name = "recipeImage") MultipartFile recipeImage,
-                                                 @PathVariable final Long recipeInfoId) {
+    public ResponseEntity<CommonResDTO> saveImage(@RequestParam(name = "recipeImage") MultipartFile recipeImage,
+                                                  @PathVariable final Long recipeInfoId) {
         final Long userId = JwtProvider.getUserId();
-        recipeImageService.addImage(recipeImage,recipeInfoId,userId);
+        recipeImageService.saveImage(recipeImage,recipeInfoId,userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("이미지 등록완료",null));
     }
 

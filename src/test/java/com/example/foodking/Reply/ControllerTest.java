@@ -82,6 +82,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("댓글 등록완료"))
                 .andDo(print());
 
+        verify(userService,times(1)).findUserById(any(Long.class));
+        verify(recipeService,times(1)).findRecipeInfoById(any(Long.class));
         verify(replyService,times(1)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
@@ -98,6 +100,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
 
+        verify(userService,times(0)).findUserById(any(Long.class));
+        verify(recipeService,times(0)).findRecipeInfoById(any(Long.class));
         verify(replyService,times(0)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
@@ -116,6 +120,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.content").value("내용을 입력해주세요"))
                 .andDo(print());
 
+        verify(userService,times(0)).findUserById(any(Long.class));
+        verify(recipeService,times(0)).findRecipeInfoById(any(Long.class));
         verify(replyService,times(0)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
@@ -132,6 +138,8 @@ public class ControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
 
+        verify(userService,times(0)).findUserById(any(Long.class));
+        verify(recipeService,times(0)).findRecipeInfoById(any(Long.class));
         verify(replyService,times(0)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
@@ -150,6 +158,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.fieldName").value("recipeInfoId"))
                 .andExpect(jsonPath("$.data.requiredType").value("Long"));
 
+        verify(userService,times(0)).findUserById(any(Long.class));
+        verify(recipeService,times(0)).findRecipeInfoById(any(Long.class));
         verify(replyService,times(0)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
@@ -168,6 +178,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
 
+        verify(userService,times(1)).findUserById(any(Long.class));
+        verify(recipeService,times(0)).findRecipeInfoById(any(Long.class));
         verify(replyService,times(0)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 
@@ -187,6 +199,8 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
                 .andDo(print());
 
+        verify(userService,times(1)).findUserById(any(Long.class));
+        verify(recipeService,times(1)).findRecipeInfoById(any(Long.class));
         verify(replyService,times(0)).addReply(any(User.class),any(RecipeInfo.class),any(String.class));
     }
 

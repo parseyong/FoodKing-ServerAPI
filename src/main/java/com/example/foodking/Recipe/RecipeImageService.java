@@ -29,10 +29,10 @@ public class RecipeImageService {
     private final RecipeInfoRepository recipeInfoRepository;
 
     @Transactional
-    public String addImage(MultipartFile recipeImage, Long recipeInfoId, Long userId) {
+    public String saveImage(MultipartFile recipeImage, Long recipeInfoId, Long userId) {
         RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
 
-        isMyRecipe(userId,recipeInfo.getUser());
+        isMyRecipe(userId,recipeInfo.getUser(),ExceptionCode.ACCESS_FAIL_FILE);
 
         if(recipeImage == null)
             throw new CommondException(ExceptionCode.INVALID_SAVE_FILE);
@@ -71,7 +71,7 @@ public class RecipeImageService {
     public void deleteImage(Long recipeInfoId,Long userId){
         RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
 
-        isMyRecipe(userId,recipeInfo.getUser());
+        isMyRecipe(userId,recipeInfo.getUser(),ExceptionCode.ACCESS_FAIL_FILE);
 
         if(recipeInfo.getRecipeImage() ==null){
             throw new CommondException(ExceptionCode.NOT_EXIST_FILE);

@@ -25,7 +25,9 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class ServiceTest {
-
+    /*
+        인증정보 데이터를 set,map이 아닌 레디스에 저장하도록 변경한 뒤 테스트코드 리팩토링을 진행할 예정
+    */
     @InjectMocks
     private CoolSmsService coolSmsService;
     @Mock

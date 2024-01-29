@@ -56,7 +56,7 @@ public class ReplyService {
         */
         if(user != null && user.getUserId() == null)
             ;
-        else if(!userId.equals(user.getUserId()) )
+        else if( user ==null || !userId.equals(user.getUserId()) )
             throw new CommondException(ExceptionCode.ACCESS_FAIL_REPLY);
 
     }
