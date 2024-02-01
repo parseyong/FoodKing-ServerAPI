@@ -1,4 +1,4 @@
-package com.example.foodking.Recipe.RecipeWayInfo.DTO;
+package com.example.foodking.Recipe.RecipeWayInfo.DTO.Request;
 
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
 import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo;

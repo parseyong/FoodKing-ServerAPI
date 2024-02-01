@@ -1,4 +1,4 @@
-package com.example.foodking.Recipe.Ingredient.DTO;
+package com.example.foodking.Recipe.Ingredient.DTO.Request;
 
 import com.example.foodking.Recipe.Ingredient.Ingredient;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;

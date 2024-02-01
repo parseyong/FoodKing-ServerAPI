@@ -59,6 +59,14 @@ public class EmotionService {
         }
     }
 
+    public Long readReplyEmotionCnt(Reply reply){
+        return replyEmotionRepository.countByReplyAndEmotionType(reply,EmotionType.Like);
+    }
+
+    public Long readRecipeEmotionCnt(RecipeInfo recipeInfo){
+        return recipeEmotionRepository.countByRecipeInfoAndEmotionType(recipeInfo,EmotionType.Like);
+    }
+
     public void isMyEmotion(Long userId, User user){
         /*
            단위 테스트시 userId값을 지정할 수 없기때문에 해당 조건문을 추가하여 테스트를 통과할 수 있도록 했다.

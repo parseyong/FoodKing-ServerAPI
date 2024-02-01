@@ -57,6 +57,7 @@ public class ServiceTest {
     @DisplayName("댓글 등록 테스트 -> 성공")
     public void addReplySuccess(){
         //given
+        given(replyRepository.save(any(Reply.class))).willReturn(reply);
 
         //when
         replyService.addReply(user,recipeInfo,"댓글테스트");

@@ -5,10 +5,11 @@ import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Config.SecurityConfig;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
-import com.example.foodking.Recipe.DTO.SaveRecipeReqDTO;
-import com.example.foodking.Recipe.Ingredient.DTO.SaveIngredientReqDTO;
+import com.example.foodking.Recipe.DTO.Request.SaveRecipeReqDTO;
+import com.example.foodking.Recipe.Ingredient.DTO.Request.SaveIngredientReqDTO;
+import com.example.foodking.Recipe.RecipeInfo.DTO.Request.SaveRecipeInfoReqDTO;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfoType;
-import com.example.foodking.Recipe.RecipeWayInfo.DTO.SaveRecipeWayInfoReqDTO;
+import com.example.foodking.Recipe.RecipeWayInfo.DTO.Request.SaveRecipeWayInfoReqDTO;
 import com.example.foodking.User.User;
 import com.example.foodking.User.UserService;
 import com.google.gson.Gson;
@@ -54,6 +55,7 @@ public class ControllerTest {
     private List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList;
     private SaveRecipeReqDTO saveRecipeReqDTO;
     private User user;
+    private SaveRecipeInfoReqDTO saveRecipeInfoReqDTO;
 
     @BeforeEach
     void beforeEach(){
@@ -62,6 +64,15 @@ public class ControllerTest {
                 .password("1234")
                 .phoneNum("01056962173")
                 .nickName("nickName")
+                .build();
+
+        this.saveRecipeInfoReqDTO = SaveRecipeInfoReqDTO.builder()
+                .recipeInfoType(RecipeInfoType.KOREAN)
+                .recipeName("테스트레시피 이름")
+                .recipeTip("테스트레시피 팁")
+                .calogy(10l)
+                .cookingTime(20l)
+                .ingredentCost(30l)
                 .build();
 
         SaveIngredientReqDTO saveIngredientReqDTO1 = SaveIngredientReqDTO.builder()
@@ -86,12 +97,7 @@ public class ControllerTest {
         this.saveRecipeWayInfoReqDTOList = new ArrayList<>(List.of(saveRecipeWayInfoReqDTO1, saveRecipeWayInfoReqDTO2));
 
         this.saveRecipeReqDTO = SaveRecipeReqDTO.builder()
-                .recipeInfoType(RecipeInfoType.KOREAN)
-                .recipeName("테스트레시피 이름")
-                .recipeTip("테스트 레시피 팁")
-                .calogy(10l)
-                .cookingTime(20l)
-                .ingredentCost(30l)
+                .saveRecipeInfoReqDTO(saveRecipeInfoReqDTO)
                 .saveIngredientReqDTOList(saveIngredientReqDTOList)
                 .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
                 .build();
@@ -225,13 +231,17 @@ public class ControllerTest {
     @DisplayName("레시피 수정 테스트 -> (실패 : 입력값 공백)")
     public void updateRecipeFail2() throws Exception {
         //given
-        SaveRecipeReqDTO saveRecipeReqDTO = SaveRecipeReqDTO.builder()
+        SaveRecipeInfoReqDTO saveRecipeInfoReqDTO = SaveRecipeInfoReqDTO.builder()
                 .recipeInfoType(RecipeInfoType.KOREAN)
                 .recipeName("")
                 .recipeTip("")
                 .calogy(null)
                 .cookingTime(null)
                 .ingredentCost(null)
+                .build();
+
+        SaveRecipeReqDTO saveRecipeReqDTO = SaveRecipeReqDTO.builder()
+                .saveRecipeInfoReqDTO(saveRecipeInfoReqDTO)
                 .saveIngredientReqDTOList(saveIngredientReqDTOList)
                 .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
                 .build();

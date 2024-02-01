@@ -2,14 +2,15 @@ package com.example.foodking.Recipe;
 
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
-import com.example.foodking.Recipe.DTO.SaveRecipeReqDTO;
-import com.example.foodking.Recipe.Ingredient.DTO.SaveIngredientReqDTO;
+import com.example.foodking.Recipe.DTO.Request.SaveRecipeReqDTO;
+import com.example.foodking.Recipe.Ingredient.DTO.Request.SaveIngredientReqDTO;
 import com.example.foodking.Recipe.Ingredient.Ingredient;
 import com.example.foodking.Recipe.Ingredient.IngredientRepository;
+import com.example.foodking.Recipe.RecipeInfo.DTO.Request.SaveRecipeInfoReqDTO;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfoRepository;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfoType;
-import com.example.foodking.Recipe.RecipeWayInfo.DTO.SaveRecipeWayInfoReqDTO;
+import com.example.foodking.Recipe.RecipeWayInfo.DTO.Request.SaveRecipeWayInfoReqDTO;
 import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfo;
 import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfoRepository;
 import com.example.foodking.User.User;
@@ -24,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.fail;
@@ -50,6 +52,7 @@ public class ServiceTest {
     private RecipeInfo recipeInfo;
     private List<RecipeWayInfo> recipeWayInfoList;
     private List<Ingredient> ingredientList;
+    private SaveRecipeInfoReqDTO saveRecipeInfoReqDTO;
     private User user;
 
     @BeforeEach
@@ -84,13 +87,17 @@ public class ServiceTest {
                 .build();
         this.saveRecipeWayInfoReqDTOList = new ArrayList<>(List.of(saveRecipeWayInfoReqDTO1, saveRecipeWayInfoReqDTO2));
 
-        this.saveRecipeReqDTO = SaveRecipeReqDTO.builder()
+        this.saveRecipeInfoReqDTO = SaveRecipeInfoReqDTO.builder()
                 .recipeInfoType(RecipeInfoType.KOREAN)
                 .recipeName("테스트레시피 이름")
                 .recipeTip("테스트레시피 팁")
                 .calogy(10l)
                 .cookingTime(20l)
                 .ingredentCost(30l)
+                .build();
+
+        this.saveRecipeReqDTO = SaveRecipeReqDTO.builder()
+                .saveRecipeInfoReqDTO(saveRecipeInfoReqDTO)
                 .saveIngredientReqDTOList(saveIngredientReqDTOList)
                 .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
                 .build();
@@ -120,23 +127,26 @@ public class ServiceTest {
     @DisplayName("레시피 수정 테스트 -> (성공 : 재료,조리법이 줄어든 경우)")
     public void updateRecipeSuccess(){
         //given
-        recipeInfo.changeRecipeWayInfoList(SaveRecipeReqDTO.toRecipeWayInfoListEntity(saveRecipeWayInfoReqDTOList,recipeInfo));
-        recipeInfo.changeIngredientList(SaveRecipeReqDTO.toIngredientListEntity(saveIngredientReqDTOList,recipeInfo));
+        List<Ingredient> ingredientList = saveIngredientReqDTOList.stream()
+                .map(dto -> SaveIngredientReqDTO.toEntity(dto, recipeInfo))
+                .collect(Collectors.toList());
+
+        List<RecipeWayInfo> recipeWayInfoList = saveRecipeWayInfoReqDTOList.stream()
+                .map(dto -> SaveRecipeWayInfoReqDTO.toEntity(dto,recipeInfo))
+                .collect(Collectors.toList());
+
+        recipeInfo.changeRecipeWayInfoList(recipeWayInfoList);
+        recipeInfo.changeIngredientList(ingredientList);
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
         SaveRecipeReqDTO saveRecipeReqDTO = SaveRecipeReqDTO.builder()
-                .recipeInfoType(RecipeInfoType.KOREAN)
-                .recipeName("테스트레시피 이름")
-                .recipeTip("테스트레시피 팁")
+                .saveRecipeInfoReqDTO(saveRecipeInfoReqDTO)
                 .saveIngredientReqDTOList(new ArrayList<>())
                 .saveRecipeWayInfoReqDTOList(new ArrayList<>())
-                .calogy(10l)
-                .cookingTime(20l)
-                .ingredentCost(30l)
                 .build();
 
         //when
-        assertThat(recipeInfo.getRecipeWayInfoList().size()).isEqualTo(2);
-        assertThat(recipeInfo.getIngredientList().size()).isEqualTo(2);
+        assertThat(recipeInfo.getRecipeWayInfoList().size()).isEqualTo(2l);
+        assertThat(recipeInfo.getIngredientList().size()).isEqualTo(2l);
         recipeService.updateRecipe(saveRecipeReqDTO,1l,1l);
 
         //then
@@ -156,6 +166,7 @@ public class ServiceTest {
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         //when
+        assertThat(recipeInfo.getRecipeWayInfoList().size()).isEqualTo(0l);
         recipeService.updateRecipe(saveRecipeReqDTO,1l,1l);
 
         //then
@@ -178,8 +189,16 @@ public class ServiceTest {
     @DisplayName("레시피 수정 테스트 -> (성공 : 재료,조리법 갯수 변경이 없는 경우)")
     public void updateRecipeSuccess3(){
         //given
-        recipeInfo.changeRecipeWayInfoList(SaveRecipeReqDTO.toRecipeWayInfoListEntity(saveRecipeWayInfoReqDTOList,recipeInfo));
-        recipeInfo.changeIngredientList(SaveRecipeReqDTO.toIngredientListEntity(saveIngredientReqDTOList,recipeInfo));
+        List<Ingredient> ingredientList = saveIngredientReqDTOList.stream()
+                .map(dto -> SaveIngredientReqDTO.toEntity(dto, recipeInfo))
+                .collect(Collectors.toList());
+
+        List<RecipeWayInfo> recipeWayInfoList = saveRecipeWayInfoReqDTOList.stream()
+                .map(dto -> SaveRecipeWayInfoReqDTO.toEntity(dto,recipeInfo))
+                .collect(Collectors.toList());
+
+        recipeInfo.changeRecipeWayInfoList(recipeWayInfoList);
+        recipeInfo.changeIngredientList(ingredientList);
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         SaveIngredientReqDTO saveIngredientReqDTO1 = SaveIngredientReqDTO.builder()
@@ -201,17 +220,13 @@ public class ServiceTest {
                 .build();
 
         SaveRecipeReqDTO saveRecipeReqDTO = SaveRecipeReqDTO.builder()
-                .recipeInfoType(RecipeInfoType.KOREAN)
-                .recipeName("테스트레시피 이름")
-                .recipeTip("테스트레시피 팁")
+                .saveRecipeInfoReqDTO(saveRecipeInfoReqDTO)
                 .saveIngredientReqDTOList(new ArrayList<>(List.of(saveIngredientReqDTO1, saveIngredientReqDTO2)))
                 .saveRecipeWayInfoReqDTOList(new ArrayList<>(List.of(saveRecipeWayInfoReqDTO1, saveRecipeWayInfoReqDTO2)))
-                .calogy(10l)
-                .cookingTime(20l)
-                .ingredentCost(30l)
                 .build();
 
         //when
+        assertThat(recipeInfo.getRecipeWayInfoList().get(0).getRecipeWay()).isEqualTo("조리법1");
         recipeService.updateRecipe(saveRecipeReqDTO,1l,1l);
 
         //then
@@ -323,7 +338,7 @@ public class ServiceTest {
     @Test
     @DisplayName("DTO와 엔티티간 변환 테스트")
     public void toEntityAndToDtoTest(){
-        RecipeInfo recipeInfo = SaveRecipeReqDTO.toRecipeInfoEntity(saveRecipeReqDTO,user);
+        RecipeInfo recipeInfo = SaveRecipeInfoReqDTO.toEntity(saveRecipeInfoReqDTO,user);
         assertThat(recipeInfo.getRecipeInfoType()).isEqualTo(RecipeInfoType.KOREAN);
         assertThat(recipeInfo.getRecipeName()).isEqualTo("테스트레시피 이름");
         assertThat(recipeInfo.getRecipeTip()).isEqualTo("테스트레시피 팁");
@@ -332,34 +347,24 @@ public class ServiceTest {
         assertThat(recipeInfo.getIngredientCost()).isEqualTo(30l);
         System.out.println("SaveRecipeReqDTO -> RecipeInfo 변환성공");
 
-        List<Ingredient> ingredientList = SaveRecipeReqDTO.toIngredientListEntity(saveRecipeReqDTO.getSaveIngredientReqDTOList(),recipeInfo);
-        if(ingredientList.size() != 2){
-            fail("SaveRecipeReqDTO -> IngredientList 변환실패");
-        }
-        assertThat(ingredientList.get(0).getIngredientName()).isEqualTo("재료명1");
-        assertThat(ingredientList.get(1).getIngredientName()).isEqualTo("재료명2");
+        SaveIngredientReqDTO saveIngredientReqDTO = SaveIngredientReqDTO.builder()
+                .ingredientName("재료명1")
+                .ingredientAmount("재료수량1")
+                .build();
+        Ingredient ingredient = SaveIngredientReqDTO.toEntity(saveIngredientReqDTO,recipeInfo);
+        assertThat(ingredient.getIngredientName()).isEqualTo("재료명1");
+        assertThat(ingredient.getIngredientAmount()).isEqualTo("재료수량1");
+        assertThat(ingredient.getRecipeInfo()).isEqualTo(recipeInfo);
+        System.out.println("SaveIngredientReqDTO -> Ingredient 변환성공");
 
-        assertThat(ingredientList.get(0).getRecipeInfo()).isEqualTo(recipeInfo);
-        assertThat(ingredientList.get(1).getRecipeInfo()).isEqualTo(recipeInfo);
-
-        assertThat(ingredientList.get(0).getIngredientAmount()).isEqualTo("재료수량1");
-        assertThat(ingredientList.get(1).getIngredientAmount()).isEqualTo("재료수량2");
-        System.out.println("SaveRecipeReqDTO -> IngredientList 변환성공");
-
-        List<RecipeWayInfo> recipeWayInfoList = SaveRecipeReqDTO.toRecipeWayInfoListEntity(saveRecipeReqDTO.getSaveRecipeWayInfoReqDTOList(),recipeInfo);
-
-        if(recipeWayInfoList.size() != 2){
-            fail("SaveRecipeReqDTO -> recipeWayInfoList 변환실패");
-        }
-
-        assertThat(recipeWayInfoList.get(0).getRecipeWay()).isEqualTo("조리법1");
-        assertThat(recipeWayInfoList.get(1).getRecipeWay()).isEqualTo("조리법2");
-
-        assertThat(recipeWayInfoList.get(0).getRecipeInfo()).isEqualTo(recipeInfo);
-        assertThat(recipeWayInfoList.get(1).getRecipeInfo()).isEqualTo(recipeInfo);
-
-        assertThat(recipeWayInfoList.get(0).getRecipeOrder()).isEqualTo(1l);
-        assertThat(recipeWayInfoList.get(1).getRecipeOrder()).isEqualTo(2l);
-        System.out.println("SaveRecipeReqDTO -> recipeWayInfoList 변환성공");
+        SaveRecipeWayInfoReqDTO saveRecipeWayInfoReqDTO = SaveRecipeWayInfoReqDTO.builder()
+                .recipeOrder(1l)
+                .recipeWay("조리법1")
+                .build();
+        RecipeWayInfo recipeWayInfo = SaveRecipeWayInfoReqDTO.toEntity(saveRecipeWayInfoReqDTO,recipeInfo);
+        assertThat(recipeWayInfo.getRecipeWay()).isEqualTo("조리법1");
+        assertThat(recipeWayInfo.getRecipeOrder()).isEqualTo(1l);
+        assertThat(ingredient.getRecipeInfo()).isEqualTo(recipeInfo);
+        System.out.println("SaveIngredientReqDTO -> Ingredient 변환성공");
     }
 }

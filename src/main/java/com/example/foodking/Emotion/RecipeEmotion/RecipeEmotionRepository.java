@@ -1,5 +1,6 @@
 package com.example.foodking.Emotion.RecipeEmotion;
 
+import com.example.foodking.Emotion.EmotionType;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
 import com.example.foodking.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +13,5 @@ public interface RecipeEmotionRepository extends JpaRepository<RecipeEmotion,Lon
 
     Optional<RecipeEmotion> findByRecipeInfoAndUser(RecipeInfo recipeInfo, User user);
 
+    Long countByRecipeInfoAndEmotionType(RecipeInfo recipeInfo, EmotionType emotionType);
 }
