@@ -38,7 +38,7 @@ public class ReplyService {
                 .map(entity -> {
                     Long replyEmotionCnt = emotionService.readReplyEmotionCnt(entity);
                     User user = entity.getUser();
-                    if(user.getUserId() == userId)
+                    if(isMyReply(userId,user))
                         return ReadReplyResDTO.toDTO(entity, user.getNickName(), true,replyEmotionCnt);
                     else
                         return ReadReplyResDTO.toDTO(entity, user.getNickName(), false,replyEmotionCnt);
@@ -53,7 +53,8 @@ public class ReplyService {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_REPLY));
 
-        isMyReply(userId,reply.getUser());
+        if(!isMyReply(userId,reply.getUser()))
+            throw new CommondException(ExceptionCode.ACCESS_FAIL_REPLY);;
         replyRepository.delete(reply);
     }
 
@@ -62,7 +63,8 @@ public class ReplyService {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_REPLY));
 
-        isMyReply(userId,reply.getUser());
+        if(!isMyReply(userId,reply.getUser()))
+            throw new CommondException(ExceptionCode.ACCESS_FAIL_REPLY);;
         reply.changeContent(content);
         replyRepository.save(reply);
     }
@@ -72,16 +74,11 @@ public class ReplyService {
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_REPLY));
     }
 
-    public void isMyReply(Long userId, User user){
-        /*
-           단위 테스트시 userId값을 지정할 수 없기때문에 해당 조건문을 추가하여 테스트를 통과할 수 있도록 했다.
-           실제 환경에서는 User는 null이 아니고 user.userId값은 null인 경우는 존재하지 않는다.
-        */
-        if(user != null && user.getUserId() == null)
-            ;
-        else if( user ==null || !userId.equals(user.getUserId()) )
-            throw new CommondException(ExceptionCode.ACCESS_FAIL_REPLY);
+    public boolean isMyReply(Long userId, User user){
+        if( user ==null || !userId.equals(user.getUserId()) )
+            return false;
 
+        return true;
     }
 
     private Comparator<ReadReplyResDTO> getComparator(ReplySortType replySortType) {

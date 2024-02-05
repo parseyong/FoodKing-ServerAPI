@@ -27,7 +27,6 @@ public class ReadRecipeResDTO {
     private List<ReadRecipeWayInfoResDTO> readRecipeWayInfoResDTOList;
     private List<ReadReplyResDTO> readReplyResDTOList;
     private Long replyCnt;
-    private Long recipeInfoId;
     private Long emotionCnt;
     private boolean isMyRecipe;
     private LocalDateTime regDate;

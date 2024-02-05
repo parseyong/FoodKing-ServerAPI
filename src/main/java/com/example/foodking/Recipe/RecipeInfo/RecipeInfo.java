@@ -39,7 +39,7 @@ public class RecipeInfo extends TimeEntity {
     @Column(nullable = false)
     private Long calogy;
 
-    @Column(name = "recioe_image")
+    @Column(name = "recipe_image")
     private String recipeImage;
 
     @Column(nullable = false, name = "recipe_tip")

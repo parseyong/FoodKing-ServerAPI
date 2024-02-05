@@ -6,10 +6,12 @@ import com.example.foodking.Config.SecurityConfig;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
 import com.example.foodking.Recipe.DTO.Request.SaveRecipeReqDTO;
+import com.example.foodking.Recipe.DTO.Response.ReadRecipeResDTO;
 import com.example.foodking.Recipe.Ingredient.DTO.Request.SaveIngredientReqDTO;
 import com.example.foodking.Recipe.RecipeInfo.DTO.Request.SaveRecipeInfoReqDTO;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfoType;
 import com.example.foodking.Recipe.RecipeWayInfo.DTO.Request.SaveRecipeWayInfoReqDTO;
+import com.example.foodking.Reply.ReplySortType;
 import com.example.foodking.User.User;
 import com.example.foodking.User.UserService;
 import com.google.gson.Gson;
@@ -31,6 +33,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.foodking.Exception.ExceptionCode.NOT_EXIST_RECIPEINFO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -306,7 +309,7 @@ public class ControllerTest {
         Gson gson = new Gson();
         String requestbody = gson.toJson(saveRecipeReqDTO);
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO)).when(recipeService).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
+        doThrow(new CommondException(NOT_EXIST_RECIPEINFO)).when(recipeService).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1l)
@@ -408,7 +411,7 @@ public class ControllerTest {
     public void deleteRecipeFail5() throws Exception {
         //given
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO)).when(recipeService).deleteRecipe(any(Long.class),any(Long.class));
+        doThrow(new CommondException(NOT_EXIST_RECIPEINFO)).when(recipeService).deleteRecipe(any(Long.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(delete("/recipes/{recipeInfoId}",1l)
@@ -435,6 +438,124 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipeService,times(1)).deleteRecipe(any(Long.class),any(Long.class));
+    }
+
+    @Test
+    @DisplayName("레시피 조회 테스트 -> 성공")
+    public void readRecipeSuccess() throws Exception {
+        // given
+        makeAuthentication();
+        ReadRecipeResDTO readRecipeResDTO = ReadRecipeResDTO.builder().build();
+        given(recipeService.readRecipe(any(Long.class),any(Long.class),any())).willReturn(readRecipeResDTO);
+
+        //when, then
+        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1l)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("sort", String.valueOf(ReplySortType.LIKE)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("레시피 상세정보 조회완료"))
+                .andExpect(jsonPath("$.data").isNotEmpty())
+                .andDo(print());
+        verify(recipeService,times(1)).readRecipe(any(Long.class),any(Long.class),any());
+    }
+
+    @Test
+    @DisplayName("레시피 조회 테스트 -> (실패 : 인증되지 않은 유저)")
+    public void readRecipeFail1() throws Exception {
+        // given
+
+        //when, then
+        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1l)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("sort", String.valueOf(ReplySortType.LIKE)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
+                .andDo(print());
+        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any());
+    }
+
+    @Test
+    @DisplayName("레시피 조회 테스트 -> (실패 : PathVariable 타입예외)")
+    public void readRecipeFail2() throws Exception {
+        // given
+        makeAuthentication();
+
+        //when, then
+        this.mockMvc.perform(get("/recipes/{recipeInfoId}","ㅎㅇ")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("sort", String.valueOf(ReplySortType.LIKE)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
+                .andExpect(jsonPath("$.data.fieldName").value("recipeInfoId"))
+                .andExpect(jsonPath("$.data.requiredType").value("Long"))
+                .andDo(print());
+        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any());
+    }
+
+    @Test
+    @DisplayName("레시피 조회 테스트 -> (실패 : PathVariable 공백)")
+    public void readRecipeFail3() throws Exception {
+        // given
+        makeAuthentication();
+
+        //when, then
+        this.mockMvc.perform(get("/recipes/{recipeInfoId}"," ")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("sort", String.valueOf(ReplySortType.LIKE)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."))
+                .andDo(print());
+        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any());
+    }
+
+    @Test
+    @DisplayName("레시피 조회 테스트 -> (실패 : 입력값enum타입 예외)")
+    public void readRecipeFail4() throws Exception {
+        // given
+        makeAuthentication();
+
+        //when, then
+        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1l)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("sort", " "))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
+                .andExpect(jsonPath("$.data.sort").value("Required request parameter 'sort' for method parameter type ReplySortType is present but converted to null(관리자에게 문의하세요)"))
+                .andDo(print());
+        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any());
+    }
+
+    @Test
+    @DisplayName("레시피 조회 테스트 -> (실패 : 입력값없음)")
+    public void readRecipeFail5() throws Exception {
+        // given
+        makeAuthentication();
+
+        //when, then
+        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1l)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
+                .andExpect(jsonPath("$.data.sort").value("Required request parameter 'sort' for method parameter type ReplySortType is not present(관리자에게 문의하세요)"))
+                .andDo(print());
+        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any());
+    }
+
+    @Test
+    @DisplayName("레시피 조회 테스트 -> (실패 : 존재하지 않는 레시피)")
+    public void readRecipeFail6() throws Exception {
+        // given
+        makeAuthentication();
+        given(recipeService.readRecipe(any(Long.class),any(Long.class),any())).willThrow(new CommondException(NOT_EXIST_RECIPEINFO));
+
+        //when, then
+        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1l)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("sort", String.valueOf(ReplySortType.LIKE)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
+                .andDo(print());
+        verify(recipeService,times(1)).readRecipe(any(Long.class),any(Long.class),any());
     }
 
     public void makeAuthentication(){

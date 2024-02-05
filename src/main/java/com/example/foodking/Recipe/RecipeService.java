@@ -87,6 +87,34 @@ public class RecipeService {
         recipeInfoRepository.delete(recipeInfo);
     }
 
+    public ReadRecipeResDTO readRecipe(Long userId,Long recipeInfoId, ReplySortType replySortType){
+        RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
+
+        ReadRecipeInfoResDTO readRecipeInfoResDTO = ReadRecipeInfoResDTO.toDTO(recipeInfo);
+
+        List<ReadRecipeWayInfoResDTO> readRecipeWayInfoResDTOList = recipeInfo.getRecipeWayInfoList().stream()
+                .map(entity -> ReadRecipeWayInfoResDTO.toDTO(entity))
+                .collect(Collectors.toList());
+
+        List<ReadIngredientResDTO> readIngredientResDTOList = recipeInfo.getIngredientList().stream()
+                .map(entity -> ReadIngredientResDTO.toDTO(entity))
+                .collect(Collectors.toList());
+
+        List<ReadReplyResDTO> readReplyResDTOList = replyService.readReply(recipeInfo,userId,replySortType);
+
+        return ReadRecipeResDTO.builder()
+                .readRecipeInfoResDTO(readRecipeInfoResDTO)
+                .readReplyResDTOList(readReplyResDTOList)
+                .readRecipeWayInfoResDTOList(readRecipeWayInfoResDTOList)
+                .readIngredientResDTOList(readIngredientResDTOList)
+                .replyCnt((long) recipeInfo.getReplyList().size())
+                .emotionCnt(emotionService.readRecipeEmotionCnt(recipeInfo))
+                .regDate(recipeInfo.getRegDate())
+                .modDate(recipeInfo.getModDate())
+                .isMyRecipe(recipeInfo.getUser().getUserId() == userId)
+                .build();
+    }
+
     public void updateRecipeInfo(RecipeInfo recipeInfo, SaveRecipeInfoReqDTO saveRecipeInfoReqDTO){
         recipeInfo.changeCalogy(saveRecipeInfoReqDTO.getCalogy());
         recipeInfo.changeRecipeInfoType(saveRecipeInfoReqDTO.getRecipeInfoType());
@@ -147,44 +175,7 @@ public class RecipeService {
     }
 
     public static void isMyRecipe(Long userId, User user, ExceptionCode exceptionCode){
-        /*
-           단위 테스트시 userId값을 지정할 수 없기때문에 해당 조건문을 추가하여 테스트를 통과할 수 있도록 했다.
-           실제 환경에서는 User는 null이 아니고 user.userId값은 null인 경우는 존재하지 않는다.
-        */
-        if(user != null && user.getUserId() == null)
-            ;
-        else if( user ==null || !userId.equals(user.getUserId()) )
+        if( user ==null || !userId.equals(user.getUserId()) )
             throw new CommondException(exceptionCode);
-
-    }
-
-    public ReadRecipeResDTO readRecipe(Long userId,Long recipeInfoId, ReplySortType replySortType){
-        RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
-
-        ReadRecipeInfoResDTO readRecipeInfoResDTO = ReadRecipeInfoResDTO.toDTO(recipeInfo);
-
-        List<ReadRecipeWayInfoResDTO> readRecipeWayInfoResDTOList = recipeInfo.getRecipeWayInfoList().stream()
-                        .map(entity -> ReadRecipeWayInfoResDTO.toDTO(entity))
-                        .collect(Collectors.toList());
-
-        List<ReadIngredientResDTO> readIngredientResDTOList = recipeInfo.getIngredientList().stream()
-                .map(entity -> ReadIngredientResDTO.toDTO(entity))
-                .collect(Collectors.toList());
-
-
-        List<ReadReplyResDTO> readReplyResDTOList = replyService.readReply(recipeInfo,userId,replySortType);
-
-        return ReadRecipeResDTO.builder()
-                .readRecipeInfoResDTO(readRecipeInfoResDTO)
-                .recipeInfoId(recipeInfo.getRecipeInfoId())
-                .readReplyResDTOList(readReplyResDTOList)
-                .readRecipeWayInfoResDTOList(readRecipeWayInfoResDTOList)
-                .readIngredientResDTOList(readIngredientResDTOList)
-                .replyCnt((long) recipeInfo.getReplyList().size())
-                .emotionCnt(emotionService.readRecipeEmotionCnt(recipeInfo))
-                .regDate(recipeInfo.getRegDate())
-                .modDate(recipeInfo.getModDate())
-                .isMyRecipe(recipeInfo.getUser().getUserId() == userId)
-                .build();
     }
 }

@@ -23,6 +23,8 @@ public class ReadRecipeInfoResDTO {
     private Long cookingTime;
     private Long calogy;
     private String recipeTip;
+    private Long recipeInfoId;
+    private String recipeImageUrl;
 
     public static ReadRecipeInfoResDTO toDTO(RecipeInfo recipeInfo){
         return ReadRecipeInfoResDTO.builder()
@@ -32,6 +34,8 @@ public class ReadRecipeInfoResDTO {
                 .cookingTime(recipeInfo.getCookingTime())
                 .recipeTip(recipeInfo.getRecipeTip())
                 .ingredentCost(recipeInfo.getIngredientCost())
+                .recipeInfoId(recipeInfo.getRecipeInfoId())
+                .recipeImageUrl(recipeInfo.getRecipeImage())
                 .build();
     }
 }

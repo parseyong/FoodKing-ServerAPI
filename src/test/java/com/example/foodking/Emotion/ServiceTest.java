@@ -23,8 +23,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ServiceTest {
@@ -43,15 +42,15 @@ public class ServiceTest {
 
     @BeforeEach
     void beforeEach(){
-        this.user= User.builder()
+        this.user= spy(User.builder()
                 .email("test@google.com")
                 .password("1234")
                 .phoneNum("01056962173")
                 .nickName("nickName")
-                .build();
-        this.recipeInfo = RecipeInfo.builder()
+                .build());
+        this.recipeInfo = spy(RecipeInfo.builder()
                 .user(user)
-                .build();
+                .build());
         this.reply = Reply.builder()
                 .content("replyTest")
                 .user(user)
@@ -89,6 +88,7 @@ public class ServiceTest {
     public void toggleReplyEmotionSuccess1(){
         // given
         given(replyEmotionRepository.findByReplyAndUser(any(Reply.class),any(User.class))).willReturn(Optional.ofNullable(replyEmotion));
+        given(user.getUserId()).willReturn(1l);
 
         // when
         emotionService.toggleReplyEmotion(user,reply,EmotionType.Like);
@@ -103,15 +103,14 @@ public class ServiceTest {
     @DisplayName("댓글 이모션 toggle테스트 -> (이모션 삭제 실패 : 이모션 권한없음)")
     public void toggleReplyEmotionFail1(){
         // given
-        ReplyEmotion replyEmotion = ReplyEmotion.builder()
-                .reply(reply)
-                .emotionType(EmotionType.Like)
-                .build();
         given(replyEmotionRepository.findByReplyAndUser(any(Reply.class),any(User.class))).willReturn(Optional.ofNullable(replyEmotion));
+        given(user.getUserId()).willReturn(1l);
+        User user1 = spy(User.builder().build());
+        given(user1.getUserId()).willReturn(2l);
 
         // when, then
         try{
-            emotionService.toggleReplyEmotion(user,reply,EmotionType.Like);
+            emotionService.toggleReplyEmotion(user1,reply,EmotionType.Like);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(replyEmotionRepository,times(1)).findByReplyAndUser(any(Reply.class),any(User.class));
@@ -141,6 +140,7 @@ public class ServiceTest {
     public void toggleRecipeEmotionSuccess2(){
         // given
         given(recipeEmotionRepository.findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class))).willReturn(Optional.ofNullable(recipeEmotion));
+        given(recipeInfo.getUser().getUserId()).willReturn(1l);
 
         // when
         emotionService.toggleRecipeInfoEmotion(user,recipeInfo,EmotionType.Like);
@@ -155,15 +155,14 @@ public class ServiceTest {
     @DisplayName("레시피 이모션 toggle테스트 -> (이모션 삭제 실패 : 이모션 권한 없음)")
     public void toggleRecipeEmotionFail1(){
         // given
-        RecipeEmotion recipeEmotion = RecipeEmotion.builder()
-                .recipeInfo(recipeInfo)
-                .emotionType(EmotionType.Like)
-                .build();
         given(recipeEmotionRepository.findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class))).willReturn(Optional.ofNullable(recipeEmotion));
+        given(recipeInfo.getUser().getUserId()).willReturn(1l);
+        User user1 = spy(User.builder().build());
+        given(user1.getUserId()).willReturn(2l);
 
         // when, then
         try{
-            emotionService.toggleRecipeInfoEmotion(user,recipeInfo,EmotionType.Like);
+            emotionService.toggleRecipeInfoEmotion(user1,recipeInfo,EmotionType.Like);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(recipeEmotionRepository,times(1)).findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class));

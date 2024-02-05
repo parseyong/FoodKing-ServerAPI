@@ -479,4 +479,5 @@ public class ServiceTest {
         assertThat(readUserInfoResDTO.getPhoneNum()).isEqualTo("01056962173");
         System.out.println("User -> ReadUserInfoResDTO 변환성공");
     }
+
 }
