@@ -4,8 +4,10 @@ import com.example.foodking.Emotion.EmotionService;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
+import com.example.foodking.Recipe.RecipeInfo.RecipeInfoRepository;
 import com.example.foodking.Reply.DTO.Response.ReadReplyResDTO;
 import com.example.foodking.User.User;
+import com.example.foodking.User.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,6 +36,10 @@ public class ServiceTest {
     private ReplyRepository replyRepository;
     @Mock
     private EmotionService emotionService;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private RecipeInfoRepository recipeInfoRepository;
 
     private User user;
     private RecipeInfo recipeInfo;
@@ -66,12 +72,53 @@ public class ServiceTest {
     public void addReplySuccess(){
         //given
         given(replyRepository.save(any(Reply.class))).willReturn(reply);
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         //when
-        replyService.addReply(user,recipeInfo,"댓글테스트");
+        replyService.addReply(1l,1l,"댓글테스트");
 
         //then
         verify(replyRepository,times(1)).save(any(Reply.class));
+        verify(userRepository,times(1)).findById(any(Long.class));
+        verify(recipeInfoRepository,times(1)).findById(any(Long.class));
+    }
+
+    @Test
+    @DisplayName("댓글 등록 테스트 -> 존재하지 않는 유저")
+    public void addReplyFail1(){
+        //given
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.empty());
+
+        //when,then
+        try{
+            replyService.addReply(1l,1l,"댓글테스트");
+            fail("예외가 발생하지 않음");
+        }catch (CommondException ex){
+            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
+            verify(replyRepository,times(0)).save(any(Reply.class));
+            verify(userRepository,times(1)).findById(any(Long.class));
+            verify(recipeInfoRepository,times(0)).findById(any(Long.class));
+        }
+    }
+
+    @Test
+    @DisplayName("댓글 등록 테스트 -> 존재하지 않는 레시피")
+    public void addReplyFail2(){
+        //given
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.empty());
+
+        //when,then
+        try{
+            replyService.addReply(1l,1l,"댓글테스트");
+            fail("예외가 발생하지 않음");
+        }catch (CommondException ex){
+            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_RECIPEINFO);
+            verify(replyRepository,times(0)).save(any(Reply.class));
+            verify(userRepository,times(1)).findById(any(Long.class));
+            verify(recipeInfoRepository,times(1)).findById(any(Long.class));
+        }
     }
 
     @Test

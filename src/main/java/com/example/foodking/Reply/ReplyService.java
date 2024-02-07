@@ -4,8 +4,10 @@ import com.example.foodking.Emotion.EmotionService;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
+import com.example.foodking.Recipe.RecipeInfo.RecipeInfoRepository;
 import com.example.foodking.Reply.DTO.Response.ReadReplyResDTO;
 import com.example.foodking.User.User;
+import com.example.foodking.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,10 +22,17 @@ import java.util.stream.Collectors;
 public class ReplyService {
 
     private final ReplyRepository replyRepository;
-
     private final EmotionService emotionService;
+    private final UserRepository userRepository;
+    private final RecipeInfoRepository recipeInfoRepository;
+
     @Transactional
-    public Long addReply(User user, RecipeInfo recipeInfo, String content){
+    public Long addReply(Long userId, Long recipeInfoId, String content){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+        RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+
         Reply reply = Reply.builder()
                 .content(content)
                 .user(user)
@@ -50,8 +59,7 @@ public class ReplyService {
 
     @Transactional
     public void deleteReply(Long userId, Long replyId){
-        Reply reply = replyRepository.findById(replyId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_REPLY));
+        Reply reply = findReplyById(replyId);
 
         if(!isMyReply(userId,reply.getUser()))
             throw new CommondException(ExceptionCode.ACCESS_FAIL_REPLY);;
@@ -60,8 +68,7 @@ public class ReplyService {
 
     @Transactional
     public void updateReply(Long userId, Long replyId, String content){
-        Reply reply = replyRepository.findById(replyId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_REPLY));
+        Reply reply = findReplyById(replyId);
 
         if(!isMyReply(userId,reply.getUser()))
             throw new CommondException(ExceptionCode.ACCESS_FAIL_REPLY);;

@@ -2,8 +2,6 @@ package com.example.foodking.Reply;
 
 import com.example.foodking.Auth.JwtProvider;
 import com.example.foodking.Common.CommonResDTO;
-import com.example.foodking.Recipe.RecipeService;
-import com.example.foodking.User.UserService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,14 +18,12 @@ import javax.validation.constraints.NotBlank;
 public class ReplyController {
 
     private final ReplyService replyService;
-    private final UserService userService;
-    private final RecipeService recipeService;
 
     @PostMapping("/{recipeInfoId}/replys")
     public ResponseEntity<CommonResDTO> addReply(@PathVariable final Long recipeInfoId,
                                                   @RequestParam(name = "content") @NotBlank(message = "내용을 입력해주세요") String content){
         final Long userId = JwtProvider.getUserId();
-        Long replyId = replyService.addReply(userService.findUserById(userId),recipeService.findRecipeInfoById(recipeInfoId),content);
+        Long replyId = replyService.addReply(userId,recipeInfoId,content);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("댓글 등록완료",replyId));
     }
 

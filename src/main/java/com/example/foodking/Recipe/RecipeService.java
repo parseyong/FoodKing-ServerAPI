@@ -21,6 +21,7 @@ import com.example.foodking.Reply.DTO.Response.ReadReplyResDTO;
 import com.example.foodking.Reply.ReplyService;
 import com.example.foodking.Reply.ReplySortType;
 import com.example.foodking.User.User;
+import com.example.foodking.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -39,11 +40,15 @@ public class RecipeService {
     private final RecipeInfoRepository recipeInfoRepository;
     private final IngredientRepository ingredientRepository;
     private final RecipeWayInfoRepository recipeWayInfoRepository;
+    private final UserRepository userRepository;
     private final ReplyService replyService;
     private final EmotionService emotionService;
 
     @Transactional
-    public Long addRecipe(SaveRecipeReqDTO saveRecipeReqDTO, User user){
+    public Long addRecipe(SaveRecipeReqDTO saveRecipeReqDTO, Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+
         RecipeInfo recipeInfo = SaveRecipeInfoReqDTO.toEntity(saveRecipeReqDTO.getSaveRecipeInfoReqDTO(),user);
 
         List<Ingredient> ingredientList = saveRecipeReqDTO.getSaveIngredientReqDTOList().stream()

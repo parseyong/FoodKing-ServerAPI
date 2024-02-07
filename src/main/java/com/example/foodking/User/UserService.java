@@ -82,15 +82,13 @@ public class UserService {
     }
 
     public ReadUserInfoResDTO readUser(Long userId){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+        User user = findUserById(userId);
 
         return ReadUserInfoResDTO.toDTO(user);
     }
     @Transactional
     public void updateUser(UpdateUserInfoReqDTO updateUserInfoReqDTO, Long userId){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+        User user = findUserById(userId);
 
         isMatchPassword(updateUserInfoReqDTO.getOldPassword(),user.getPassword(),ExceptionCode.PASSWORD_NOT_COLLECT);
         user.changeNickName(updateUserInfoReqDTO.getNickName());

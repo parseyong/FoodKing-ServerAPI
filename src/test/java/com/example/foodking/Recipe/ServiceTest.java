@@ -21,6 +21,7 @@ import com.example.foodking.Recipe.RecipeWayInfo.RecipeWayInfoRepository;
 import com.example.foodking.Reply.ReplyService;
 import com.example.foodking.Reply.ReplySortType;
 import com.example.foodking.User.User;
+import com.example.foodking.User.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,8 @@ public class ServiceTest {
     private IngredientRepository ingredientRepository;
     @Mock
     private RecipeWayInfoRepository recipeWayInfoRepository;
+    @Mock
+    private UserRepository userRepository;
     @Mock
     private EmotionService emotionService;
     @Mock
@@ -126,14 +129,35 @@ public class ServiceTest {
     @DisplayName("레시피 등록테스트 -> (성공)")
     public void addRecipeInfoSuccess(){
         //given
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
 
         //when
-        recipeService.addRecipe(saveRecipeReqDTO,user);
+        recipeService.addRecipe(saveRecipeReqDTO,1l);
 
         //then
+        verify(userRepository,times(1)).findById(any(Long.class));
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
         verify(ingredientRepository,times(1)).saveAll(any(List.class));
         verify(recipeWayInfoRepository,times(1)).saveAll(any(List.class));
+    }
+
+    @Test
+    @DisplayName("레시피 등록테스트 -> (실패 : 존재하지 않는 유저)")
+    public void addRecipeInfoFail1(){
+        //given
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.empty());
+
+        //when,then
+        try {
+            recipeService.addRecipe(saveRecipeReqDTO,1l);
+            fail("예외가 발생하지 않음");
+        }catch (CommondException ex){
+            verify(userRepository,times(1)).findById(any(Long.class));
+            verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
+            verify(ingredientRepository,times(0)).saveAll(any(List.class));
+            verify(recipeWayInfoRepository,times(0)).saveAll(any(List.class));
+            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
+        }
     }
 
     @Test

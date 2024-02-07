@@ -7,8 +7,11 @@ import com.example.foodking.Emotion.ReplyEmotion.ReplyEmotionRepository;
 import com.example.foodking.Exception.CommondException;
 import com.example.foodking.Exception.ExceptionCode;
 import com.example.foodking.Recipe.RecipeInfo.RecipeInfo;
+import com.example.foodking.Recipe.RecipeInfo.RecipeInfoRepository;
 import com.example.foodking.Reply.Reply;
+import com.example.foodking.Reply.ReplyRepository;
 import com.example.foodking.User.User;
+import com.example.foodking.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +25,17 @@ public class EmotionService {
 
     private final ReplyEmotionRepository replyEmotionRepository;
     private final RecipeEmotionRepository recipeEmotionRepository;
+    private final UserRepository userRepository;
+    private final ReplyRepository replyRepository;
+    private final RecipeInfoRepository recipeInfoRepository;
 
     @Transactional
-    public void toggleReplyEmotion(User user, Reply reply,EmotionType emotionType){
+    public void toggleReplyEmotion(Long userId, Long replyId, EmotionType emotionType){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+        Reply  reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_REPLY));
+
         Optional<ReplyEmotion> result = replyEmotionRepository.findByReplyAndUser(reply,user);
         if(result.isEmpty()){
             ReplyEmotion replyEmotion = ReplyEmotion.builder()
@@ -44,7 +55,12 @@ public class EmotionService {
     }
 
     @Transactional
-    public void toggleRecipeInfoEmotion(User user, RecipeInfo recipeInfo, EmotionType emotionType){
+    public void toggleRecipeInfoEmotion(Long userId, Long recipeInfoId, EmotionType emotionType){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
+        RecipeInfo  recipeInfo = recipeInfoRepository.findById(recipeInfoId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+
         Optional<RecipeEmotion> result = recipeEmotionRepository.findByRecipeInfoAndUser(recipeInfo,user);
         if(result.isEmpty()){
             RecipeEmotion recipeEmotion = RecipeEmotion.builder()
