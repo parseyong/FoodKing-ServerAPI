@@ -1,4 +1,4 @@
-package com.example.foodking.Common;
+package com.example.foodking.common;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -15,7 +15,7 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultSupertypeSerializer")
 public class QTimeEntity extends EntityPathBase<TimeEntity> {
 
-    private static final long serialVersionUID = 1931445963L;
+    private static final long serialVersionUID = -2007283989L;
 
     public static final QTimeEntity timeEntity = new QTimeEntity("timeEntity");
 
