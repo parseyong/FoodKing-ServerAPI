@@ -3,6 +3,8 @@ package com.example.foodking.recipe.service;
 import com.example.foodking.emotion.service.EmotionService;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
+import com.example.foodking.recipe.common.RecipeInfoType;
+import com.example.foodking.recipe.common.RecipeSortType;
 import com.example.foodking.recipe.domain.Ingredient;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.domain.RecipeWayInfo;
@@ -11,6 +13,7 @@ import com.example.foodking.recipe.dto.ingredient.response.ReadIngredientResDTO;
 import com.example.foodking.recipe.dto.recipe.request.SaveRecipeReqDTO;
 import com.example.foodking.recipe.dto.recipe.response.ReadRecipeResDTO;
 import com.example.foodking.recipe.dto.recipeInfo.request.SaveRecipeInfoReqDTO;
+import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoPagingResDTO;
 import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoResDTO;
 import com.example.foodking.recipe.dto.recipeWayInfo.request.SaveRecipeWayInfoReqDTO;
 import com.example.foodking.recipe.dto.recipeWayInfo.response.ReadRecipeWayInfoResDTO;
@@ -24,6 +27,8 @@ import com.example.foodking.user.domain.User;
 import com.example.foodking.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +48,7 @@ public class RecipeService {
     private final UserRepository userRepository;
     private final ReplyService replyService;
     private final EmotionService emotionService;
+    private final PagingService pagingService;
 
     @Transactional
     public Long addRecipe(SaveRecipeReqDTO saveRecipeReqDTO, Long userId){
@@ -118,6 +124,15 @@ public class RecipeService {
                 .recipeTip(recipeInfo.getRecipeTip())
                 .isMyRecipe(recipeInfo.getUser().getUserId() == userId)
                 .build();
+    }
+
+    public Object readRecipePaging(Long pageNum, RecipeSortType recipeSortType, RecipeInfoType recipeInfoType){
+        Pageable pageable= PageRequest.of((int) (pageNum-1),10);
+        Long recipeCnt = pagingService.findRecipeInfoTotalCnt(recipeInfoType);
+
+        List<ReadRecipeInfoResDTO> readRecipeInfoResDTOList = pagingService.findPagingRecipeInfo(pageable,recipeSortType,recipeInfoType);
+
+        return ReadRecipeInfoPagingResDTO.toDTO(readRecipeInfoResDTOList,recipeCnt);
     }
 
     public void updateRecipeInfo(RecipeInfo recipeInfo, SaveRecipeInfoReqDTO saveRecipeInfoReqDTO){
