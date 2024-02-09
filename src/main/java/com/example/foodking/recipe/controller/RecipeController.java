@@ -58,7 +58,7 @@ public class RecipeController {
     }
 
     @GetMapping("/recipes/{recipeType}/{pageNum}")
-    public ResponseEntity<?> paging(@PathVariable(name = "recipeType") final RecipeInfoType recipeInfoType,
+    public ResponseEntity<CommonResDTO> paging(@PathVariable(name = "recipeType") final RecipeInfoType recipeInfoType,
                                     @PathVariable final Long pageNum, @RequestParam(name = "sort") @NotNull(message ="정렬타입을 입력해주세요")RecipeSortType recipeSortType){
 
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("레시피 조회성공"

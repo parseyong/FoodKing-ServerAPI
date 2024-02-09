@@ -60,6 +60,7 @@ public class PagingService {
                 .collect(Collectors.toList());
 
     }
+
     // 총 레시피 수를 반환하는 메소드, fetchResult는 deprecated되었고 성능상 좋지 않기때문에 두 쿼리를 분리했다.
     public Long findRecipeInfoTotalCnt(RecipeInfoType recipeInfoType){
 

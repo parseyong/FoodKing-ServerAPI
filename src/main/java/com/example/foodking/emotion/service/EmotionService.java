@@ -30,6 +30,13 @@ public class EmotionService {
     private final ReplyRepository replyRepository;
     private final RecipeInfoRepository recipeInfoRepository;
 
+    /*
+        추후에 싫어요 이모션을 추가할 예정입니다.
+        한 사람당 좋아요와 싫어요를 모두 누를 수 없으며 좋아요를 누른 상태에서 싫어요를 누르면 좋아요는 자동 취소되고 싫어요 카운트가 늘어납니다.
+        싫어요 이모션 추가 시 이모션 개수 를 반환할 경우 좋아요-싫어요 개수를 반환합니다.
+        졸아요-싫어요 값이 -이면 0을 반환합니다.
+    */
+
     @Transactional
     public void toggleReplyEmotion(Long userId, Long replyId, EmotionType emotionType){
         User user = userRepository.findById(userId)
@@ -94,4 +101,5 @@ public class EmotionService {
 
         return true;
     }
+
 }
