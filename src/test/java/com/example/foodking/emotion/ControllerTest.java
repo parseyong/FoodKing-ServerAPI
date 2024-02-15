@@ -5,12 +5,9 @@ import com.example.foodking.auth.JwtProvider;
 import com.example.foodking.config.SecurityConfig;
 import com.example.foodking.emotion.controller.EmotionController;
 import com.example.foodking.emotion.service.EmotionService;
-import com.example.foodking.recipe.controller.RecipeController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -25,7 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebMvcTest(value = RecipeController.class)
+@WebMvcTest(value = EmotionController.class)
 @Import({SecurityConfig.class, JwtProvider.class})
 public class ControllerTest {
 
