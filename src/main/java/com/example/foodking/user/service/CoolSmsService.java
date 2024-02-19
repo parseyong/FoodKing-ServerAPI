@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -36,10 +39,14 @@ public class CoolSmsService {
         authenticationNumberMap : 전화번호와 인증번호를 저장한 Map
         authenticationedPhoneNumSet : 인증확인이 완료된 전화번호 set
     */
-    @Getter
-    private HashMap<String,String> authenticationNumberMap = new HashMap<>();
-    @Getter
-    private HashSet<String> authenticationedPhoneNumSet = new HashSet<>();
+
+    @Autowired
+    @Qualifier("authNumberRedis")
+    private RedisTemplate<String, String> authNumberRedis;
+    @Autowired
+    @Qualifier("isAuthNumberRedis")
+    private RedisTemplate<String,String> isAuthNumberRedis;
+
 
     @PostConstruct
     protected void init() {
@@ -64,7 +71,7 @@ public class CoolSmsService {
         try {
             coolSms.send(params);
             //인증번호 확인을 위해 발급된 인증번호를 key-value(전화번호-인증번호)형태로 저장
-            authenticationNumberMap.put(phoneNum, String.valueOf(authenticationNumber));
+            authNumberRedis.opsForValue().set(phoneNum, String.valueOf(authenticationNumber));
         } catch (CoolsmsException e) {
             System.out.println(e.getCode()+":"+e.getMessage());
             log.error(e.getCode()+":"+e.getMessage());
@@ -79,23 +86,18 @@ public class CoolSmsService {
     */
     public void authNumCheck(PhoneAuthReqDTO phoneAuthReqDTO) {
 
-        String authenticationNum = authenticationNumberMap.get(phoneAuthReqDTO.getPhoneNum());
-        log.info(authenticationNumberMap.toString() + "authNumcheck");
-        log.info(authenticationedPhoneNumSet.toString() + "authNumcheck");
+        String authenticationNum = authNumberRedis.opsForValue().get(phoneAuthReqDTO.getPhoneNum());
 
         if(authenticationNum == null || !authenticationNum.equals(phoneAuthReqDTO.getAuthenticationNumber()))
             throw new CommondException(SMS_AUTHENTICATION_FAIL);
 
-        authenticationedPhoneNumSet.add(phoneAuthReqDTO.getPhoneNum());
+       isAuthNumberRedis.opsForValue().set(phoneAuthReqDTO.getPhoneNum(),"true");
     }
     
     // 해당 전화번호가 인증이 완료된 전화번호인지 체크 즉, authenticationedPhoneNumset에 전화번호가 존재하는지 체크한다.
     public boolean isAuthenticatedNum(String phoneNum){
 
-        log.info(authenticationNumberMap.toString() + "isAuth");
-        log.info(authenticationedPhoneNumSet.toString() + "isAuth");
-
-        if(!authenticationedPhoneNumSet.contains(phoneNum)){
+        if(isAuthNumberRedis.opsForValue().get(phoneNum) == null){
             throw new CommondException(SMS_NOT_AUTHENTICATION);
         }
         return true;
@@ -106,7 +108,7 @@ public class CoolSmsService {
         인증로직 완료 후 삭제해 버리면 로그인로직에서 예외 발생시 전화번호 인증을 다시해야하기때문에 회원가입이 완료된 후 삭제한다.
     */
     public void deleteAuthInfo(String phoneNum){
-        authenticationedPhoneNumSet.remove(phoneNum);
-        authenticationNumberMap.remove(phoneNum);
+        isAuthNumberRedis.delete(phoneNum);
+        authNumberRedis.delete(phoneNum);
     }
 }
