@@ -18,6 +18,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,22 +32,16 @@ import java.util.stream.Collectors;
 
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PagingService {
 
+    private final UserRepository userRepository;
     private final JPAQueryFactory jpaQueryFactory;
-    private final EntityManager entityManager;
     private final QRecipeInfo qRecipeInfo = QRecipeInfo.recipeInfo;
     private final QRecipeEmotion qRecipeEmotion = QRecipeEmotion.recipeEmotion;
-    private final UserRepository userRepository;
 
-    @Autowired
-    public PagingService(EntityManager entityManager,UserRepository userRepository){
-        this.entityManager=entityManager;
-        this.userRepository=userRepository;
-        jpaQueryFactory = new JPAQueryFactory(this.entityManager);
-    }
-    
+
     /*
         컨트롤러로부터 request처리를 위임받고 처리결과를 반환하는 메소드로 페이징기능에 대한 main메소드? 의 역할
         자신이 쓴 레시피, 졸아요를 누른 레시피, 레시피 타입에 대한 검색, 키워드 검색에 대한 요청을 모두 해당 메소드가 처리한다.

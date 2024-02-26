@@ -23,7 +23,7 @@ public class EmotionController {
     private final EmotionService emotionService;
 
     @PostMapping("/replys/emotions/{replyId}")
-    public ResponseEntity<?> toggleReplyEmotion(@PathVariable final Long replyId
+    public ResponseEntity<CommonResDTO> toggleReplyEmotion(@PathVariable final Long replyId
             , @RequestParam @NotNull(message = "이모션 정보를 입력해주세요") EmotionType emotionType){
         final Long userId = JwtProvider.getUserId();
         emotionService.toggleReplyEmotion(userId,replyId,emotionType);
@@ -32,7 +32,7 @@ public class EmotionController {
     }
 
     @PostMapping("/recipes/emotions/{recipeInfoId}")
-    public ResponseEntity<?> toggleRecipeEmotion(@PathVariable final Long recipeInfoId
+    public ResponseEntity<CommonResDTO> toggleRecipeEmotion(@PathVariable final Long recipeInfoId
             , @RequestParam @NotNull(message = "이모션 정보를 입력해주세요") EmotionType emotionType){
         final Long userId = JwtProvider.getUserId();
         emotionService.toggleRecipeInfoEmotion(userId,recipeInfoId,emotionType);
