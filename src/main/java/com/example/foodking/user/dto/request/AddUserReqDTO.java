@@ -15,8 +15,8 @@ public class AddUserReqDTO {
     @Email(message = "이메일 형식이 올바르지 않습니다")
     @NotBlank(message = "이메일 정보를 입력해주세요")
     private String email;
-    @NotBlank(message = "비밀번호를 입력해주세요")
     @Setter
+    @NotBlank(message = "비밀번호를 입력해주세요")
     private String password;
     @NotBlank(message = "비밀번호를 입력해주세요")
     private String passwordRepeat;

@@ -1,6 +1,5 @@
 package com.example.foodking.user.controller;
 
-import com.example.foodking.auth.JwtProvider;
 import com.example.foodking.common.CommonResDTO;
 import com.example.foodking.user.dto.request.*;
 import com.example.foodking.user.dto.response.ReadUserInfoResDTO;
@@ -10,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,15 +70,17 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<CommonResDTO> readUser(){
-        final Long userId = JwtProvider.getUserId();
+    public ResponseEntity<CommonResDTO> readUser(@AuthenticationPrincipal final Long userId){
+
         ReadUserInfoResDTO readUserInfoResDTO = userService.readUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 조회 성공",readUserInfoResDTO));
     }
 
     @PatchMapping("/users")
-    public ResponseEntity<CommonResDTO> updateUser(@RequestBody @Valid UpdateUserInfoReqDTO updateUserInfoReqDTO){
-        final Long userId = JwtProvider.getUserId();
+    public ResponseEntity<CommonResDTO> updateUser(
+            @AuthenticationPrincipal final Long userId,
+            @RequestBody @Valid UpdateUserInfoReqDTO updateUserInfoReqDTO){
+
         userService.updateUser(updateUserInfoReqDTO,userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 변경 성공",null));
     }

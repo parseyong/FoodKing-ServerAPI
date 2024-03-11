@@ -22,8 +22,8 @@ public class CoolSmsController {
     private final CoolSmsService coolSmsService;
 
     @GetMapping("/messages")
-    public ResponseEntity<CommonResDTO> sendMessage(@RequestParam(name = "phoneNum")
-                                                        @NotBlank(message = "전화번호를 입력해주세요") String phoneNum){
+    public ResponseEntity<CommonResDTO> sendMessage(
+            @RequestParam(name = "phoneNum") @NotBlank(message = "전화번호를 입력해주세요") String phoneNum){
 
         coolSmsService.sendMessage(phoneNum);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("인증번호 전송",null));

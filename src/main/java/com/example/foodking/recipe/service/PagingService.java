@@ -1,6 +1,5 @@
 package com.example.foodking.recipe.service;
 
-import com.example.foodking.auth.JwtProvider;
 import com.example.foodking.emotion.domain.QRecipeEmotion;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
@@ -19,13 +18,11 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,7 +43,7 @@ public class PagingService {
         컨트롤러로부터 request처리를 위임받고 처리결과를 반환하는 메소드로 페이징기능에 대한 main메소드? 의 역할
         자신이 쓴 레시피, 졸아요를 누른 레시피, 레시피 타입에 대한 검색, 키워드 검색에 대한 요청을 모두 해당 메소드가 처리한다.
     */
-    public ReadRecipeInfoPagingResDTO readRecipeInfoPagingByCondition(Long pageNum, ReadRecipeInfoPagingReqDTO readRecipeInfoPagingReqDTO, Object condition){
+    public ReadRecipeInfoPagingResDTO readRecipeInfoPagingByCondition(Long userId, Long pageNum, ReadRecipeInfoPagingReqDTO readRecipeInfoPagingReqDTO, Object condition){
         RecipeSortType recipeSortType = readRecipeInfoPagingReqDTO.getRecipeSortType();
         String searchKeyword = readRecipeInfoPagingReqDTO.getSearchKeyword();
 
@@ -54,7 +51,7 @@ public class PagingService {
         Pageable pageable= PageRequest.of((int) (pageNum-1),10);
         
         // 조건(condition)에 따라 동적으로 WHERE절을 생성
-        BooleanBuilder builder = getBuilder(condition,searchKeyword);
+        BooleanBuilder builder = getBuilder(condition,searchKeyword,userId);
         
         // 해당 조건에 대한 전체 결과 수 측정
         Long recipeCnt = findRecipeInfoTotalCnt(builder,condition);
@@ -133,7 +130,7 @@ public class PagingService {
     }
 
     // 동적으로 쿼리의 WHERE절을 생성하는 메소드
-    private BooleanBuilder getBuilder(Object condition, String searchKeyword){
+    private BooleanBuilder getBuilder(Object condition, String searchKeyword, Long userId){
         BooleanBuilder builder = new BooleanBuilder();
 
         if(condition instanceof RecipeInfoType ){
@@ -142,13 +139,11 @@ public class PagingService {
         }
         else if(condition instanceof String && condition.equals("mine")){
             // 자신이 쓴 레시피 조회 시
-            Long userId = JwtProvider.getUserId();
             User user = findByUserId(userId);
             builder.and(qRecipeInfo.user.eq(findByUserId(userId)));
         }
         else if(condition instanceof String && condition.equals("like")){
             // 좋아요 누른 레시피 조회 시
-            Long userId = JwtProvider.getUserId();
             User user = findByUserId(userId);
             builder.and(qRecipeEmotion.user.eq(user));
         }

@@ -2,7 +2,6 @@ package com.example.foodking.user.service;
 
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.user.dto.request.PhoneAuthReqDTO;
-import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.regex.Pattern;
 
