@@ -5,12 +5,10 @@ import com.example.foodking.emotion.domain.RecipeEmotion;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import java.util.Optional;
 
-public interface RecipeEmotionRepository extends JpaRepository<RecipeEmotion,Long>,
-        QuerydslPredicateExecutor<RecipeEmotion> {
+public interface RecipeEmotionRepository extends JpaRepository<RecipeEmotion,Long>{
 
     Optional<RecipeEmotion> findByRecipeInfoAndUser(RecipeInfo recipeInfo, User user);
 

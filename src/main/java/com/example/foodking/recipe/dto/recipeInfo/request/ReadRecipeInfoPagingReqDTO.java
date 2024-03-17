@@ -15,4 +15,10 @@ public class ReadRecipeInfoPagingReqDTO {
     private RecipeSortType recipeSortType;
 
     private String searchKeyword;
+
+    private Object condition;
+
+    public void addFindCondition(Object condition){
+        this.condition=condition;
+    }
 }
