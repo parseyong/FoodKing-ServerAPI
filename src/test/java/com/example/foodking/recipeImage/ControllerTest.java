@@ -105,9 +105,7 @@ public class ControllerTest {
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
-                .andExpect(jsonPath("$.data.fieldName").value("recipeInfoId"))
-                .andExpect(jsonPath("$.data.requiredType").value("Long"));
+                .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."));
 
         verify(recipeImageService,times(0)).saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
     }
@@ -127,7 +125,7 @@ public class ControllerTest {
                         .file(newImage)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
 
         verify(recipeImageService,times(0)).saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
@@ -296,8 +294,6 @@ public class ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
-                .andExpect(jsonPath("$.data.fieldName").value("recipeInfoId"))
-                .andExpect(jsonPath("$.data.requiredType").value("Long"))
                 .andDo(print());
 
         verify(recipeImageService,times(0)).deleteImage(any(Long.class),any(Long.class));
@@ -311,7 +307,7 @@ public class ControllerTest {
         makeAuthentication();
         this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}"," ")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."))
                 .andDo(print());
 

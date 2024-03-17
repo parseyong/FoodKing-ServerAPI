@@ -275,8 +275,6 @@ public class ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestbody))
                 .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
-                .andExpect(jsonPath("$.data.fieldName").value("recipeInfoId"))
-                .andExpect(jsonPath("$.data.requiredType").value("Long"))
                 .andDo(print());
 
         verify(recipeService,times(0)).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
@@ -294,7 +292,7 @@ public class ControllerTest {
         this.mockMvc.perform(patch("/recipes/{recipeInfoId}"," ")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestbody))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."))
                 .andDo(print());
 
@@ -382,8 +380,6 @@ public class ControllerTest {
         this.mockMvc.perform(delete("/recipes/{recipeInfoId}","ㅎㅇ")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
-                .andExpect(jsonPath("$.data.fieldName").value("recipeInfoId"))
-                .andExpect(jsonPath("$.data.requiredType").value("Long"))
                 .andDo(print());
 
         verify(recipeService,times(0)).deleteRecipe(any(Long.class),any(Long.class));
@@ -398,7 +394,7 @@ public class ControllerTest {
         //when, then
         this.mockMvc.perform(delete("/recipes/{recipeInfoId}"," ")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."))
                 .andDo(print());
 
@@ -485,8 +481,6 @@ public class ControllerTest {
                         .param("sort", String.valueOf(ReplySortType.LIKE)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
-                .andExpect(jsonPath("$.data.fieldName").value("recipeInfoId"))
-                .andExpect(jsonPath("$.data.requiredType").value("Long"))
                 .andDo(print());
         verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any());
     }
@@ -501,7 +495,7 @@ public class ControllerTest {
         this.mockMvc.perform(get("/recipes/{recipeInfoId}"," ")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("sort", String.valueOf(ReplySortType.LIKE)))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."))
                 .andDo(print());
         verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any());
@@ -517,7 +511,7 @@ public class ControllerTest {
         this.mockMvc.perform(get("/recipes/{recipeInfoId}",1l)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("sort", " "))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.sort").value("Required request parameter 'sort' for method parameter type ReplySortType is present but converted to null(관리자에게 문의하세요)"))
                 .andDo(print());
@@ -533,7 +527,7 @@ public class ControllerTest {
         //when, then
         this.mockMvc.perform(get("/recipes/{recipeInfoId}",1l)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.sort").value("Required request parameter 'sort' for method parameter type ReplySortType is not present(관리자에게 문의하세요)"))
                 .andDo(print());

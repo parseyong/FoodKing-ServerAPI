@@ -105,8 +105,7 @@ public class ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content",""))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
-                .andExpect(jsonPath("$.data.content").value("내용을 입력해주세요"))
+                .andExpect(jsonPath("$.message").value("댓글내용을 입력해주세요"))
                 .andDo(print());
 
         verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(String.class));
@@ -122,7 +121,7 @@ public class ControllerTest {
         this.mockMvc.perform(post("/{recipeInfoId}/replys"," ")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글테스트"))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
 
         verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(String.class));
@@ -139,9 +138,7 @@ public class ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글테스트"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
-                .andExpect(jsonPath("$.data.fieldName").value("recipeInfoId"))
-                .andExpect(jsonPath("$.data.requiredType").value("Long"));
+                .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."));
 
         verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(String.class));
     }
@@ -225,7 +222,7 @@ public class ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content",""))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
+                .andExpect(jsonPath("$.message").value("댓글내용을 입력해주세요"))
                 .andDo(print());
 
         verify(replyService,times(0)).updateReply(any(Long.class),any(Long.class),any(String.class));
@@ -241,7 +238,7 @@ public class ControllerTest {
         this.mockMvc.perform(patch("/replys/{replyId}"," ")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글 수정테스트"))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
 
         verify(replyService,times(0)).updateReply(any(Long.class),any(Long.class),any(String.class));
@@ -258,9 +255,7 @@ public class ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글 수정테스트"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("replyId이 Long타입이여야 합니다."))
-                .andExpect(jsonPath("$.data.fieldName").value("replyId"))
-                .andExpect(jsonPath("$.data.requiredType").value("Long"));
+                .andExpect(jsonPath("$.message").value("replyId이 Long타입이여야 합니다."));
 
         verify(replyService,times(0)).updateReply(any(Long.class),any(Long.class),any(String.class));
     }
@@ -339,7 +334,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(delete("/replys/{replyId}"," ")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
 
         verify(replyService,times(0)).deleteReply(any(Long.class),any(Long.class));
@@ -355,9 +350,7 @@ public class ControllerTest {
         this.mockMvc.perform(delete("/replys/{replyId}","ㅎㅇ")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("replyId이 Long타입이여야 합니다."))
-                .andExpect(jsonPath("$.data.fieldName").value("replyId"))
-                .andExpect(jsonPath("$.data.requiredType").value("Long"));
+                .andExpect(jsonPath("$.message").value("replyId이 Long타입이여야 합니다."));
 
         verify(replyService,times(0)).deleteReply(any(Long.class),any(Long.class));
     }

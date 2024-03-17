@@ -365,8 +365,7 @@ public class ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("email","testgoogle.com"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.data.email").value("이메일 형식이 올바르지 않습니다"))
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
+                .andExpect(jsonPath("$.message").value("이메일 형식이 올바르지 않습니다"))
                 .andDo(print());
         verify(userService,times(0)).emailDuplicatedChecking(any(String.class));
 
@@ -383,8 +382,7 @@ public class ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("email",""))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.data.email").value("이메일 정보를 입력해주세요"))
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
+                .andExpect(jsonPath("$.message").value("이메일 정보를 입력해주세요"))
                 .andDo(print());
         verify(userService,times(0)).emailDuplicatedChecking(any(String.class));
 
@@ -399,7 +397,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(get("/email/check")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.data.email").value("Required request parameter 'email' for method parameter type String is not present(관리자에게 문의하세요)"))
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
@@ -435,8 +433,7 @@ public class ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("nickName",""))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
-                .andExpect(jsonPath("$.data.nickName").value("닉네임 정보를 입력해주세요"))
+                .andExpect(jsonPath("$.message").value("닉네임 정보를 입력해주세요"))
                 .andDo(print());
         verify(userService,times(0)).nickNameDuplicatedChecking(any(String.class));
 
@@ -451,7 +448,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(get("/nickname/check")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.nickName").value("Required request parameter 'nickName' for method parameter type String is not present(관리자에게 문의하세요)"))
                 .andDo(print());

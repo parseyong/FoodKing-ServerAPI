@@ -101,7 +101,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(get("/messages")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.phoneNum").value("Required request parameter 'phoneNum' for method parameter type String is not present(관리자에게 문의하세요)"))
                 .andDo(print());
@@ -119,8 +119,7 @@ public class ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("phoneNum",""))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
-                .andExpect(jsonPath("$.data.phoneNum").value("전화번호를 입력해주세요"))
+                .andExpect(jsonPath("$.message").value("전화번호를 입력해주세요"))
                 .andDo(print());
 
         verify(coolSmsService,times(0)).sendMessage(any(String.class));

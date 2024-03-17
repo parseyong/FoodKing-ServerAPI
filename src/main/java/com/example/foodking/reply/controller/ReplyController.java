@@ -26,7 +26,7 @@ public class ReplyController {
     public ResponseEntity<CommonResDTO> addReply(
             @AuthenticationPrincipal final Long userId,
             @PathVariable final Long recipeInfoId,
-            @RequestParam(name = "content") @NotBlank(message = "내용을 입력해주세요") String content){
+            @RequestParam(name = "content") @NotBlank(message = "댓글내용을 입력해주세요") String content){
 
         Long replyId = replyService.addReply(userId,recipeInfoId,content);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("댓글 등록완료",replyId));
@@ -36,7 +36,7 @@ public class ReplyController {
     public ResponseEntity<CommonResDTO> updateReply(
             @AuthenticationPrincipal final Long userId,
             @PathVariable final Long replyId,
-            @RequestParam(name = "content") @NotBlank(message = "내용을 입력해주세요") String content){
+            @RequestParam(name = "content") @NotBlank(message = "댓글내용을 입력해주세요") String content){
 
         replyService.updateReply(userId,replyId,content);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("댓글 수정완료",null));
