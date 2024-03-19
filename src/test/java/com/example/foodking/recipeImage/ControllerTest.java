@@ -43,7 +43,7 @@ public class ControllerTest {
     private RecipeImageService recipeImageService;
 
     @MockBean
-    private CustomUserDetailsService customUserDetailsService;
+    private JwtProvider jwtProvider;
 
     @Autowired
     private MockMvc mockMvc;
@@ -59,7 +59,7 @@ public class ControllerTest {
         );
 
         //when, then
-        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1L)
                         .file(newImage)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .accept(MediaType.APPLICATION_JSON))
@@ -79,7 +79,7 @@ public class ControllerTest {
         );
 
         //when, then
-        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1L)
                         .file(newImage)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .accept(MediaType.APPLICATION_JSON))
@@ -143,7 +143,7 @@ public class ControllerTest {
         given(recipeImageService.saveImage(any(MultipartFile.class),any(Long.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.FILE_IOEXCEPTION));
 
         //when, then
-        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1L)
                         .file(newImage)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .accept(MediaType.APPLICATION_JSON))
@@ -166,7 +166,7 @@ public class ControllerTest {
         given(recipeImageService.saveImage(any(MultipartFile.class),any(Long.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.INVALID_SAVE_FILE));
 
         //when, then
-        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1L)
                         .file(newImage)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .accept(MediaType.APPLICATION_JSON))
@@ -189,7 +189,7 @@ public class ControllerTest {
         given(recipeImageService.saveImage(any(MultipartFile.class),any(Long.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
 
         //when, then
-        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1L)
                         .file(newImage)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .accept(MediaType.APPLICATION_JSON))
@@ -212,7 +212,7 @@ public class ControllerTest {
         given(recipeImageService.saveImage(any(MultipartFile.class),any(Long.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.ACCESS_FAIL_FILE));
 
         //when, then
-        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1l)
+        this.mockMvc.perform(multipart("/recipes/images/{recipeInfoId}", 1L)
                         .file(newImage)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .accept(MediaType.APPLICATION_JSON))
@@ -227,9 +227,11 @@ public class ControllerTest {
     //@WithMockUser
     @DisplayName("이미지 삭제 테스트 -> (성공)")
     public void deleteImageSuccess() throws Exception {
-        //when, then
+        //given
         makeAuthentication();
-        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1l)
+
+        //when, then
+        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("이미지 삭제완료"))
@@ -241,8 +243,10 @@ public class ControllerTest {
     //@WithAnonymousUser
     @DisplayName("이미지 삭제 테스트 -> (실패 : 인증되지 않은 유저)")
     public void deleteImageFail1() throws Exception {
+        //given
+
         //when, then
-        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1l)
+        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
@@ -259,7 +263,7 @@ public class ControllerTest {
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO)).when(recipeImageService).deleteImage(any(Long.class),any(Long.class));
 
         //when, then
-        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1l)
+        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
@@ -276,7 +280,7 @@ public class ControllerTest {
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_FILE)).when(recipeImageService).deleteImage(any(Long.class),any(Long.class));
 
         //when, then
-        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1l)
+        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("파일이 존재하지 않습니다"))
@@ -288,8 +292,10 @@ public class ControllerTest {
     //@WithMockUser
     @DisplayName("이미지 삭제 테스트 -> (실패 : pathVariable 타입예외)")
     public void deleteImageFail4() throws Exception {
-        //when, then
+        //given
         makeAuthentication();
+
+        //when, then
         this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}","ㅎㅇ")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -303,8 +309,10 @@ public class ControllerTest {
     //@WithMockUser
     @DisplayName("이미지 삭제 테스트 -> (실패 : pathVariable 공백)")
     public void deleteImageFail5() throws Exception {
-        //when, then
+        //given
         makeAuthentication();
+
+        //when, then
         this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}"," ")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -323,7 +331,7 @@ public class ControllerTest {
         doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_FILE)).when(recipeImageService).deleteImage(any(Long.class),any(Long.class));
 
         //when, then
-        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1l)
+        this.mockMvc.perform(delete("/recipes/images/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 파일에 대한 권한이 없습니다"))
@@ -335,7 +343,7 @@ public class ControllerTest {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(1l,"1234",authorities);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(1L,"1234",authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

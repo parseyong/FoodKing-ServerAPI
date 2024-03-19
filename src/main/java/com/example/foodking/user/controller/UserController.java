@@ -21,7 +21,6 @@ import javax.validation.constraints.NotBlank;
 @Validated
 @RequiredArgsConstructor
 @Api(tags = "USER")
-@Log4j2
 public class UserController {
 
     private final UserService userService;

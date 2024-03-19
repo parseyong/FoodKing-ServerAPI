@@ -1,15 +1,11 @@
 package com.example.foodking.reply;
 
-import com.example.foodking.auth.CustomUserDetailsService;
 import com.example.foodking.auth.JwtProvider;
 import com.example.foodking.config.SecurityConfig;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
-import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.reply.controller.ReplyController;
 import com.example.foodking.reply.service.ReplyService;
-import com.example.foodking.user.domain.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,25 +37,9 @@ public class ControllerTest {
     @MockBean
     private ReplyService replyService;
     @MockBean
-    private CustomUserDetailsService customUserDetailsService;
+    private JwtProvider jwtProvider;
     @Autowired
     private MockMvc mockMvc;
-
-    private User user;
-    private RecipeInfo recipeInfo;
-    @BeforeEach
-    void beforEach(){
-        this.user = User.builder()
-                .email("test@google.com")
-                .nickName("test")
-                .password("1234")
-                .phoneNum("01011111111")
-                .build();
-
-        this.recipeInfo = RecipeInfo.builder()
-                .user(user)
-                .build();
-    }
 
     @Test
     @DisplayName("댓글 등록 테스트 -> 성공")
@@ -68,7 +48,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(post("/{recipeInfoId}/replys",1l)
+        this.mockMvc.perform(post("/{recipeInfoId}/replys",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글 테스트"))
                 .andExpect(status().isCreated())
@@ -84,7 +64,7 @@ public class ControllerTest {
         //given
 
         //when,then
-        this.mockMvc.perform(post("/{recipeInfoId}/replys",1l)
+        this.mockMvc.perform(post("/{recipeInfoId}/replys",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글 테스트"))
                 .andExpect(status().isUnauthorized())
@@ -101,7 +81,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(post("/{recipeInfoId}/replys",1l)
+        this.mockMvc.perform(post("/{recipeInfoId}/replys",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content",""))
                 .andExpect(status().isBadRequest())
@@ -151,7 +131,7 @@ public class ControllerTest {
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
-        this.mockMvc.perform(post("/{recipeInfoId}/replys",1l)
+        this.mockMvc.perform(post("/{recipeInfoId}/replys",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글테스트"))
                 .andExpect(status().isBadRequest())
@@ -168,7 +148,7 @@ public class ControllerTest {
         makeAuthentication();
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO)).when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
         //when,then
-        this.mockMvc.perform(post("/{recipeInfoId}/replys",1l)
+        this.mockMvc.perform(post("/{recipeInfoId}/replys",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글테스트"))
                 .andExpect(status().isBadRequest())
@@ -185,7 +165,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(patch("/replys/{replyId}",1l)
+        this.mockMvc.perform(patch("/replys/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글 수정테스트"))
                 .andExpect(status().isOk())
@@ -201,7 +181,7 @@ public class ControllerTest {
         //given
 
         //when,then
-        this.mockMvc.perform(patch("/replys/{replyId}",1l)
+        this.mockMvc.perform(patch("/replys/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글 수정테스트"))
                 .andExpect(status().isUnauthorized())
@@ -218,7 +198,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(patch("/replys/{replyId}",1l)
+        this.mockMvc.perform(patch("/replys/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content",""))
                 .andExpect(status().isBadRequest())
@@ -268,7 +248,7 @@ public class ControllerTest {
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_REPLY)).when(replyService).updateReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
-        this.mockMvc.perform(patch("/replys/{replyId}",1l)
+        this.mockMvc.perform(patch("/replys/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글 수정테스트"))
                 .andExpect(status().isBadRequest())
@@ -285,7 +265,7 @@ public class ControllerTest {
         doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_REPLY)).when(replyService).updateReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
-        this.mockMvc.perform(patch("/replys/{replyId}",1l)
+        this.mockMvc.perform(patch("/replys/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글 수정테스트"))
                 .andExpect(status().isForbidden())
@@ -301,7 +281,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(delete("/replys/{replyId}",1l)
+        this.mockMvc.perform(delete("/replys/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("댓글 삭제완료"))
@@ -316,7 +296,7 @@ public class ControllerTest {
         //given
 
         //when,then
-        this.mockMvc.perform(delete("/replys/{replyId}",1l)
+        this.mockMvc.perform(delete("/replys/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
@@ -363,7 +343,7 @@ public class ControllerTest {
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_REPLY)).when(replyService).deleteReply(any(Long.class),any(Long.class));
 
         //when,then
-        this.mockMvc.perform(delete("/replys/{replyId}",1l)
+        this.mockMvc.perform(delete("/replys/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 댓글입니다"));
@@ -379,7 +359,7 @@ public class ControllerTest {
         doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_REPLY)).when(replyService).deleteReply(any(Long.class),any(Long.class));
 
         //when,then
-        this.mockMvc.perform(delete("/replys/{replyId}",1l)
+        this.mockMvc.perform(delete("/replys/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 댓글에 대한 권한이 없습니다"));
@@ -391,7 +371,7 @@ public class ControllerTest {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(1l,"1234",authorities);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(1L,"1234",authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

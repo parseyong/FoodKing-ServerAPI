@@ -1,6 +1,5 @@
 package com.example.foodking.user;
 
-import com.example.foodking.auth.CustomUserDetailsService;
 import com.example.foodking.auth.JwtProvider;
 import com.example.foodking.config.SecurityConfig;
 import com.example.foodking.exception.CommondException;
@@ -37,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-
 @WebMvcTest(value = UserController.class)
 @Import({SecurityConfig.class, JwtProvider.class})
 public class ControllerTest {
@@ -45,7 +43,7 @@ public class ControllerTest {
     @MockBean
     private UserService userService;
     @MockBean
-    private CustomUserDetailsService customUserDetailsService;
+    private JwtProvider jwtProvider;
     @Autowired
     private MockMvc mockMvc;
 
@@ -1040,7 +1038,7 @@ public class ControllerTest {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(1l,"1234",authorities);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(1L,"1234",authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

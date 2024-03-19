@@ -1,6 +1,5 @@
 package com.example.foodking.recipe;
 
-import com.example.foodking.auth.CustomUserDetailsService;
 import com.example.foodking.auth.JwtProvider;
 import com.example.foodking.config.SecurityConfig;
 import com.example.foodking.exception.CommondException;
@@ -53,31 +52,23 @@ public class ControllerTest {
     @MockBean
     private PagingService pagingService;
     @MockBean
-    private CustomUserDetailsService customUserDetailsService;
+    private JwtProvider jwtProvider;
     @Autowired
     private MockMvc mockMvc;
     private List<SaveIngredientReqDTO> saveIngredientReqDTOList;
     private List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList;
     private SaveRecipeReqDTO saveRecipeReqDTO;
-    private User user;
     private SaveRecipeInfoReqDTO saveRecipeInfoReqDTO;
 
     @BeforeEach
     void beforeEach(){
-        this.user= User.builder()
-                .email("test@google.com")
-                .password("1234")
-                .phoneNum("01056962173")
-                .nickName("nickName")
-                .build();
-
         this.saveRecipeInfoReqDTO = SaveRecipeInfoReqDTO.builder()
                 .recipeInfoType(RecipeInfoType.KOREAN)
                 .recipeName("테스트레시피 이름")
                 .recipeTip("테스트레시피 팁")
-                .calogy(10l)
-                .cookingTime(20l)
-                .ingredentCost(30l)
+                .calogy(10L)
+                .cookingTime(20L)
+                .ingredentCost(30L)
                 .build();
 
         SaveIngredientReqDTO saveIngredientReqDTO1 = SaveIngredientReqDTO.builder()
@@ -92,11 +83,11 @@ public class ControllerTest {
         this.saveIngredientReqDTOList = new ArrayList<>(List.of(saveIngredientReqDTO1, saveIngredientReqDTO2));
 
         SaveRecipeWayInfoReqDTO saveRecipeWayInfoReqDTO1 = SaveRecipeWayInfoReqDTO.builder()
-                .recipeOrder(1l)
+                .recipeOrder(1L)
                 .recipeWay("조리법 1")
                 .build();
         SaveRecipeWayInfoReqDTO saveRecipeWayInfoReqDTO2 = SaveRecipeWayInfoReqDTO.builder()
-                .recipeOrder(2l)
+                .recipeOrder(2L)
                 .recipeWay("조리법 2")
                 .build();
         this.saveRecipeWayInfoReqDTOList = new ArrayList<>(List.of(saveRecipeWayInfoReqDTO1, saveRecipeWayInfoReqDTO2));
@@ -201,7 +192,7 @@ public class ControllerTest {
         String requestbody = gson.toJson(saveRecipeReqDTO);
 
         //when, then
-        this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestbody))
                 .andExpect(status().isOk())
@@ -219,7 +210,7 @@ public class ControllerTest {
         String requestbody = gson.toJson(saveRecipeReqDTO);
 
         //when, then
-        this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestbody))
                 .andExpect(status().isUnauthorized())
@@ -252,7 +243,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when, then
-        this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestbody))
                 .andExpect(status().isBadRequest())
@@ -309,7 +300,7 @@ public class ControllerTest {
         doThrow(new CommondException(NOT_EXIST_RECIPEINFO)).when(recipeService).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
 
         //when, then
-        this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestbody))
                 .andExpect(status().isBadRequest())
@@ -329,7 +320,7 @@ public class ControllerTest {
         doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_RECIPE)).when(recipeService).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
 
         //when, then
-        this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestbody))
                 .andExpect(status().isForbidden())
@@ -346,7 +337,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when, then
-        this.mockMvc.perform(delete("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(delete("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("레시피 삭제완료"))
@@ -361,7 +352,7 @@ public class ControllerTest {
         //given
 
         //when, then
-        this.mockMvc.perform(delete("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(delete("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
@@ -409,7 +400,7 @@ public class ControllerTest {
         doThrow(new CommondException(NOT_EXIST_RECIPEINFO)).when(recipeService).deleteRecipe(any(Long.class),any(Long.class));
 
         //when, then
-        this.mockMvc.perform(delete("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(delete("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
@@ -426,7 +417,7 @@ public class ControllerTest {
         doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_RECIPE)).when(recipeService).deleteRecipe(any(Long.class),any(Long.class));
 
         //when, then
-        this.mockMvc.perform(delete("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(delete("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 레시피에 대해 권한이 없습니다"))
@@ -444,7 +435,7 @@ public class ControllerTest {
         given(recipeService.readRecipe(any(Long.class),any(Long.class),any())).willReturn(readRecipeResDTO);
 
         //when, then
-        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("sort", String.valueOf(ReplySortType.LIKE)))
                 .andExpect(status().isOk())
@@ -460,7 +451,7 @@ public class ControllerTest {
         // given
 
         //when, then
-        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("sort", String.valueOf(ReplySortType.LIKE)))
                 .andExpect(status().isUnauthorized())
@@ -508,7 +499,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when, then
-        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("sort", " "))
                 .andExpect(status().isBadRequest())
@@ -525,7 +516,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when, then
-        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
@@ -542,7 +533,7 @@ public class ControllerTest {
         given(recipeService.readRecipe(any(Long.class),any(Long.class),any())).willThrow(new CommondException(NOT_EXIST_RECIPEINFO));
 
         //when, then
-        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1l)
+        this.mockMvc.perform(get("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("sort", String.valueOf(ReplySortType.LIKE)))
                 .andExpect(status().isBadRequest())
@@ -555,7 +546,7 @@ public class ControllerTest {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(1l,"1234",authorities);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(1L,"1234",authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

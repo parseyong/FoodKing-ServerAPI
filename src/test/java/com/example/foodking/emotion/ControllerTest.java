@@ -27,7 +27,7 @@ import java.util.List;
 public class ControllerTest {
 
     @MockBean
-    private CustomUserDetailsService customUserDetailsService;
+    private JwtProvider jwtProvider;
     @MockBean
     private EmotionService emotionService;
     @Autowired
@@ -54,7 +54,7 @@ public class ControllerTest {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(1l,"1234",authorities);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(1L,"1234",authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }
