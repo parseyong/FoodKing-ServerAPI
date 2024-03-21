@@ -1,6 +1,5 @@
 package com.example.foodking.recipeImage;
 
-import com.example.foodking.auth.CustomUserDetailsService;
 import com.example.foodking.auth.JwtProvider;
 import com.example.foodking.config.SecurityConfig;
 import com.example.foodking.exception.CommondException;

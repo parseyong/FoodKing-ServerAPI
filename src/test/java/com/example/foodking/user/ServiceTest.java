@@ -9,7 +9,6 @@ import com.example.foodking.user.dto.response.ReadUserInfoResDTO;
 import com.example.foodking.user.repository.UserRepository;
 import com.example.foodking.user.service.CoolSmsService;
 import com.example.foodking.user.service.UserService;
-import org.apache.commons.lang.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

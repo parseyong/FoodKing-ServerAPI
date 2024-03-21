@@ -14,7 +14,6 @@ import com.example.foodking.recipe.dto.recipeWayInfo.request.SaveRecipeWayInfoRe
 import com.example.foodking.recipe.service.PagingService;
 import com.example.foodking.recipe.service.RecipeService;
 import com.example.foodking.reply.common.ReplySortType;
-import com.example.foodking.user.domain.User;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
