@@ -82,7 +82,7 @@ public class RecipeImageService {
         recipeInfoRepository.save(recipeInfo);
     }
 
-    public RecipeInfo findRecipeInfoById(Long recipeInfoId){
+    private RecipeInfo findRecipeInfoById(Long recipeInfoId){
         return recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
     }

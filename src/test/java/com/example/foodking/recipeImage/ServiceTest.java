@@ -60,14 +60,14 @@ public class ServiceTest {
     @DisplayName("이미지 등록테스트 -> (성공)")
     public void addImageSucess() {
         //given
-        given(user.getUserId()).willReturn(1l);
+        given(user.getUserId()).willReturn(1L);
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
 
         //when
-        String savedImagePath = recipeImageService.saveImage(newImage,1l,1l);
+        String savedImagePath = recipeImageService.saveImage(newImage,1L,1L);
         File newFile = new File(savedImagePath);
 
         //then
@@ -80,7 +80,7 @@ public class ServiceTest {
     @DisplayName("이미지 수정테스트 -> (성공)")
     public void updateImageSucess() throws IOException {
         //given
-        given(user.getUserId()).willReturn(1l);
+        given(user.getUserId()).willReturn(1L);
         recipeInfo.addRecipeImage("C:/upload/testOldImage");
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
         MockMultipartFile newImage = new MockMultipartFile(
@@ -94,7 +94,7 @@ public class ServiceTest {
         assertThat(oldFile.exists()).isTrue();
 
         //when
-        String savedImagePath = recipeImageService.saveImage(newImage,1l,1l);
+        String savedImagePath = recipeImageService.saveImage(newImage,1L,1L);
         File newFile = new File(savedImagePath);
 
         //then
@@ -115,9 +115,8 @@ public class ServiceTest {
 
         //when,then
         try{
-            recipeImageService.saveImage(newImage,1l,1l);
+            recipeImageService.saveImage(newImage,1L,1L);
             fail("예외가 발생하지 않음");
-
         }catch (CommondException ex){
             //then
             verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
@@ -130,14 +129,14 @@ public class ServiceTest {
     @DisplayName("이미지 등록/수정 테스트 -> (실패 : 파일이 없음)")
     public void updateImageFail2(){
         //given
-        given(user.getUserId()).willReturn(1l);
+        given(user.getUserId()).willReturn(1L);
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         MockMultipartFile newImage = null;
 
         //when,then
         try{
-            recipeImageService.saveImage(newImage,1l,1l);
+            recipeImageService.saveImage(newImage,1L,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             //then
@@ -151,7 +150,7 @@ public class ServiceTest {
     @DisplayName("이미지 등록/수정 테스트 -> (실패 : 파일수정 권한 없음)")
     public void updateImageFail3() throws IOException {
         //given
-        given(user.getUserId()).willReturn(2l);
+        given(user.getUserId()).willReturn(2L);
         recipeInfo.addRecipeImage("C:/upload/testOldImage");
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
         MockMultipartFile newImage = new MockMultipartFile(
@@ -166,7 +165,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            recipeImageService.saveImage(newImage,1l,1l);
+            recipeImageService.saveImage(newImage,1L,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             //then
@@ -180,7 +179,7 @@ public class ServiceTest {
     @DisplayName("이미지 삭제 테스트 -> (성공)")
     public void deleteImageSuccess() throws IOException {
         //given
-        given(user.getUserId()).willReturn(1l);
+        given(user.getUserId()).willReturn(1L);
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
@@ -191,7 +190,7 @@ public class ServiceTest {
         assertThat(file.exists()).isTrue();
 
         //when
-        recipeImageService.deleteImage(1l,1l);
+        recipeImageService.deleteImage(1L,1L);
 
         //then
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
@@ -208,7 +207,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            recipeImageService.deleteImage(1l,1l);
+            recipeImageService.deleteImage(1L,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             //then
@@ -222,12 +221,12 @@ public class ServiceTest {
     @DisplayName("이미지 삭제 테스트 -> (실패 : 삭제할 파일 없음)")
     public void deleteImageFail2(){
         //given
-        given(user.getUserId()).willReturn(1l);
+        given(user.getUserId()).willReturn(1L);
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         //when,then
         try{
-            recipeImageService.deleteImage(1l,1l);
+            recipeImageService.deleteImage(1L,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             //then
@@ -241,7 +240,7 @@ public class ServiceTest {
     @DisplayName("이미지 삭제 테스트 -> (실패 : 파일 삭제권한 없음)")
     public void deleteImageFail3() throws IOException {
         //given
-        given(user.getUserId()).willReturn(2l);
+        given(user.getUserId()).willReturn(2L);
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
@@ -253,7 +252,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            recipeImageService.deleteImage(1l,1l);
+            recipeImageService.deleteImage(1L,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             //then

@@ -80,7 +80,7 @@ public class ServiceTest {
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         //when
-        replyService.addReply(1l,1l,"댓글테스트");
+        replyService.addReply(1L,1L,"댓글테스트");
 
         //then
         verify(replyRepository,times(1)).save(any(Reply.class));
@@ -96,7 +96,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            replyService.addReply(1l,1l,"댓글테스트");
+            replyService.addReply(1L,1L,"댓글테스트");
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
@@ -115,7 +115,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            replyService.addReply(1l,1l,"댓글테스트");
+            replyService.addReply(1L,1L,"댓글테스트");
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_RECIPEINFO);
@@ -130,10 +130,10 @@ public class ServiceTest {
     public void updateReplySuccess(){
         //given
         given(replyRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(reply));
-        given(user.getUserId()).willReturn(1l);
+        given(user.getUserId()).willReturn(1L);
 
         //when
-        replyService.updateReply(1l,1l,"수정된 댓글");
+        replyService.updateReply(1L,1L,"수정된 댓글");
 
         //then
         assertThat(reply.getContent()).isEqualTo("수정된 댓글");
@@ -149,7 +149,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            replyService.updateReply(1l,1l,"수정된 댓글");
+            replyService.updateReply(1L,1L,"수정된 댓글");
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_REPLY);
@@ -164,11 +164,11 @@ public class ServiceTest {
     public void updateReplyFail2(){
         //given
         given(replyRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(reply));
-        given(user.getUserId()).willReturn(2l);
+        given(user.getUserId()).willReturn(2L);
 
         //when,then
         try{
-            replyService.updateReply(1l,1l,"수정된 댓글");
+            replyService.updateReply(1L,1L,"수정된 댓글");
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.ACCESS_FAIL_REPLY);
@@ -183,10 +183,10 @@ public class ServiceTest {
     public void deleteReplySuccess(){
         //given
         given(replyRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(reply));
-        given(user.getUserId()).willReturn(1l);
+        given(user.getUserId()).willReturn(1L);
 
         //when
-        replyService.deleteReply(1l,1l);
+        replyService.deleteReply(1L,1L);
 
         //then
         verify(replyRepository,times(1)).findById(any(Long.class));
@@ -201,7 +201,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            replyService.deleteReply(1l,1l);
+            replyService.deleteReply(1L,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_REPLY);
@@ -215,11 +215,11 @@ public class ServiceTest {
     public void deleteReplyFail2(){
         //given
         given(replyRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(reply));
-        given(user.getUserId()).willReturn(2l);
+        given(user.getUserId()).willReturn(2L);
 
         //when,then
         try{
-            replyService.deleteReply(1l,1l);
+            replyService.deleteReply(1L,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.ACCESS_FAIL_REPLY);
@@ -244,17 +244,17 @@ public class ServiceTest {
         given(reply2.getRegDate()).willReturn(LocalDateTime.of(2024,02,02,06,17));
         given(reply3.getRegDate()).willReturn(LocalDateTime.of(2024,02,02,06,5));
         given(recipeInfoSpy.getReplyList()).willReturn(replyList);
-        given(user.getUserId()).willReturn(1l);
+        given(user.getUserId()).willReturn(1L);
 
-        given(emotionService.readReplyEmotionCnt(reply1)).willReturn(3l);
-        given(emotionService.readReplyEmotionCnt(reply2)).willReturn(1l);
-        given(emotionService.readReplyEmotionCnt(reply3)).willReturn(2l);
+        given(emotionService.readReplyEmotionCnt(reply1)).willReturn(3L);
+        given(emotionService.readReplyEmotionCnt(reply2)).willReturn(1L);
+        given(emotionService.readReplyEmotionCnt(reply3)).willReturn(2L);
         replyList.add(reply1);
         replyList.add(reply2);
         replyList.add(reply3);
 
         // when
-        List<ReadReplyResDTO> result = replyService.readReply(recipeInfoSpy,1l, ReplySortType.LATEST);
+        List<ReadReplyResDTO> result = replyService.readReply(recipeInfoSpy,1L, ReplySortType.LATEST);
 
         // then
         verify(emotionService,times(3)).readReplyEmotionCnt(any(Reply.class));
@@ -283,24 +283,24 @@ public class ServiceTest {
         given(reply2.getRegDate()).willReturn(LocalDateTime.of(2024,02,02,06,17));
         given(reply3.getRegDate()).willReturn(LocalDateTime.of(2024,02,02,06,5));
         given(recipeInfoSpy.getReplyList()).willReturn(replyList);
-        given(user.getUserId()).willReturn(1l);
+        given(user.getUserId()).willReturn(1L);
 
-        given(emotionService.readReplyEmotionCnt(reply1)).willReturn(3l);
-        given(emotionService.readReplyEmotionCnt(reply2)).willReturn(1l);
-        given(emotionService.readReplyEmotionCnt(reply3)).willReturn(2l);
+        given(emotionService.readReplyEmotionCnt(reply1)).willReturn(3L);
+        given(emotionService.readReplyEmotionCnt(reply2)).willReturn(1L);
+        given(emotionService.readReplyEmotionCnt(reply3)).willReturn(2L);
         replyList.add(reply1);
         replyList.add(reply2);
         replyList.add(reply3);
 
         // when
-        List<ReadReplyResDTO> result = replyService.readReply(recipeInfoSpy,1l,ReplySortType.LIKE);
+        List<ReadReplyResDTO> result = replyService.readReply(recipeInfoSpy,1L,ReplySortType.LIKE);
 
         // then
         verify(emotionService,times(3)).readReplyEmotionCnt(any(Reply.class));
         assertThat(result.size()).isEqualTo(3);
-        assertThat(result.get(0).getEmotionCnt()).isEqualTo(3l);
-        assertThat(result.get(1).getEmotionCnt()).isEqualTo(2l);
-        assertThat(result.get(2).getEmotionCnt()).isEqualTo(1l);
+        assertThat(result.get(0).getEmotionCnt()).isEqualTo(3L);
+        assertThat(result.get(1).getEmotionCnt()).isEqualTo(2L);
+        assertThat(result.get(2).getEmotionCnt()).isEqualTo(1L);
         assertThat(result.get(0).isMyReply()).isTrue();
         assertThat(result.get(1).isMyReply()).isTrue();
         assertThat(result.get(2).isMyReply()).isTrue();

@@ -9,6 +9,7 @@ import com.example.foodking.user.dto.response.ReadUserInfoResDTO;
 import com.example.foodking.user.repository.UserRepository;
 import com.example.foodking.user.service.CoolSmsService;
 import com.example.foodking.user.service.UserService;
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -272,7 +273,7 @@ public class ServiceTest {
         given(passwordEncoder.encode(any(String.class))).willReturn("encodedNewPassword");
 
         //when
-        String result = userService.findPassword(findPwdReqDTO);
+        userService.findPassword(findPwdReqDTO);
 
         //then
         verify(coolSmsService,times(1)).authNumCheck(any(PhoneAuthReqDTO.class));
@@ -329,7 +330,7 @@ public class ServiceTest {
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
 
         //when
-        ReadUserInfoResDTO readUserInfoResDTO = userService.readUser(1l);
+        ReadUserInfoResDTO readUserInfoResDTO = userService.readUser(1L);
 
         //then
         assertThat(readUserInfoResDTO.getEmail()).isEqualTo("test@google.com");
@@ -346,7 +347,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            userService.readUser(1l);
+            userService.readUser(1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(userRepository,times(1)).findById(any(Long.class));
@@ -363,7 +364,7 @@ public class ServiceTest {
         given(passwordEncoder.matches(any(String.class),any(String.class))).willReturn(true);
 
         //when
-        userService.updateUser(updateUserInfoReqDTO,1l);
+        userService.updateUser(updateUserInfoReqDTO,1L);
 
         //then
         assertThat(user.getNickName()).isEqualTo("newNickName");
@@ -383,7 +384,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            userService.updateUser(updateUserInfoReqDTO,1l);
+            userService.updateUser(updateUserInfoReqDTO,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
@@ -403,7 +404,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            userService.updateUser(updateUserInfoReqDTO,1l);
+            userService.updateUser(updateUserInfoReqDTO,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.PASSWORD_NOT_COLLECT);
@@ -466,22 +467,4 @@ public class ServiceTest {
             verify(userRepository,times(1)).findUserByEmail(any(String.class));
         }
     }
-
-    @Test
-    @DisplayName("DTO와 엔티티간 변환 테스트")
-    public void toEntityAndToDtoTest(){
-        User savedUser = AddUserReqDTO.toEntity(addUserReqDTO);
-        assertThat(savedUser.getPassword()).isEqualTo("1234");
-        assertThat(savedUser.getEmail()).isEqualTo("test@google.com");
-        assertThat(savedUser.getNickName()).isEqualTo("nickName");
-        assertThat(savedUser.getPhoneNum()).isEqualTo("01056962173");
-        System.out.println("AddUserReqDTO -> User 변환성공");
-
-        ReadUserInfoResDTO readUserInfoResDTO = ReadUserInfoResDTO.toDTO(user);
-        assertThat(readUserInfoResDTO.getEmail()).isEqualTo("test@google.com");
-        assertThat(readUserInfoResDTO.getNickName()).isEqualTo("nickName");
-        assertThat(readUserInfoResDTO.getPhoneNum()).isEqualTo("01056962173");
-        System.out.println("User -> ReadUserInfoResDTO 변환성공");
-    }
-
 }

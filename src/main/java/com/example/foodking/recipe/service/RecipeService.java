@@ -120,7 +120,7 @@ public class RecipeService {
                 .build();
     }
 
-    public void updateRecipeInfo(RecipeInfo recipeInfo, SaveRecipeInfoReqDTO saveRecipeInfoReqDTO){
+    private void updateRecipeInfo(RecipeInfo recipeInfo, SaveRecipeInfoReqDTO saveRecipeInfoReqDTO){
         recipeInfo.changeCalogy(saveRecipeInfoReqDTO.getCalogy());
         recipeInfo.changeRecipeInfoType(saveRecipeInfoReqDTO.getRecipeInfoType());
         recipeInfo.changeCookingTime(saveRecipeInfoReqDTO.getCookingTime());
@@ -129,7 +129,7 @@ public class RecipeService {
         recipeInfo.changeRecipeTip(saveRecipeInfoReqDTO.getRecipeTip());
     }
 
-    public void updateRecipeWayInfoList(List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList , List<RecipeWayInfo> recipeWayInfoList,
+    private void updateRecipeWayInfoList(List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList , List<RecipeWayInfo> recipeWayInfoList,
                                         RecipeInfo recipeInfo){
         int minSize = Math.min(saveRecipeWayInfoReqDTOList.size(), recipeWayInfoList.size());
 
@@ -147,7 +147,7 @@ public class RecipeService {
 
     }
 
-    public void updateIngredientList(List<SaveIngredientReqDTO> saveIngredientReqDTOList, List<Ingredient> ingredientList,
+    private void updateIngredientList(List<SaveIngredientReqDTO> saveIngredientReqDTOList, List<Ingredient> ingredientList,
                                      RecipeInfo recipeInfo){
         int minSize = Math.min(saveIngredientReqDTOList.size(), ingredientList.size());
 
@@ -174,7 +174,7 @@ public class RecipeService {
                 });
     }
 
-    public RecipeInfo findRecipeInfoById(Long recipeInfoId){
+    private RecipeInfo findRecipeInfoById(Long recipeInfoId){
         return recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
     }

@@ -79,12 +79,12 @@ public class ReplyService {
         replyRepository.save(reply);
     }
 
-    public Reply findReplyById(Long replyId){
+    private Reply findReplyById(Long replyId){
         return replyRepository.findById(replyId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_REPLY));
     }
 
-    public boolean isMyReply(Long userId, User user){
+    private boolean isMyReply(Long userId, User user){
         if( user ==null || !userId.equals(user.getUserId()) )
             return false;
 

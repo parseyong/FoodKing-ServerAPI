@@ -88,7 +88,7 @@ public class ServiceTest {
         given(replyRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(reply));
 
         // when
-        emotionService.toggleReplyEmotion(1l,1l,EmotionType.Like);
+        emotionService.toggleReplyEmotion(1L,1L,EmotionType.Like);
 
         // then
         verify(replyEmotionRepository,times(1)).findByReplyAndUser(any(Reply.class),any(User.class));
@@ -105,10 +105,10 @@ public class ServiceTest {
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
         given(replyRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(reply));
         given(replyEmotionRepository.findByReplyAndUser(any(Reply.class),any(User.class))).willReturn(Optional.ofNullable(replyEmotion));
-        given(user.getUserId()).willReturn(1l);
+        given(user.getUserId()).willReturn(1L);
 
         // when
-        emotionService.toggleReplyEmotion(1l,1l,EmotionType.Like);
+        emotionService.toggleReplyEmotion(1L,1L,EmotionType.Like);
 
         // then
         verify(replyEmotionRepository,times(1)).findByReplyAndUser(any(Reply.class),any(User.class));
@@ -123,15 +123,15 @@ public class ServiceTest {
     public void toggleReplyEmotionFail1(){
         // given
         User user1 = spy(User.builder().build());
-        given(user.getUserId()).willReturn(1l);
-        given(user1.getUserId()).willReturn(2l);
+        given(user.getUserId()).willReturn(1L);
+        given(user1.getUserId()).willReturn(2L);
         given(replyEmotionRepository.findByReplyAndUser(any(Reply.class),any(User.class))).willReturn(Optional.ofNullable(replyEmotion));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user1));
         given(replyRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(reply));
 
         // when, then
         try{
-            emotionService.toggleReplyEmotion(2l,1l,EmotionType.Like);
+            emotionService.toggleReplyEmotion(2L,1L,EmotionType.Like);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(replyEmotionRepository,times(1)).findByReplyAndUser(any(Reply.class),any(User.class));
@@ -151,7 +151,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            emotionService.toggleReplyEmotion(1l,1l,EmotionType.Like);
+            emotionService.toggleReplyEmotion(1L,1L,EmotionType.Like);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(replyEmotionRepository,times(0)).findByReplyAndUser(any(Reply.class),any(User.class));
@@ -172,7 +172,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            emotionService.toggleReplyEmotion(1l,1l,EmotionType.Like);
+            emotionService.toggleReplyEmotion(1L,1L,EmotionType.Like);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(replyEmotionRepository,times(0)).findByReplyAndUser(any(Reply.class),any(User.class));
@@ -193,7 +193,7 @@ public class ServiceTest {
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         // when
-        emotionService.toggleRecipeInfoEmotion(1l,1l,EmotionType.Like);
+        emotionService.toggleRecipeInfoEmotion(1L,1L,EmotionType.Like);
 
         // then
         verify(recipeEmotionRepository,times(1)).findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class));
@@ -210,10 +210,10 @@ public class ServiceTest {
         given(recipeEmotionRepository.findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class))).willReturn(Optional.ofNullable(recipeEmotion));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
-        given(recipeInfo.getUser().getUserId()).willReturn(1l);
+        given(recipeInfo.getUser().getUserId()).willReturn(1L);
 
         // when
-        emotionService.toggleRecipeInfoEmotion(1l,1l,EmotionType.Like);
+        emotionService.toggleRecipeInfoEmotion(1L,1L,EmotionType.Like);
 
         // then
         verify(recipeEmotionRepository,times(1)).findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class));
@@ -228,15 +228,15 @@ public class ServiceTest {
     public void toggleRecipeEmotionFail1(){
         // given
         User user1 = spy(User.builder().build());
-        given(user1.getUserId()).willReturn(2l);
+        given(user1.getUserId()).willReturn(2L);
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user1));
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
         given(recipeEmotionRepository.findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class))).willReturn(Optional.ofNullable(recipeEmotion));
-        given(recipeInfo.getUser().getUserId()).willReturn(1l);
+        given(recipeInfo.getUser().getUserId()).willReturn(1L);
 
         // when, then
         try{
-            emotionService.toggleRecipeInfoEmotion(2l,1l,EmotionType.Like);
+            emotionService.toggleRecipeInfoEmotion(2L,1L,EmotionType.Like);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(recipeEmotionRepository,times(1)).findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class));
@@ -256,7 +256,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            emotionService.toggleRecipeInfoEmotion(1l,1l,EmotionType.Like);
+            emotionService.toggleRecipeInfoEmotion(1L,1L,EmotionType.Like);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(recipeEmotionRepository,times(0)).findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class));
@@ -277,7 +277,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            emotionService.toggleRecipeInfoEmotion(1l,1l,EmotionType.Like);
+            emotionService.toggleRecipeInfoEmotion(1L,1L,EmotionType.Like);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(recipeEmotionRepository,times(0)).findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class));
