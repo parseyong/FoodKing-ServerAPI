@@ -95,7 +95,7 @@ public class EmotionService {
         return recipeEmotionRepository.countByRecipeInfoAndEmotionType(recipeInfo,EmotionType.Like);
     }
 
-    public boolean isMyEmotion(Long userId, User user){
+    private boolean isMyEmotion(Long userId, User user){
         if( user ==null || !userId.equals(user.getUserId()) )
             return false;
 
