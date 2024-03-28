@@ -44,6 +44,9 @@ public class RecipeInfo extends TimeEntity {
     @Column(nullable = false, name = "recipe_tip")
     private String recipeTip;
 
+    @Column(nullable = false, name = "visit_cnt")
+    private Long visitCnt;
+
     @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Reply> replyList;
 
@@ -69,6 +72,7 @@ public class RecipeInfo extends TimeEntity {
         this.user=user;
         this.recipeWayInfoList=recipeWayInfoList;
         this.ingredientList=ingredientList;
+        this.visitCnt = 0L;
     }
     public void changeRecipeName(String recipeName){
         this.recipeName = recipeName;
@@ -99,5 +103,9 @@ public class RecipeInfo extends TimeEntity {
     }
     public void changeIngredientList(List<Ingredient> ingredientList){
         this.ingredientList=ingredientList;
+    }
+
+    public void addVisitCnt(){
+        this.visitCnt += 1;
     }
 }

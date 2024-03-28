@@ -30,6 +30,7 @@ public class ReadRecipeInfoResDTO {
     private Long emotionCnt;
     private LocalDateTime regDate;
     private LocalDateTime modDate;
+    private Long visitCnt;
 
     public static ReadRecipeInfoResDTO toDTO(RecipeInfo recipeInfo,Long replyCnt, Long emotionCnt){
         return ReadRecipeInfoResDTO.builder()
@@ -44,6 +45,7 @@ public class ReadRecipeInfoResDTO {
                 .emotionCnt(emotionCnt)
                 .regDate(recipeInfo.getRegDate())
                 .modDate(recipeInfo.getModDate())
+                .visitCnt(recipeInfo.getVisitCnt())
                 .build();
     }
 }

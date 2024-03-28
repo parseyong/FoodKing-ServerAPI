@@ -4,5 +4,6 @@ public enum RecipeSortType {
     LIKE,
     LATEST,
     CALOGY,
-    COOKTIME
+    COOKTIME,
+    VISIT
 }

@@ -92,8 +92,10 @@ public class RecipeService {
         recipeInfoRepository.delete(recipeInfo);
     }
 
+    @Transactional
     public ReadRecipeResDTO readRecipe(Long userId,Long recipeInfoId, ReplySortType replySortType){
         RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
+        recipeInfo.addVisitCnt();
 
         Long replyCnt = (long)recipeInfo.getReplyList().size();
         Long emotionCnt = emotionService.readRecipeEmotionCnt(recipeInfo);
@@ -110,6 +112,8 @@ public class RecipeService {
 
         List<ReadReplyResDTO> readReplyResDTOList = replyService.readReply(recipeInfo,userId,replySortType);
 
+        recipeInfoRepository.save(recipeInfo);
+
         return ReadRecipeResDTO.builder()
                 .readRecipeInfoResDTO(readRecipeInfoResDTO)
                 .readReplyResDTOList(readReplyResDTOList)
@@ -117,6 +121,7 @@ public class RecipeService {
                 .readIngredientResDTOList(readIngredientResDTOList)
                 .recipeTip(recipeInfo.getRecipeTip())
                 .isMyRecipe(recipeInfo.getUser().getUserId() == userId)
+                .visitCnt(recipeInfo.getVisitCnt())
                 .build();
     }
 

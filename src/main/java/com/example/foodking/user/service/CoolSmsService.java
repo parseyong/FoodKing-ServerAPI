@@ -2,6 +2,7 @@ package com.example.foodking.user.service;
 
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.user.dto.request.PhoneAuthReqDTO;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
@@ -21,8 +22,14 @@ import java.util.regex.Pattern;
 import static com.example.foodking.exception.ExceptionCode.*;
 
 @Service
+@RequiredArgsConstructor
 @Log4j2
 public class CoolSmsService {
+
+    private final RedissonClient authNumberRedis;
+
+    @Qualifier("isAuthNumberRedis")
+    private final RedissonClient isAuthNumberRedis;
 
     @Value("${CoolSMS.Api.Key}")
     private String apiKey; // 발급받은 api_key
@@ -31,13 +38,6 @@ public class CoolSmsService {
     @Value("${CoolSMS.Caller}")
     private String callId; // 발신자 번호
     private Message coolSms;
-
-    @Autowired
-    private RedissonClient authNumberRedis;
-
-    @Autowired
-    @Qualifier("isAuthNumberRedis")
-    private RedissonClient isAuthNumberRedis;
 
     @PostConstruct
     protected void init() {

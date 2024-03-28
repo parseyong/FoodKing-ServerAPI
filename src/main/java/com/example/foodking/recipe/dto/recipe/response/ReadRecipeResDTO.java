@@ -27,5 +27,6 @@ public class ReadRecipeResDTO {
     private List<ReadReplyResDTO> readReplyResDTOList;
     private String recipeTip;
     private boolean isMyRecipe;
+    private Long visitCnt;
 
 }

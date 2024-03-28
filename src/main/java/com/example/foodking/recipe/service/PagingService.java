@@ -97,6 +97,9 @@ public class PagingService {
         else if(recipeSortType.equals(RecipeSortType.COOKTIME)){
             orderSpecifiers.add(new OrderSpecifier(Order.ASC, recipeInfo.cookingTime));
         }
+        else if(recipeSortType.equals(RecipeSortType.VISIT)){
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, recipeInfo.visitCnt));
+        }
         else{
             orderSpecifiers.add(new OrderSpecifier(Order.DESC, recipeEmotion.count()));
         }

@@ -54,6 +54,8 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final com.example.foodking.user.domain.QUser user;
 
+    public final NumberPath<Long> visitCnt = createNumber("visitCnt", Long.class);
+
     public QRecipeInfo(String variable) {
         this(RecipeInfo.class, forVariable(variable), INITS);
     }
