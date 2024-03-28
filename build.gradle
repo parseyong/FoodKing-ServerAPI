@@ -62,7 +62,7 @@ dependencies {
     //GSON
     implementation 'com.google.code.gson:gson:2.8.7'
     //redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.17.0'
 }
 
 

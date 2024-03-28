@@ -5,15 +5,17 @@ import com.example.foodking.user.dto.request.PhoneAuthReqDTO;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import static com.example.foodking.exception.ExceptionCode.*;
@@ -29,22 +31,13 @@ public class CoolSmsService {
     @Value("${CoolSMS.Caller}")
     private String callId; // 발신자 번호
     private Message coolSms;
-    /*
-        전화번호로 인증번호를 보내면 (전화번호-인증번호)를 key-value형태로 Map에 저장
-        그 뒤 인증번호 확인 요청이 오면 이 Map을 통해 인증번호가 올바른지 확인한다.
-        인증번호 확인이 되면 authenticationedPhoneNumSet에 저장하고 Map에서 해당 정보를 삭제한다.
-
-        authenticationNumberMap : 전화번호와 인증번호를 저장한 Map
-        authenticationedPhoneNumSet : 인증확인이 완료된 전화번호 set
-    */
 
     @Autowired
-    @Qualifier("authNumberRedis")
-    private RedisTemplate<String, String> authNumberRedis;
+    private RedissonClient authNumberRedis;
+
     @Autowired
     @Qualifier("isAuthNumberRedis")
-    private RedisTemplate<String,String> isAuthNumberRedis;
-
+    private RedissonClient isAuthNumberRedis;
 
     @PostConstruct
     protected void init() {
@@ -68,8 +61,10 @@ public class CoolSmsService {
 
         try {
             coolSms.send(params);
-            //인증번호 확인을 위해 발급된 인증번호를 key-value(전화번호-인증번호)형태로 저장
-            authNumberRedis.opsForValue().set(phoneNum, String.valueOf(authenticationNumber));
+            //인증번호 확인을 위해 발급된 인증번호를 key-value(전화번호-인증번호)형태로 저장, 60초 후 자동 소멸
+            RBucket<String> authNumber = authNumberRedis.getBucket(phoneNum);
+            authNumber.set(String.valueOf(authenticationNumber), 60, TimeUnit.SECONDS);
+
         } catch (CoolsmsException e) {
             System.out.println(e.getCode()+":"+e.getMessage());
             log.error(e.getCode()+":"+e.getMessage());
@@ -84,18 +79,22 @@ public class CoolSmsService {
     */
     public void authNumCheck(PhoneAuthReqDTO phoneAuthReqDTO) {
 
-        String authenticationNum = authNumberRedis.opsForValue().get(phoneAuthReqDTO.getPhoneNum());
+        RBucket<String> bucket = authNumberRedis.getBucket(phoneAuthReqDTO.getPhoneNum());
+        String authenticationNum = bucket.get();
 
         if(authenticationNum == null || !authenticationNum.equals(phoneAuthReqDTO.getAuthenticationNumber()))
             throw new CommondException(SMS_AUTHENTICATION_FAIL);
 
-       isAuthNumberRedis.opsForValue().set(phoneAuthReqDTO.getPhoneNum(),"true");
+        RBucket<String> isAuthBucket = isAuthNumberRedis.getBucket(phoneAuthReqDTO.getPhoneNum());
+        isAuthBucket.set("true",10,TimeUnit.MINUTES);
     }
     
     // 해당 전화번호가 인증이 완료된 전화번호인지 체크 즉, authenticationedPhoneNumset에 전화번호가 존재하는지 체크한다.
     public boolean isAuthenticatedNum(String phoneNum){
+        RBucket<String> isAuthBucket = isAuthNumberRedis.getBucket(phoneNum);
+        String isAuth = isAuthBucket.get();
 
-        if(isAuthNumberRedis.opsForValue().get(phoneNum) == null){
+        if(isAuth == null){
             throw new CommondException(SMS_NOT_AUTHENTICATION);
         }
         return true;
@@ -106,7 +105,7 @@ public class CoolSmsService {
         인증로직 완료 후 삭제해 버리면 로그인로직에서 예외 발생시 전화번호 인증을 다시해야하기때문에 회원가입이 완료된 후 삭제한다.
     */
     public void deleteAuthInfo(String phoneNum){
-        isAuthNumberRedis.delete(phoneNum);
-        authNumberRedis.delete(phoneNum);
+        authNumberRedis.getBucket(phoneNum).delete();
+        isAuthNumberRedis.getBucket(phoneNum).delete();
     }
 }

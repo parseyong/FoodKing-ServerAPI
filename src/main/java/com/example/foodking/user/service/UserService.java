@@ -47,8 +47,8 @@ public class UserService {
         // passwordEncoder를 통한 비밀번호 암호화 및 salt처리
         addUserReqDTO.setPassword(passwordEncoder.encode(addUserReqDTO.getPassword()));
         User user = AddUserReqDTO.toEntity(addUserReqDTO);
-        coolSmsService.deleteAuthInfo(addUserReqDTO.getPhoneNum());
         userRepository.save(user);
+        coolSmsService.deleteAuthInfo(addUserReqDTO.getPhoneNum());
     }
 
     public boolean emailDuplicatedChecking(String email){
