@@ -8,7 +8,6 @@ import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -88,7 +87,7 @@ public class CoolSmsService {
         RBucket<String> isAuthBucket = isAuthNumberRedis.getBucket(phoneAuthReqDTO.getPhoneNum());
         isAuthBucket.set("true",10,TimeUnit.MINUTES);
     }
-    
+
     // 해당 전화번호가 인증이 완료된 전화번호인지 체크 즉, authenticationedPhoneNumset에 전화번호가 존재하는지 체크한다.
     public boolean isAuthenticatedNum(String phoneNum){
         RBucket<String> isAuthBucket = isAuthNumberRedis.getBucket(phoneNum);

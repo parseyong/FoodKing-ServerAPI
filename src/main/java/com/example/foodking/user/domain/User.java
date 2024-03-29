@@ -29,16 +29,16 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, name = "nick_name")
+    @Column(nullable = false, name = "nick_name", unique = true)
     private String nickName;
 
-    @Column(nullable = false, name = "phone_num")
+    @Column(nullable = false, name = "phone_num",unique = true)
     private String phoneNum;
 
     @Column(nullable = false,name = "role_name")
     private String roleName;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private List<RecipeInfo> recipeInfoList;
 
     @Builder

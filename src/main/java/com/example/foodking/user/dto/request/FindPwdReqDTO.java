@@ -18,6 +18,4 @@ public class FindPwdReqDTO {
     @NotBlank(message = "전화번호를 입력해주세요")
     private String phoneNum;
 
-    @NotBlank(message = "인증번호를 입력해주세요")
-    private String authenticationNumber;
 }

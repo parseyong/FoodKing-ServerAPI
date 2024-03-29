@@ -241,7 +241,8 @@ public class ControllerTest {
                 .password("1234")
                 .passwordRepeat("1234")
                 .build();
-        doThrow(new CommondException(ExceptionCode.EMAIL_DUPLICATED)).when(userService).addUser(any(AddUserReqDTO.class));
+        doThrow(new CommondException(ExceptionCode.EMAIL_DUPLICATED))
+                .when(userService).addUser(any(AddUserReqDTO.class));
         Gson gson = new Gson();
         String requestBody = gson.toJson(addUserReqDTO);
 
@@ -267,7 +268,8 @@ public class ControllerTest {
                 .password("1234")
                 .passwordRepeat("1234")
                 .build();
-        doThrow(new CommondException(ExceptionCode.NICKNAME_DUPLICATED)).when(userService).addUser(any(AddUserReqDTO.class));
+        doThrow(new CommondException(ExceptionCode.NICKNAME_DUPLICATED))
+                .when(userService).addUser(any(AddUserReqDTO.class));
         Gson gson = new Gson();
         String requestBody = gson.toJson(addUserReqDTO);
 
@@ -294,7 +296,8 @@ public class ControllerTest {
                 .passwordRepeat("12345")
                 .build();
 
-        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT)).when(userService).addUser(any(AddUserReqDTO.class));
+        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT))
+                .when(userService).addUser(any(AddUserReqDTO.class));
         Gson gson = new Gson();
         String requestBody = gson.toJson(addUserReqDTO);
 
@@ -458,95 +461,67 @@ public class ControllerTest {
     @DisplayName("이메일 찾기 테스트 -> (이메일 찾기 성공)")
     public void findEmailSuccess() throws Exception {
         //given
-        PhoneAuthReqDTO phoneAuthReqDTO = PhoneAuthReqDTO.builder()
-                .phoneNum("01056962173")
-                .authenticationNumber("1234")
-                .build();
-
-        Gson gson = new Gson();
-        String requestBody = gson.toJson(phoneAuthReqDTO);
-        given(userService.findEmail(any(PhoneAuthReqDTO.class))).willReturn("test");
+        given(userService.findEmail(any(String.class))).willReturn("test");
 
         //when,then
         this.mockMvc.perform(get("/email/find")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("phoneNum","01056962173"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("이메일 찾기 성공"))
                 .andExpect(jsonPath("$.data").value("test"))
                 .andDo(print());
-        verify(userService,times(1)).findEmail(any(PhoneAuthReqDTO.class));
+        verify(userService,times(1)).findEmail(any(String.class));
     }
 
     @Test
     @DisplayName("이메일 찾기 테스트 -> (이메일 찾기 실패 : 요청값 공백)")
     public void findEmailFail1() throws Exception {
         //given
-        PhoneAuthReqDTO phoneAuthReqDTO = PhoneAuthReqDTO.builder()
-                .phoneNum("")
-                .authenticationNumber("")
-                .build();
-
-        Gson gson = new Gson();
-        String requestBody = gson.toJson(phoneAuthReqDTO);
 
         //when,then
         this.mockMvc.perform(get("/email/find")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("phoneNum",""))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
-                .andExpect(jsonPath("$.data.phoneNum").value("전화번호를 입력하세요"))
-                .andExpect(jsonPath("$.data.authenticationNumber").value("인증번호를 입력하세요"))
+                .andExpect(jsonPath("$.message").value("전화번호를 입력하세요"))
                 .andDo(print());
-        verify(userService,times(0)).findEmail(phoneAuthReqDTO);
+        verify(userService,times(0)).findEmail(any(String.class));
     }
 
     @Test
-    @DisplayName("이메일 찾기 테스트 -> (이메일 찾기 실패 : 인증번호 불일치)")
+    @DisplayName("이메일 찾기 테스트 -> (이메일 찾기 실패 : 인증되지않은 번호)")
     public void findEmailFail2() throws Exception {
         //given
-        PhoneAuthReqDTO phoneAuthReqDTO = PhoneAuthReqDTO.builder()
-                .phoneNum("01056962173")
-                .authenticationNumber("1234")
-                .build();
-
-        Gson gson = new Gson();
-        String requestBody = gson.toJson(phoneAuthReqDTO);
-        doThrow(new CommondException(ExceptionCode.SMS_AUTHENTICATION_FAIL)).when(userService).findEmail(any(PhoneAuthReqDTO.class));
+        doThrow(new CommondException(ExceptionCode.SMS_NOT_AUTHENTICATION))
+                .when(userService).findEmail(any(String.class));
 
         //when,then
         this.mockMvc.perform(get("/email/find")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("phoneNum","01056962173"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("인증번호가 올바르지 않습니다"))
-                .andExpect(jsonPath("$.data.authenticationNumber").value("인증번호가 올바르지 않습니다"))
+                .andExpect(jsonPath("$.message").value("인증이 되지않은 번호입니다."))
+                .andExpect(jsonPath("$.data.phoneNum").value("인증이 되지않은 번호입니다."))
                 .andDo(print());
-        verify(userService,times(1)).findEmail(any(PhoneAuthReqDTO.class));
+        verify(userService,times(1)).findEmail(any(String.class));
     }
 
     @Test
     @DisplayName("이메일 찾기 테스트 -> (이메일 찾기 실패 : 존재하지 않는 유저)")
     public void findEmailFail3() throws Exception {
         //given
-        PhoneAuthReqDTO phoneAuthReqDTO = PhoneAuthReqDTO.builder()
-                .phoneNum("01056962173")
-                .authenticationNumber("1234")
-                .build();
-
-        Gson gson = new Gson();
-        String requestBody = gson.toJson(phoneAuthReqDTO);
-        given(userService.findEmail(any(PhoneAuthReqDTO.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
+        given(userService.findEmail(any(String.class)))
+                .willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         //when,then
         this.mockMvc.perform(get("/email/find")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("phoneNum","01056962173"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
-        verify(userService,times(1)).findEmail(any(PhoneAuthReqDTO.class));
+        verify(userService,times(1)).findEmail(any(String.class));
     }
 
     @Test
@@ -556,7 +531,6 @@ public class ControllerTest {
         FindPwdReqDTO findPwdReqDTO = FindPwdReqDTO.builder()
                 .email("test@google.com")
                 .phoneNum("01056962173")
-                .authenticationNumber("1234")
                 .build();
 
         Gson gson = new Gson();
@@ -581,7 +555,6 @@ public class ControllerTest {
         FindPwdReqDTO findPwdReqDTO = FindPwdReqDTO.builder()
                 .email("")
                 .phoneNum("")
-                .authenticationNumber("")
                 .build();
 
         Gson gson = new Gson();
@@ -605,7 +578,6 @@ public class ControllerTest {
         FindPwdReqDTO findPwdReqDTO = FindPwdReqDTO.builder()
                 .email("test")
                 .phoneNum("01056962173")
-                .authenticationNumber("1234")
                 .build();
 
         Gson gson = new Gson();
@@ -624,26 +596,26 @@ public class ControllerTest {
     }
 
     @Test
-    @DisplayName("비밀번호 찾기 테스트 -> (비밀번호 찾기 실패 : 인증번호 불일치)")
+    @DisplayName("비밀번호 찾기 테스트 -> (비밀번호 찾기 실패 : 인증되지 않은 번호)")
     public void findPasswordFail3() throws Exception {
         //given
         FindPwdReqDTO findPwdReqDTO = FindPwdReqDTO.builder()
                 .email("test@google.com")
                 .phoneNum("01056962173")
-                .authenticationNumber("1234")
                 .build();
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReqDTO);
-        doThrow(new CommondException(ExceptionCode.SMS_AUTHENTICATION_FAIL)).when(userService).findPassword(any(FindPwdReqDTO.class));
+        doThrow(new CommondException(ExceptionCode.SMS_NOT_AUTHENTICATION))
+                .when(userService).findPassword(any(FindPwdReqDTO.class));
 
         //when,then
         this.mockMvc.perform(get("/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("인증번호가 올바르지 않습니다"))
-                .andExpect(jsonPath("$.data.authenticationNumber").value("인증번호가 올바르지 않습니다"))
+                .andExpect(jsonPath("$.message").value("인증이 되지않은 번호입니다."))
+                .andExpect(jsonPath("$.data.phoneNum").value("인증이 되지않은 번호입니다."))
                 .andDo(print());
         verify(userService,times(1)).findPassword(any(FindPwdReqDTO.class));
     }
@@ -655,12 +627,12 @@ public class ControllerTest {
         FindPwdReqDTO findPwdReqDTO = FindPwdReqDTO.builder()
                 .email("test@google.com")
                 .phoneNum("01056962173")
-                .authenticationNumber("1234")
                 .build();
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReqDTO);
-        given(userService.findPassword(any(FindPwdReqDTO.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
+        given(userService.findPassword(any(FindPwdReqDTO.class)))
+                .willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         //when,then
         this.mockMvc.perform(get("/password/find")
@@ -679,12 +651,12 @@ public class ControllerTest {
         FindPwdReqDTO findPwdReqDTO = FindPwdReqDTO.builder()
                 .email("test@google.com")
                 .phoneNum("01056962173")
-                .authenticationNumber("1234")
                 .build();
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReqDTO);
-        given(userService.findPassword(any(FindPwdReqDTO.class))).willThrow(new CommondException(ExceptionCode.ACCESS_FAIL_USER));
+        given(userService.findPassword(any(FindPwdReqDTO.class)))
+                .willThrow(new CommondException(ExceptionCode.ACCESS_FAIL_USER));
 
         //when,then
         this.mockMvc.perform(get("/password/find")
@@ -849,7 +821,8 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(updateUserInfoReqDTO);
-        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT)).when(userService).updateUser(any(UpdateUserInfoReqDTO.class),any(Long.class));
+        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT))
+                .when(userService).updateUser(any(UpdateUserInfoReqDTO.class),any(Long.class));
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -876,7 +849,8 @@ public class ControllerTest {
                 .build();
         Gson gson = new Gson();
         String requestBody = gson.toJson(updateUserInfoReqDTO);
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(userService).updateUser(any(UpdateUserInfoReqDTO.class),any(Long.class));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER))
+                .when(userService).updateUser(any(UpdateUserInfoReqDTO.class),any(Long.class));
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -948,7 +922,8 @@ public class ControllerTest {
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(deleteUserReqDTO);
-        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT)).when(userService).deleteUser(any(DeleteUserReqDTO.class));
+        doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT))
+                .when(userService).deleteUser(any(DeleteUserReqDTO.class));
 
         //when,then
         this.mockMvc.perform(delete("/users")
@@ -974,7 +949,8 @@ public class ControllerTest {
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(deleteUserReqDTO);
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(userService).deleteUser(any(DeleteUserReqDTO.class));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER))
+                .when(userService).deleteUser(any(DeleteUserReqDTO.class));
 
         //when,then
         this.mockMvc.perform(delete("/users")
