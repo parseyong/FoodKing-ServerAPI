@@ -25,6 +25,7 @@ import static com.example.foodking.exception.ExceptionCode.*;
 @Log4j2
 public class CoolSmsService {
 
+    @Qualifier("authNumberRedis")
     private final RedissonClient authNumberRedis;
 
     @Qualifier("isAuthNumberRedis")
@@ -72,10 +73,7 @@ public class CoolSmsService {
         return String.valueOf(authenticationNumber);
     }
 
-    /*
-        해당 전화번호에 발급된 인증번호에 대한 인증을 실행하는 메소드
-        인증에 성공하면 authenticationedPhoneNumset에 전화번호를 저장한다.
-    */
+    //해당 전화번호에 발급된 인증번호에 대한 인증을 실행하는 메소드
     public void authNumCheck(PhoneAuthReqDTO phoneAuthReqDTO) {
 
         RBucket<String> bucket = authNumberRedis.getBucket(phoneAuthReqDTO.getPhoneNum());
@@ -88,7 +86,7 @@ public class CoolSmsService {
         isAuthBucket.set("true",10,TimeUnit.MINUTES);
     }
 
-    // 해당 전화번호가 인증이 완료된 전화번호인지 체크 즉, authenticationedPhoneNumset에 전화번호가 존재하는지 체크한다.
+    // 해당 전화번호가 인증이 완료된 전화번호인지 체크
     public boolean isAuthenticatedNum(String phoneNum){
         RBucket<String> isAuthBucket = isAuthNumberRedis.getBucket(phoneNum);
         String isAuth = isAuthBucket.get();

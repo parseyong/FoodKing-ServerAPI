@@ -14,8 +14,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Entity
 @Getter
+@Entity
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User implements UserDetails {
     @Id
@@ -48,9 +49,6 @@ public class User implements UserDetails {
         this.nickName=nickName;
         this.phoneNum=phoneNum;
         this.roleName="ROLE_USER";
-    }
-    public void changePhoneNum(String phoneNum){
-        this.phoneNum=phoneNum;
     }
     public void changeNickName(String nickName){
         this.nickName=nickName;

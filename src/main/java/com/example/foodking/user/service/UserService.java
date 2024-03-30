@@ -59,10 +59,7 @@ public class UserService {
         // 유저 저장
         userRepository.save(AddUserReqDTO.toEntity(addUserReqDTO));
 
-        /*
-            레디스에 저장된 인증정보 삭제
-            레디스는 기본적으로 트랜잭션 기능을 제공하지 않기때문에 로직 마지막에 데이터를 삭제한다.
-        */
+        //레디스에 저장된 인증정보 삭제
         coolSmsService.deleteAuthInfo(addUserReqDTO.getPhoneNum());
     }
 

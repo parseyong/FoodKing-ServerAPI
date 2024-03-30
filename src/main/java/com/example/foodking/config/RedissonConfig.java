@@ -2,6 +2,7 @@ package com.example.foodking.config;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,9 +23,19 @@ public class RedissonConfig {
 
     @Bean
     @Primary
-    public RedissonClient authNumberRedis() {
+    public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+port).setDatabase(1);
+        config.setCodec(new JsonJacksonCodec());
+        return Redisson.create(config);
+    }
+
+    @Bean
+    @Qualifier("authNumberRedis")
+    public RedissonClient authNumberRedis() {
+        Config config = new Config();
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+port).setDatabase(2);
+        config.setCodec(new JsonJacksonCodec());
         return Redisson.create(config);
     }
 
@@ -32,7 +43,8 @@ public class RedissonConfig {
     @Qualifier("isAuthNumberRedis")
     public RedissonClient isAuthNumberRedis() {
         Config config = new Config();
-        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+port).setDatabase(2);
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+port).setDatabase(3);
+        config.setCodec(new JsonJacksonCodec());
         return Redisson.create(config);
     }
 
@@ -40,7 +52,8 @@ public class RedissonConfig {
     @Qualifier("tokenRedis")
     public RedissonClient tokenRedis() {
         Config config = new Config();
-        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+port).setDatabase(3);
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+port).setDatabase(4);
+        config.setCodec(new JsonJacksonCodec());
         return Redisson.create(config);
     }
 }

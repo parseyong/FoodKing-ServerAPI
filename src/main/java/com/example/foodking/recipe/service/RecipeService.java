@@ -1,5 +1,6 @@
 package com.example.foodking.recipe.service;
 
+import com.example.foodking.aop.distributedLock.DistributedLock;
 import com.example.foodking.emotion.service.EmotionService;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
@@ -28,13 +29,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-@Log4j2
 public class RecipeService {
 
     private final RecipeInfoRepository recipeInfoRepository;
@@ -93,7 +96,9 @@ public class RecipeService {
     }
 
     @Transactional
+    @DistributedLock(key = "#recipeId")
     public ReadRecipeResDTO readRecipe(Long userId,Long recipeInfoId, ReplySortType replySortType){
+
         RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
         recipeInfo.addVisitCnt();
 

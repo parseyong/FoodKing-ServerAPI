@@ -159,7 +159,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<CommonResDTO> handleException(Exception ex) {
 
         String message = "서버 내부에 에러가 발생했습니다.";
-        log.error(message+":"+ex.getMessage());
+        log.error(message+":"+ex.getMessage()+ex.getStackTrace());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(CommonResDTO.of(message,null));
     }

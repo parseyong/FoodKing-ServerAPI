@@ -90,5 +90,4 @@ public class UserController {
         userService.deleteUser(deleteUserReqDTO);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저 삭제완료",null));
     }
-
 }
