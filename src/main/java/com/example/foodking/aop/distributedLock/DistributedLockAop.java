@@ -39,7 +39,6 @@ public class DistributedLockAop {
                 (signature.getParameterNames(), joinPoint.getArgs(), distributedLock.key());
 
         // lock 획득시도
-        log.info("락 획득 시도");
         RLock rLock = redissonClient.getLock(key);
 
         try {

@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -95,7 +96,7 @@ public class RecipeService {
         recipeInfoRepository.delete(recipeInfo);
     }
 
-    @Transactional
+    //@Transactional
     @DistributedLock(key = "#recipeId")
     public ReadRecipeResDTO readRecipe(Long userId,Long recipeInfoId, ReplySortType replySortType){
 
