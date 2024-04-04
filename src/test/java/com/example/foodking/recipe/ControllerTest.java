@@ -11,7 +11,7 @@ import com.example.foodking.recipe.dto.recipe.request.SaveRecipeReqDTO;
 import com.example.foodking.recipe.dto.recipe.response.ReadRecipeResDTO;
 import com.example.foodking.recipe.dto.recipeInfo.request.SaveRecipeInfoReqDTO;
 import com.example.foodking.recipe.dto.recipeWayInfo.request.SaveRecipeWayInfoReqDTO;
-import com.example.foodking.recipe.service.PagingService;
+import com.example.foodking.recipe.service.RecipePagingService;
 import com.example.foodking.recipe.service.RecipeService;
 import com.example.foodking.reply.common.ReplySortType;
 import com.google.gson.Gson;
@@ -49,7 +49,7 @@ public class ControllerTest {
     @MockBean
     private RecipeService recipeService;
     @MockBean
-    private PagingService pagingService;
+    private RecipePagingService recipePagingService;
     @MockBean
     private JwtProvider jwtProvider;
     @Autowired

@@ -6,6 +6,7 @@ import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.controller.UserController;
 import com.example.foodking.user.dto.request.*;
+import com.example.foodking.user.dto.response.LoginTokenResDTO;
 import com.example.foodking.user.dto.response.ReadUserInfoResDTO;
 import com.example.foodking.user.service.UserService;
 import com.google.gson.Gson;
@@ -56,8 +57,12 @@ public class ControllerTest {
                 .email("test@google.com")
                 .password("1234")
                 .build();
-        String accessToken = "test";
-        given(userService.login(any(LoginReqDTO.class))).willReturn(accessToken);
+        LoginTokenResDTO loginTokenResDTO = LoginTokenResDTO.builder()
+                .accessToken("access")
+                .refreshToken("refresh")
+                .build();
+
+        given(userService.login(any(LoginReqDTO.class))).willReturn(loginTokenResDTO);
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(loginReqDTO);
@@ -67,7 +72,8 @@ public class ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").value(accessToken))
+                .andExpect(jsonPath("$.data.accessToken").value("access"))
+                .andExpect(jsonPath("$.data.refreshToken").value("refresh"))
                 .andExpect(jsonPath("$.message").value("로그인 성공!"))
                 .andDo(print());
 
@@ -82,8 +88,13 @@ public class ControllerTest {
                 .email("")
                 .password("")
                 .build();
+
+        LoginTokenResDTO loginTokenResDTO = LoginTokenResDTO.builder()
+                .accessToken("access")
+                .refreshToken("refresh")
+                .build();
         String accessToken = "test";
-        given(userService.login(any(LoginReqDTO.class))).willReturn(accessToken);
+        given(userService.login(any(LoginReqDTO.class))).willReturn(loginTokenResDTO);
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(loginReqDTO);
@@ -109,8 +120,13 @@ public class ControllerTest {
                 .email("testgoogle.com")
                 .password("1234")
                 .build();
+
+        LoginTokenResDTO loginTokenResDTO = LoginTokenResDTO.builder()
+                .accessToken("access")
+                .refreshToken("refresh")
+                .build();
         String accessToken = "test";
-        given(userService.login(any(LoginReqDTO.class))).willReturn(accessToken);
+        given(userService.login(any(LoginReqDTO.class))).willReturn(loginTokenResDTO);
 
         Gson gson = new Gson();
         String requestBody = gson.toJson(loginReqDTO);

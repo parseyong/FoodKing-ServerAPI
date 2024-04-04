@@ -5,7 +5,7 @@ import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.dto.recipe.request.SaveRecipeReqDTO;
 import com.example.foodking.recipe.dto.recipe.response.ReadRecipeResDTO;
 import com.example.foodking.recipe.dto.recipeInfo.request.ReadRecipeInfoPagingReqDTO;
-import com.example.foodking.recipe.service.PagingService;
+import com.example.foodking.recipe.service.RecipePagingService;
 import com.example.foodking.recipe.service.RecipeService;
 import com.example.foodking.reply.common.ReplySortType;
 import io.swagger.annotations.Api;
@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 public class RecipeController {
 
     private final RecipeService recipeService;
-    private final PagingService pagingService;
+    private final RecipePagingService recipePagingService;
 
     @PostMapping("/recipes")
     public ResponseEntity<CommonResDTO> addRecipe(
@@ -74,7 +74,7 @@ public class RecipeController {
             @RequestBody  @Valid ReadRecipeInfoPagingReqDTO readRecipeInfoPagingReqDTO){
 
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("레시피 타입 조회성공"
-                ,pagingService.readRecipeInfoPagingByCondition(userId,pageNum,readRecipeInfoPagingReqDTO,recipeInfoType)));
+                , recipePagingService.readRecipeInfoPagingByCondition(userId,pageNum,readRecipeInfoPagingReqDTO,recipeInfoType)));
     }
 
     @GetMapping("/recipes/mine/{pageNum}")
@@ -84,7 +84,7 @@ public class RecipeController {
             @RequestBody @Valid ReadRecipeInfoPagingReqDTO readRecipeInfoPagingReqDTO){
 
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("내가 쓴 레시피 조회성공"
-                ,pagingService.readRecipeInfoPagingByCondition(userId,pageNum,readRecipeInfoPagingReqDTO,"mine")));
+                , recipePagingService.readRecipeInfoPagingByCondition(userId,pageNum,readRecipeInfoPagingReqDTO,"mine")));
     }
 
     @GetMapping("/recipes/like/{pageNum}")
@@ -94,7 +94,7 @@ public class RecipeController {
             @RequestBody @Valid ReadRecipeInfoPagingReqDTO readRecipeInfoPagingReqDTO){
 
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("좋아요 누른 레시피 조회성공"
-                ,pagingService.readRecipeInfoPagingByCondition(userId,pageNum,readRecipeInfoPagingReqDTO,"like")));
+                , recipePagingService.readRecipeInfoPagingByCondition(userId,pageNum,readRecipeInfoPagingReqDTO,"like")));
     }
 
     @GetMapping("/recipes/search/{pageNum}")
@@ -104,6 +104,6 @@ public class RecipeController {
             @RequestBody @Valid ReadRecipeInfoPagingReqDTO readRecipeInfoPagingReqDTO){
 
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("키워드 레시피조회 성공"
-                ,pagingService.readRecipeInfoPagingByCondition(userId,pageNum,readRecipeInfoPagingReqDTO,"keyword")));
+                , recipePagingService.readRecipeInfoPagingByCondition(userId,pageNum,readRecipeInfoPagingReqDTO,"keyword")));
     }
 }

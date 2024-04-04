@@ -27,8 +27,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<CommonResDTO> login(@RequestBody @Valid LoginReqDTO loginReqDTO){
 
-        String accessToken = userService.login(loginReqDTO);
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("로그인 성공!",accessToken));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResDTO.of("로그인 성공!",userService.login(loginReqDTO)));
     }
 
     @PostMapping("/users")

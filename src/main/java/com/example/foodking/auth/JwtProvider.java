@@ -1,12 +1,18 @@
 package com.example.foodking.auth;
 
+import com.example.foodking.exception.CommondException;
+import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.domain.User;
+import com.example.foodking.user.dto.response.LoginTokenResDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,24 +24,36 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Log4j2
 @RequiredArgsConstructor
 public class JwtProvider {
 
-    @Value("${JWT.SecretKey}")
-    private String secretKey;
-    private long validTokenTime = 30 * 60 * 1000L;
+    @Value("${JWT.Access.SecretKey}")
+    private String accessSecretKey;
+
+    @Value("${JWT.Refresh.SecretKey}")
+    private String refreshSecretKey;
+
+    @Qualifier("tokenRedis")
+    private final RedissonClient tokenRedis;
+
+    // 30분
+    private Long validAccessTokenTime = 30 * 60 * 1000L;
+    // 1달
+    private Long validRefreshTokenTime = 30 * 24 * 60 * 60L;
     private final CustomUserDetailsService customUserDetailsService;
 
     @PostConstruct
     protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        accessSecretKey = Base64.getEncoder().encodeToString(accessSecretKey.getBytes());
+        refreshSecretKey = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes());
     }
     
     // 로그인 성공 시 토큰을 생성해서 반환하는 메소드
-    public String createToken(Long userId, Collection<? extends GrantedAuthority> roleList) {
+    public String createAccessToken(Long userId, Collection<? extends GrantedAuthority> roleList) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
         claims.put("roleList", roleList);
         Date now = new Date();
@@ -43,35 +61,94 @@ public class JwtProvider {
         return Jwts.builder()
                 .setClaims(claims) // claim 저장
                 .setIssuedAt(now) // 토큰 발행시간 저장
-                .setExpiration(new Date(now.getTime() + validTokenTime)) // 토큰 유효시간 설정
-                .signWith(SignatureAlgorithm.HS256, secretKey)  // 암호화 알고리즘과, secret 값
+                .setExpiration(new Date(now.getTime() + validAccessTokenTime)) // 토큰 유효시간 설정
+                .signWith(SignatureAlgorithm.HS256, accessSecretKey)  // 암호화 알고리즘과, secret 값
                 .compact();
     }
 
-    // 토큰에서 인증객체를 추출하는 메소드
-    public Authentication getAuthentication(String token) {
-        User user = (User) customUserDetailsService.loadUserByUsername(this.getUserId(token));
+    public String createRefreshToken(Long userId, Collection<? extends GrantedAuthority> roleList) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
+        claims.put("roleList", roleList);
+        Date now = new Date();
+
+        String refreshToken = Jwts.builder()
+                .setClaims(claims) // claim 저장
+                .setIssuedAt(now) // 토큰 발행시간 저장
+                .setExpiration(new Date(now.getTime() + validRefreshTokenTime)) // 토큰 유효시간 설정
+                .signWith(SignatureAlgorithm.HS256, refreshSecretKey)  // 암호화 알고리즘과, secret 값
+                .compact();
+        
+        // 레디스에 RefreshToken 저장
+        RBucket<String> refreshTokenBucket = tokenRedis.getBucket(String.valueOf(userId));
+        refreshTokenBucket.set(refreshToken, validRefreshTokenTime, TimeUnit.SECONDS);
+
+        return  refreshToken;
+    }
+    
+    // 토큰 재발급
+    public LoginTokenResDTO reissueToken(String refreshToken){
+        // refreshToken의 유효성검사
+        if(!validateRefreshToken(refreshToken))
+            throw new CommondException(ExceptionCode.LOGIN_FAIL);
+
+        // refreshToken에서 userId값 추출
+        String userId = getUserIdByRefreshToken(refreshToken);
+
+        // 레디스에 존재하는 토큰인지 확인
+        String tokenInRedis = (String) tokenRedis.getBucket(userId).get();
+
+        if(tokenInRedis == null || !tokenInRedis.equals(refreshToken))
+            throw new CommondException(ExceptionCode.LOGIN_FAIL);
+
+        User user = (User) customUserDetailsService.loadUserByUsername(userId);
+
+        return LoginTokenResDTO.builder()
+                .accessToken(createAccessToken(Long.valueOf(userId), user.getAuthorities()))
+                .refreshToken(createRefreshToken(Long.valueOf(userId),user.getAuthorities()))
+                .build();
+    }
+
+    // Http헤더에서 AccessToken을 가져오는 메소드
+    public String resolveAccessToken(HttpServletRequest request) {
+
+        return request.getHeader("Auth");
+    }
+
+    // 토큰에서 추출한 userId값을 통해 인증객체를 생성하는 메소드
+    public Authentication getAuthenticationByAccessToken(String token) {
+        User user = (User) customUserDetailsService.loadUserByUsername(this.getUserIdByAccessToken(token));
         return new UsernamePasswordAuthenticationToken(user.getUserId(),user.getPassword(),user.getAuthorities());
     }
 
-    public String getUserId(String token) {
-        log.info(token);
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
-    }
-
-    // 토큰의 유효성을 검증하는 메소드
-    public boolean validateToken(String token) {
+    // AccessToken의 유효성을 검증하는 메소드
+    public boolean validateAccessToken(String token) {
         try {
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(accessSecretKey).build().parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }
     }
 
-    // Http헤더에서 인증토큰을 가져오는 메소드
-    public String resolveToken(HttpServletRequest request) {
+    // RefreshToken의 유효성을 검증하는 메소드
+    private boolean validateRefreshToken(String token) {
+        try {
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(refreshSecretKey).build().parseClaimsJws(token);
+            return !claims.getBody().getExpiration().before(new Date());
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-        return request.getHeader("Auth");
+    // AccessToken에서 userId값을 추출하는 메소드
+    private String getUserIdByAccessToken(String token) {
+        log.info(token);
+        return Jwts.parser().setSigningKey(accessSecretKey).parseClaimsJws(token).getBody().getSubject();
+    }
+
+    // RefreshToken에서 userId값을 추출하는 메소드
+    private String getUserIdByRefreshToken(String token) {
+        log.info(token);
+        return Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(token).getBody().getSubject();
     }
 }

@@ -5,6 +5,7 @@ import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.domain.User;
 import com.example.foodking.user.dto.request.*;
+import com.example.foodking.user.dto.response.LoginTokenResDTO;
 import com.example.foodking.user.dto.response.ReadUserInfoResDTO;
 import com.example.foodking.user.repository.UserRepository;
 import com.example.foodking.user.service.CoolSmsService;
@@ -23,8 +24,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.util.AssertionErrors.fail;
 
 /*
@@ -95,17 +95,23 @@ public class ServiceTest {
     @DisplayName("로그인 테스트 -> (로그인 성공)")
     public void loginSuccess(){
         //given
-        given(userRepository.findUserByEmail(any(String.class))).willReturn(Optional.ofNullable(user));
-        given(jwtProvider.createToken(any(),any())).willReturn("token");
+        User spyUser = spy(user);
+
+        given(spyUser.getUserId()).willReturn(1L);
+        given(userRepository.findUserByEmail(any(String.class))).willReturn(Optional.ofNullable(spyUser));
+        given(jwtProvider.createAccessToken(any(Long.class),any())).willReturn("accessToken");
+        given(jwtProvider.createRefreshToken(any(Long.class),any())).willReturn("refreshToken");
         given(passwordEncoder.matches(any(String.class),any(String.class))).willReturn(true);
 
         //when
-        String token = userService.login(loginReqDTO);
+        LoginTokenResDTO loginTokenResDTO = userService.login(loginReqDTO);
 
         //then
-        assertThat(token).isEqualTo("token");
+        assertThat(loginTokenResDTO.getAccessToken()).isEqualTo("accessToken");
+        assertThat(loginTokenResDTO.getRefreshToken()).isEqualTo("refreshToken");
         verify(passwordEncoder,times(1)).matches(any(String.class),any(String.class));
-        verify(jwtProvider,times(1)).createToken(any(),any());
+        verify(jwtProvider,times(1)).createAccessToken(any(Long.class),any());
+        verify(jwtProvider,times(1)).createRefreshToken(any(Long.class),any());
     }
 
     @Test
@@ -121,7 +127,8 @@ public class ServiceTest {
         }catch (CommondException ex){
             verify(userRepository,times(1)).findUserByEmail(any(String.class));
             verify(passwordEncoder,times(0)).matches(any(String.class),any(String.class));
-            verify(jwtProvider,times(0)).createToken(any(),any());
+            verify(jwtProvider,times(0)).createAccessToken(any(Long.class),any());
+            verify(jwtProvider,times(0)).createRefreshToken(any(Long.class),any());
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.LOGIN_FAIL);
         }
     }
@@ -140,7 +147,8 @@ public class ServiceTest {
         }catch (CommondException ex){
             verify(userRepository,times(1)).findUserByEmail(any(String.class));
             verify(passwordEncoder,times(1)).matches(any(String.class),any(String.class));
-            verify(jwtProvider,times(0)).createToken(any(),any());
+            verify(jwtProvider,times(0)).createAccessToken(any(Long.class),any());
+            verify(jwtProvider,times(0)).createRefreshToken(any(Long.class),any());
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.LOGIN_FAIL);
         }
     }

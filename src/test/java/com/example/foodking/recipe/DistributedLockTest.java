@@ -1,6 +1,5 @@
 package com.example.foodking.recipe;
 
-import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.example.foodking.recipe.service.RecipeService;
 import com.example.foodking.reply.common.ReplySortType;

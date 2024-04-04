@@ -5,6 +5,7 @@ import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.domain.User;
 import com.example.foodking.user.dto.request.*;
+import com.example.foodking.user.dto.response.LoginTokenResDTO;
 import com.example.foodking.user.dto.response.ReadUserInfoResDTO;
 import com.example.foodking.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +27,16 @@ public class UserService {
 
     private final CoolSmsService coolSmsService;
 
-    public String login(LoginReqDTO loginReqDTO){
+    public LoginTokenResDTO login(LoginReqDTO loginReqDTO){
         User user = userRepository.findUserByEmail(loginReqDTO.getEmail())
                 .orElseThrow(() -> new CommondException(ExceptionCode.LOGIN_FAIL));
 
         isMatchPassword(loginReqDTO.getPassword(), user.getPassword(), ExceptionCode.LOGIN_FAIL);
-        
-        // 토큰 생성 후 반환
-        return jwtProvider.createToken(user.getUserId(), user.getAuthorities());
+
+        return LoginTokenResDTO.builder()
+                .accessToken(jwtProvider.createAccessToken(user.getUserId(), user.getAuthorities()))
+                .refreshToken(jwtProvider.createRefreshToken(user.getUserId(),user.getAuthorities()))
+                .build();
     }
 
     @Transactional

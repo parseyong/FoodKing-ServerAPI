@@ -18,7 +18,9 @@ public class RedissonConfig {
 
     @Value("${spring.redis.port}")
     private int port;
-
+    
+    // 나중에 (인증정보+토큰정보)레디스 / 분산락 레디스 / 캐싱레디스의 포트를 분리할 예장
+    
     private static final String REDISSON_HOST_PREFIX = "redis://";
 
     @Bean

@@ -29,12 +29,14 @@ import static com.example.foodking.recipe.domain.QRecipeInfo.recipeInfo;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PagingService {
+public class RecipePagingService {
 
     private final UserRepository userRepository;
     private final RecipeInfoRepository recipeInfoRepository;
 
-    public ReadRecipeInfoPagingResDTO readRecipeInfoPagingByCondition(Long userId, Long pageNum, ReadRecipeInfoPagingReqDTO readRecipeInfoPagingReqDTO, Object condition){
+    public ReadRecipeInfoPagingResDTO readRecipeInfoPagingByCondition
+            (Long userId, Long pageNum, ReadRecipeInfoPagingReqDTO readRecipeInfoPagingReqDTO, Object condition){
+
         RecipeSortType recipeSortType = readRecipeInfoPagingReqDTO.getRecipeSortType();
         String searchKeyword = readRecipeInfoPagingReqDTO.getSearchKeyword();
 

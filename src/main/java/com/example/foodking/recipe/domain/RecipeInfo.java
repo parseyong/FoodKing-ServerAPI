@@ -47,7 +47,7 @@ public class RecipeInfo extends TimeEntity {
     @Column(nullable = false, name = "visit_cnt")
     private Long visitCnt;
 
-    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private List<Reply> replyList;
 
     @ManyToOne
