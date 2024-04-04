@@ -58,4 +58,13 @@ public class RedissonConfig {
         config.setCodec(new JsonJacksonCodec());
         return Redisson.create(config);
     }
+
+    @Bean
+    @Qualifier("blackListRedis")
+    public RedissonClient blackListRedis() {
+        Config config = new Config();
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+port).setDatabase(5);
+        config.setCodec(new JsonJacksonCodec());
+        return Redisson.create(config);
+    }
 }

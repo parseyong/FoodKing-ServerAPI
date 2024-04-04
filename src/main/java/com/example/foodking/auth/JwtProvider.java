@@ -1,5 +1,6 @@
 package com.example.foodking.auth;
 
+import com.example.foodking.common.RedissonPrefix;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.domain.User;
@@ -40,8 +41,11 @@ public class JwtProvider {
     @Qualifier("tokenRedis")
     private final RedissonClient tokenRedis;
 
+    @Qualifier("blackListRedis")
+    private final RedissonClient blackListRedis;
+
     // 30분
-    private Long validAccessTokenTime = 30 * 60 * 1000L;
+    public Long validAccessTokenTime = 30 * 60 * 1000L;
     // 1달
     private Long validRefreshTokenTime = 30 * 24 * 60 * 60L;
     private final CustomUserDetailsService customUserDetailsService;
@@ -79,7 +83,8 @@ public class JwtProvider {
                 .compact();
         
         // 레디스에 RefreshToken 저장
-        RBucket<String> refreshTokenBucket = tokenRedis.getBucket(String.valueOf(userId));
+        RBucket<String> refreshTokenBucket = tokenRedis.getBucket
+                (RedissonPrefix.TOKEN_REDIS + String.valueOf(userId));
         refreshTokenBucket.set(refreshToken, validRefreshTokenTime, TimeUnit.SECONDS);
 
         return  refreshToken;
@@ -95,7 +100,7 @@ public class JwtProvider {
         String userId = getUserIdByRefreshToken(refreshToken);
 
         // 레디스에 존재하는 토큰인지 확인
-        String tokenInRedis = (String) tokenRedis.getBucket(userId).get();
+        String tokenInRedis = (String) tokenRedis.getBucket(RedissonPrefix.TOKEN_REDIS + userId).get();
 
         if(tokenInRedis == null || !tokenInRedis.equals(refreshToken))
             throw new CommondException(ExceptionCode.LOGIN_FAIL);
@@ -127,6 +132,10 @@ public class JwtProvider {
     // AccessToken의 유효성을 검증하는 메소드
     public boolean validateAccessToken(String token) {
         try {
+            RBucket<String> blackList = blackListRedis.getBucket(RedissonPrefix.BLACK_LIST_REDIS + token);
+            if(blackList.get() != null)
+                return false;
+
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(accessSecretKey).build().parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {

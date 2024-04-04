@@ -1,6 +1,7 @@
 package com.example.foodking.user.service;
 
 import com.example.foodking.auth.JwtProvider;
+import com.example.foodking.common.RedissonPrefix;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.domain.User;
@@ -10,9 +11,14 @@ import com.example.foodking.user.dto.response.ReadUserInfoResDTO;
 import com.example.foodking.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.RandomStringUtils;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,12 @@ public class UserService {
 
     private final CoolSmsService coolSmsService;
 
+    @Qualifier("tokenRedis")
+    private final RedissonClient tokenRedis;
+
+    @Qualifier("blackListRedis")
+    private final RedissonClient blackListRedis;
+
     public LoginTokenResDTO login(LoginReqDTO loginReqDTO){
         User user = userRepository.findUserByEmail(loginReqDTO.getEmail())
                 .orElseThrow(() -> new CommondException(ExceptionCode.LOGIN_FAIL));
@@ -37,6 +49,15 @@ public class UserService {
                 .accessToken(jwtProvider.createAccessToken(user.getUserId(), user.getAuthorities()))
                 .refreshToken(jwtProvider.createRefreshToken(user.getUserId(),user.getAuthorities()))
                 .build();
+    }
+
+    public void logOut(Long userId, String accessToken){
+        accessToken = accessToken.substring(7);
+
+        RBucket<String> blackList = blackListRedis.getBucket(RedissonPrefix.BLACK_LIST_REDIS + accessToken);
+        blackList.set(String.valueOf(userId), jwtProvider.validAccessTokenTime, TimeUnit.MILLISECONDS );
+
+        tokenRedis.getBucket(RedissonPrefix.TOKEN_REDIS + String.valueOf(userId)).delete();
     }
 
     @Transactional

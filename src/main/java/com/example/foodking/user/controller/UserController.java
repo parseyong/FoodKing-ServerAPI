@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -29,6 +30,15 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResDTO.of("로그인 성공!",userService.login(loginReqDTO)));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<CommonResDTO> logOut(
+            @AuthenticationPrincipal final Long userId,
+            HttpServletRequest request){
+
+        userService.logOut(userId,request.getHeader("Authorization"));
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("로그아웃 성공!",null));
     }
 
     @PostMapping("/users")

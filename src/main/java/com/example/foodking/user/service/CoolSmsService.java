@@ -1,5 +1,6 @@
 package com.example.foodking.user.service;
 
+import com.example.foodking.common.RedissonPrefix;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.user.dto.request.PhoneAuthReqDTO;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +63,7 @@ public class CoolSmsService {
         try {
             coolSms.send(params);
             //인증번호 확인을 위해 발급된 인증번호를 key-value(전화번호-인증번호)형태로 저장, 60초 후 자동 소멸
-            RBucket<String> authNumber = authNumberRedis.getBucket(phoneNum);
+            RBucket<String> authNumber = authNumberRedis.getBucket(RedissonPrefix.AUTH_NUM_REDIS + phoneNum);
             authNumber.set(String.valueOf(authenticationNumber), 60, TimeUnit.SECONDS);
 
         } catch (CoolsmsException e) {
@@ -76,19 +77,21 @@ public class CoolSmsService {
     //해당 전화번호에 발급된 인증번호에 대한 인증을 실행하는 메소드
     public void authNumCheck(PhoneAuthReqDTO phoneAuthReqDTO) {
 
-        RBucket<String> bucket = authNumberRedis.getBucket(phoneAuthReqDTO.getPhoneNum());
+        RBucket<String> bucket = authNumberRedis.getBucket
+                (RedissonPrefix.AUTH_NUM_REDIS + phoneAuthReqDTO.getPhoneNum());
         String authenticationNum = bucket.get();
 
         if(authenticationNum == null || !authenticationNum.equals(phoneAuthReqDTO.getAuthenticationNumber()))
             throw new CommondException(SMS_AUTHENTICATION_FAIL);
 
-        RBucket<String> isAuthBucket = isAuthNumberRedis.getBucket(phoneAuthReqDTO.getPhoneNum());
+        RBucket<String> isAuthBucket = isAuthNumberRedis.getBucket
+                (RedissonPrefix.IS_AUTH_NUM_REDIS + phoneAuthReqDTO.getPhoneNum());
         isAuthBucket.set("true",10,TimeUnit.MINUTES);
     }
 
     // 해당 전화번호가 인증이 완료된 전화번호인지 체크
     public boolean isAuthenticatedNum(String phoneNum){
-        RBucket<String> isAuthBucket = isAuthNumberRedis.getBucket(phoneNum);
+        RBucket<String> isAuthBucket = isAuthNumberRedis.getBucket(RedissonPrefix.IS_AUTH_NUM_REDIS + phoneNum);
         String isAuth = isAuthBucket.get();
 
         if(isAuth == null){
@@ -102,7 +105,7 @@ public class CoolSmsService {
         인증로직 완료 후 삭제해 버리면 로그인로직에서 예외 발생시 전화번호 인증을 다시해야하기때문에 회원가입이 완료된 후 삭제한다.
     */
     public void deleteAuthInfo(String phoneNum){
-        authNumberRedis.getBucket(phoneNum).delete();
-        isAuthNumberRedis.getBucket(phoneNum).delete();
+        authNumberRedis.getBucket(RedissonPrefix.AUTH_NUM_REDIS + phoneNum).delete();
+        isAuthNumberRedis.getBucket(RedissonPrefix.IS_AUTH_NUM_REDIS + phoneNum).delete();
     }
 }
