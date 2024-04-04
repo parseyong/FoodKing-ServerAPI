@@ -110,8 +110,12 @@ public class JwtProvider {
 
     // Http헤더에서 AccessToken을 가져오는 메소드
     public String resolveAccessToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
 
-        return request.getHeader("Auth");
+        if(token == null || !token.substring(0,7).equals("Bearer "))
+            return null;
+
+        return token.substring(7);
     }
 
     // 토큰에서 추출한 userId값을 통해 인증객체를 생성하는 메소드
