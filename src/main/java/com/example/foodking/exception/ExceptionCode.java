@@ -10,7 +10,7 @@ public enum ExceptionCode {
     NICKNAME_DUPLICATED(HttpStatus.BAD_REQUEST,"중복된 닉네임입니다","nickName"),
     PASSWORD_NOT_COLLECT(HttpStatus.BAD_REQUEST,"비밀번호가 일치하지 않습니다.","password"),
     ACCESS_FAIL_USER(HttpStatus.FORBIDDEN,"해당 유저에 대한 권한이 없습니다",null),
-    TOKEN_TYPE_EXCEPTION(HttpStatus.UNAUTHORIZED,"토큰 타입이 올바르지 않습니다.",null),
+    PHONE_NUMBER_DUPLICATED(HttpStatus.BAD_REQUEST,"해당 번호로 이미 가입된 계정이 있습니다.","phoneNum"),
 
     // Login, CoolSMS EXCEPTION
     LOGIN_FAIL(HttpStatus.BAD_REQUEST,"로그인에 실패하였습니다.",null),

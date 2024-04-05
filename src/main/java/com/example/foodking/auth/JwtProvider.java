@@ -11,10 +11,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.redisson.api.RBucket;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,10 +38,10 @@ public class JwtProvider {
     private String refreshSecretKey;
 
     @Qualifier("tokenRedis")
-    private final RedissonClient tokenRedis;
+    private final RedisTemplate<String,String> tokenRedis;
 
     @Qualifier("blackListRedis")
-    private final RedissonClient blackListRedis;
+    private final RedisTemplate<String,String> blackListRedis;
 
     // 30분
     public Long validAccessTokenTime = 30 * 60 * 1000L;
@@ -84,9 +83,11 @@ public class JwtProvider {
                 .compact();
         
         // 레디스에 RefreshToken 저장
-        RBucket<String> refreshTokenBucket = tokenRedis.getBucket
-                (RedissonPrefix.TOKEN_REDIS + String.valueOf(userId));
-        refreshTokenBucket.set(refreshToken, validRefreshTokenTime, TimeUnit.SECONDS);
+        tokenRedis.opsForValue().set(
+                RedissonPrefix.TOKEN_REDIS + String.valueOf(userId),
+                refreshToken,
+                validRefreshTokenTime,
+                TimeUnit.SECONDS);
 
         return  refreshToken;
     }
@@ -101,7 +102,7 @@ public class JwtProvider {
         String userId = getUserIdByRefreshToken(refreshToken);
 
         // 레디스에 존재하는 토큰인지 확인
-        String tokenInRedis = (String) tokenRedis.getBucket(RedissonPrefix.TOKEN_REDIS + userId).get();
+        String tokenInRedis = tokenRedis.opsForValue().get(RedissonPrefix.TOKEN_REDIS + userId);
 
         if(tokenInRedis == null || !tokenInRedis.equals(refreshToken))
             throw new CommondException(ExceptionCode.LOGIN_FAIL);
@@ -133,8 +134,8 @@ public class JwtProvider {
     // AccessToken의 유효성을 검증하는 메소드
     public boolean validateAccessToken(String token) {
         try {
-            RBucket<String> blackList = blackListRedis.getBucket(RedissonPrefix.BLACK_LIST_REDIS + token);
-            if(blackList.get() != null)
+            String blackList = blackListRedis.opsForValue().get(RedissonPrefix.BLACK_LIST_REDIS + token);
+            if(blackList != null)
                 return false;
 
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(accessSecretKey).build().parseClaimsJws(token);

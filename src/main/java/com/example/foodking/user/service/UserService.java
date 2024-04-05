@@ -11,9 +11,8 @@ import com.example.foodking.user.dto.response.ReadUserInfoResDTO;
 import com.example.foodking.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.RandomStringUtils;
-import org.redisson.api.RBucket;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,10 +33,11 @@ public class UserService {
     private final CoolSmsService coolSmsService;
 
     @Qualifier("tokenRedis")
-    private final RedissonClient tokenRedis;
+    private final RedisTemplate<String,String> tokenRedis;
 
     @Qualifier("blackListRedis")
-    private final RedissonClient blackListRedis;
+    private final RedisTemplate<String,String> blackListRedis;
+
 
     public LoginTokenResDTO login(LoginReqDTO loginReqDTO){
         User user = userRepository.findUserByEmail(loginReqDTO.getEmail())
@@ -51,13 +51,17 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
     public void logOut(Long userId, String accessToken){
         accessToken = accessToken.substring(7);
 
-        RBucket<String> blackList = blackListRedis.getBucket(RedissonPrefix.BLACK_LIST_REDIS + accessToken);
-        blackList.set(String.valueOf(userId), jwtProvider.validAccessTokenTime, TimeUnit.MILLISECONDS );
+        blackListRedis.opsForValue().set(
+                RedissonPrefix.BLACK_LIST_REDIS + accessToken,
+                String.valueOf(userId),
+                jwtProvider.validAccessTokenTime,
+                TimeUnit.MILLISECONDS);
 
-        tokenRedis.getBucket(RedissonPrefix.TOKEN_REDIS + String.valueOf(userId)).delete();
+        tokenRedis.delete(RedissonPrefix.TOKEN_REDIS + String.valueOf(userId));
     }
 
     @Transactional
@@ -72,6 +76,10 @@ public class UserService {
         // 닉네임 중복체크
         if(nickNameDuplicatedChecking(addUserReqDTO.getNickName()))
             throw new CommondException(ExceptionCode.NICKNAME_DUPLICATED);
+
+        // 휴대폰번호로 가입된 계정이 있는 지 체크
+        if(userRepository.existsByPhoneNum(addUserReqDTO.getPhoneNum()))
+            throw new CommondException(ExceptionCode.PHONE_NUMBER_DUPLICATED);
         
         // 회원가입 시 입력하는 두개의 비밀번호 일치여부 체크
         if(!addUserReqDTO.getPassword().equals(addUserReqDTO.getPasswordRepeat()))

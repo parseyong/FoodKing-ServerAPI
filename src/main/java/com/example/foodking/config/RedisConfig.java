@@ -1,0 +1,141 @@
+package com.example.foodking.config;
+
+import lombok.RequiredArgsConstructor;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.codec.JsonJacksonCodec;
+import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+@Configuration
+@RequiredArgsConstructor
+public class RedisConfig {
+
+    @Value("${spring.redis.host}")
+    private String host;
+
+    @Value("${spring.redis.lock.port}")
+    private int lockPort;
+
+    @Value("${spring.redis.auth.port}")
+    private int authPort;
+
+    @Value("${spring.redis.cache.port}")
+    private int cachePort;
+
+    private static final String REDISSON_HOST_PREFIX = "redis://";
+
+    @Bean
+    public RedissonClient redissonClient() {
+        Config config = new Config();
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+ lockPort);
+        config.setCodec(new JsonJacksonCodec());
+        return Redisson.create(config);
+    }
+
+    @Bean({"redisConnectionFactory", "cacheRedisConnectionFactory"})
+    public RedisConnectionFactory cacheRedisConnectionFactory() {
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+        redisStandaloneConfiguration.setHostName(host);
+        redisStandaloneConfiguration.setPort(cachePort);
+        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(
+                redisStandaloneConfiguration);
+
+        return lettuceConnectionFactory;
+    }
+
+    @Bean
+    public RedisConnectionFactory authRedisConnectionFactory() {
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+        redisStandaloneConfiguration.setHostName(host);
+        redisStandaloneConfiguration.setPort(authPort);
+        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(
+                redisStandaloneConfiguration);
+
+        return lettuceConnectionFactory;
+    }
+
+    @Bean
+    @Qualifier("authNumberRedis")
+    public RedisTemplate<String, String> authNumberRedis() {
+
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(authRedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        redisTemplate.setEnableTransactionSupport(true);
+
+        return redisTemplate;
+    }
+
+    @Bean
+    @Qualifier("isAuthNumberRedis")
+    public RedisTemplate<String, String> isAuthNumberRedis() {
+
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(authRedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        redisTemplate.setEnableTransactionSupport(true);
+
+        return redisTemplate;
+    }
+
+    @Bean
+    @Qualifier("tokenRedis")
+    public RedisTemplate<String, String> tokenRedis() {
+
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(authRedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        redisTemplate.setEnableTransactionSupport(true);
+
+        return redisTemplate;
+    }
+
+    @Bean
+    @Qualifier("blackListRedis")
+    public RedisTemplate<String,String> blackListRedis() {
+
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(authRedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        redisTemplate.setEnableTransactionSupport(true);
+
+        return redisTemplate;
+    }
+
+    @Bean
+    @Qualifier("cacheRedis")
+    public RedisTemplate<String, Object> cacheRedis() {
+        // 캐시서버 포트를 열어놓고 잘 열리는지 테스트하기 위해 임시로 생성해 둠
+
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(cacheRedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        redisTemplate.setEnableTransactionSupport(true);
+
+        return redisTemplate;
+    }
+}
