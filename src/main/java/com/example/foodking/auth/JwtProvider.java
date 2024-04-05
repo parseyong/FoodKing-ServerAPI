@@ -50,6 +50,7 @@ public class JwtProvider {
     private Long validRefreshTokenTime = 30 * 24 * 60 * 60L;
     private final CustomUserDetailsService customUserDetailsService;
 
+
     @PostConstruct
     protected void init() {
         accessSecretKey = Base64.getEncoder().encodeToString(accessSecretKey.getBytes());

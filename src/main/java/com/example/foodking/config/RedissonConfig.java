@@ -9,6 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedissonConfig {
@@ -16,18 +20,22 @@ public class RedissonConfig {
     @Value("${spring.redis.host}")
     private String host;
 
-    @Value("${spring.redis.port}")
-    private int port;
-    
-    // 나중에 (인증정보+토큰정보)레디스 / 분산락 레디스 / 캐싱레디스의 포트를 분리할 예장
-    
+    @Value("${spring.redis.lock.port}")
+    private int lockPort;
+
+    @Value("${spring.redis.auth.port}")
+    private int authPort;
+
+    @Value("${spring.redis.cache.port}")
+    private int cachePort;
+
     private static final String REDISSON_HOST_PREFIX = "redis://";
 
     @Bean
     @Primary
     public RedissonClient redissonClient() {
         Config config = new Config();
-        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+port).setDatabase(1);
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+ lockPort);
         config.setCodec(new JsonJacksonCodec());
         return Redisson.create(config);
     }
@@ -36,7 +44,7 @@ public class RedissonConfig {
     @Qualifier("authNumberRedis")
     public RedissonClient authNumberRedis() {
         Config config = new Config();
-        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+port).setDatabase(2);
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+ authPort);
         config.setCodec(new JsonJacksonCodec());
         return Redisson.create(config);
     }
@@ -45,7 +53,7 @@ public class RedissonConfig {
     @Qualifier("isAuthNumberRedis")
     public RedissonClient isAuthNumberRedis() {
         Config config = new Config();
-        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+port).setDatabase(3);
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+ authPort);
         config.setCodec(new JsonJacksonCodec());
         return Redisson.create(config);
     }
@@ -54,7 +62,7 @@ public class RedissonConfig {
     @Qualifier("tokenRedis")
     public RedissonClient tokenRedis() {
         Config config = new Config();
-        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+port).setDatabase(4);
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+ authPort);
         config.setCodec(new JsonJacksonCodec());
         return Redisson.create(config);
     }
@@ -63,8 +71,25 @@ public class RedissonConfig {
     @Qualifier("blackListRedis")
     public RedissonClient blackListRedis() {
         Config config = new Config();
-        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+port).setDatabase(5);
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+authPort);
         config.setCodec(new JsonJacksonCodec());
         return Redisson.create(config);
+    }
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        return new LettuceConnectionFactory(host, cachePort);
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate() {
+
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+
+        return redisTemplate;
     }
 }
