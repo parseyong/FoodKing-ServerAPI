@@ -4,11 +4,10 @@ import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.common.RecipeSortType;
-import com.example.foodking.recipe.dto.recipeInfo.request.ReadRecipeInfoPagingReqDTO;
-import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoPagingResDTO;
-import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoResDTO;
+import com.example.foodking.recipe.dto.recipeInfo.request.ReadRecipeInfoPagingReq;
+import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoPagingRes;
+import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoRes;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
-import com.example.foodking.user.repository.UserRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -30,49 +29,65 @@ import static com.example.foodking.recipe.domain.QRecipeInfo.recipeInfo;
 @Transactional(readOnly = true)
 public class RecipePagingService {
 
-    private final UserRepository userRepository;
     private final RecipeInfoRepository recipeInfoRepository;
 
-    public ReadRecipeInfoPagingResDTO readRecipeInfoPagingByCondition
-            (Long userId, Long pageNum, ReadRecipeInfoPagingReqDTO readRecipeInfoPagingReqDTO, Object condition){
+    public ReadRecipeInfoPagingRes readRecipeInfoPagingByCondition(ReadRecipeInfoPagingReq readRecipeInfoPagingReq){
 
-        RecipeSortType recipeSortType = readRecipeInfoPagingReqDTO.getRecipeSortType();
-        String searchKeyword = readRecipeInfoPagingReqDTO.getSearchKeyword();
-
-        Pageable pageable= PageRequest.of((int) (pageNum-1),10);
+        Object condition = readRecipeInfoPagingReq.getCondition();
+        String searchKeyword = readRecipeInfoPagingReq.getSearchKeyword();
+        Long userId = readRecipeInfoPagingReq.getUserId();
+        RecipeSortType recipeSortType = readRecipeInfoPagingReq.getRecipeSortType();
+        Pageable pageable= PageRequest.of((int) (readRecipeInfoPagingReq.getPageNum()-1),10);
 
         // 조건(condition)에 따라 동적으로 WHERE절을 생성
         BooleanBuilder builder = getBuilder(condition,searchKeyword,userId);
 
         // 해당 조건에 대한 전체 결과 수 측정
-        Long recipeCnt = recipeInfoRepository.findRecipeInfoTotalCnt(builder,condition);
+        Long recipeCnt = recipeInfoRepository.findRecipeInfoTotalCnt(builder);
 
         // 쿼리 실행
-        List<ReadRecipeInfoResDTO> readRecipeInfoResDTOList =
-                recipeInfoRepository.findRecipeInfoPagingByCondition(pageable ,createOrderSpecifier(recipeSortType), builder, condition);
+        List<ReadRecipeInfoRes> readRecipeInfoResDTOList =
+                recipeInfoRepository.findRecipeInfoPagingByCondition(builder,createOrderSpecifier(recipeSortType),pageable);
 
         // 존재하지 않는 페이지일 경우 예외를 던짐
         if(readRecipeInfoResDTOList.size() == 0)
             throw new CommondException(ExceptionCode.NOT_EXIST_PAGE);
 
-        return ReadRecipeInfoPagingResDTO.toDTO(readRecipeInfoResDTOList,recipeCnt);
+        return ReadRecipeInfoPagingRes.toDTO(readRecipeInfoResDTOList,recipeCnt);
+    }
+
+    public ReadRecipeInfoPagingRes readLikedRecipeInfoPaging(ReadRecipeInfoPagingReq readRecipeInfoPagingReq){
+
+        String searchKeyword = readRecipeInfoPagingReq.getSearchKeyword();
+        Long userId = readRecipeInfoPagingReq.getUserId();
+        RecipeSortType recipeSortType = readRecipeInfoPagingReq.getRecipeSortType();
+        Pageable pageable= PageRequest.of((int) (readRecipeInfoPagingReq.getPageNum()-1),10);
+
+        // 해당 조건에 대한 전체 결과 수 측정
+        Long recipeCnt = recipeInfoRepository.findLikedRecipeInfoCnt(searchKeyword,userId);
+
+        // 쿼리 실행
+        List<ReadRecipeInfoRes> readRecipeInfoResDTOList =
+                recipeInfoRepository.findLikedRecipeInfoList(createOrderSpecifier(recipeSortType),searchKeyword,pageable,userId);
+
+        // 존재하지 않는 페이지일 경우 예외를 던짐
+        if(readRecipeInfoResDTOList.size() == 0)
+            throw new CommondException(ExceptionCode.NOT_EXIST_PAGE);
+
+        return ReadRecipeInfoPagingRes.toDTO(readRecipeInfoResDTOList, recipeCnt);
     }
 
     // 동적으로 쿼리의 WHERE절을 생성하는 메소드
     private BooleanBuilder getBuilder(Object condition, String searchKeyword, Long userId){
         BooleanBuilder builder = new BooleanBuilder();
 
-        if(condition instanceof RecipeInfoType ){
+        if(condition instanceof RecipeInfoType){
             // 레시피 타입으로 레시피 조회 시
             builder.and(recipeInfo.recipeInfoType.eq((RecipeInfoType) condition));
         }
         else if(condition instanceof String && condition.equals("mine")){
             // 자신이 쓴 레시피 조회 시
             builder.and(recipeInfo.user.userId.eq(userId));
-        }
-        else if(condition instanceof String && condition.equals("like")){
-            // 좋아요 누른 레시피 조회 시
-            builder.and(recipeEmotion.user.userId.eq(userId));
         }
 
         if(searchKeyword != null){
@@ -104,5 +119,4 @@ public class RecipePagingService {
 
         return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);
     }
-
 }

@@ -13,4 +13,5 @@ public interface RecipeEmotionRepository extends CrudRepository<RecipeEmotion,Lo
     Optional<RecipeEmotion> findByRecipeInfoAndUser(RecipeInfo recipeInfo, User user);
 
     Long countByRecipeInfoAndEmotionType(RecipeInfo recipeInfo, EmotionType emotionType);
+
 }

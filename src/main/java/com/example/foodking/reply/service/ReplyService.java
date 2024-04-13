@@ -7,7 +7,7 @@ import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.example.foodking.reply.common.ReplySortType;
 import com.example.foodking.reply.domain.Reply;
-import com.example.foodking.reply.dto.response.ReadReplyResDTO;
+import com.example.foodking.reply.dto.response.ReadReplyRes;
 import com.example.foodking.reply.repository.ReplyRepository;
 import com.example.foodking.user.domain.User;
 import com.example.foodking.user.repository.UserRepository;
@@ -45,21 +45,27 @@ public class ReplyService {
         return replyRepository.save(reply).getReplyId();
     }
 
-    public List<ReadReplyResDTO> readReply(RecipeInfo recipeInfo, Long userId, ReplySortType replySortType){
+    public List<ReadReplyRes> readReply(RecipeInfo recipeInfo, Long userId, ReplySortType replySortType){
 
         List<Reply> replyList = recipeInfo.getReplyList();
-        List<ReadReplyResDTO> readReplyResDTOList = replyList.stream()
+
+        List<ReadReplyRes> readReplyResList = replyList.stream()
                 .map(entity -> {
+                    
+                    // 각 댓글의 좋아요 개수 가져오기
                     Long replyEmotionCnt = emotionService.readReplyEmotionCnt(entity);
+                    // 댓글 작성자 정보 가져오기
                     User user = entity.getUser();
+                    // 자신이 쓴 댓글인지 여부 반환
                     if(isMyReply(userId,user))
-                        return ReadReplyResDTO.toDTO(entity, user.getNickName(), true,replyEmotionCnt);
+                        return ReadReplyRes.toDTO(entity, user.getNickName(), true,replyEmotionCnt);
                     else
-                        return ReadReplyResDTO.toDTO(entity, user.getNickName(), false,replyEmotionCnt);
+                        return ReadReplyRes.toDTO(entity, user.getNickName(), false,replyEmotionCnt);
                 })
                 .sorted(getComparator(replySortType))
                 .collect(Collectors.toList());
-        return  readReplyResDTOList;
+        
+        return readReplyResList;
     }
 
     @Transactional
@@ -95,13 +101,13 @@ public class ReplyService {
         return true;
     }
 
-    private Comparator<ReadReplyResDTO> getComparator(ReplySortType replySortType) {
+    private Comparator<ReadReplyRes> getComparator(ReplySortType replySortType) {
         switch (replySortType) {
             case LIKE:
-                return Comparator.comparing(ReadReplyResDTO::getEmotionCnt).reversed();
+                return Comparator.comparing(ReadReplyRes::getEmotionCnt).reversed();
             // 다른 정렬 기준에 따른 case 추가
             default:
-                return Comparator.comparing(ReadReplyResDTO::getRegDate);
+                return Comparator.comparing(ReadReplyRes::getRegDate);
         }
     }
 

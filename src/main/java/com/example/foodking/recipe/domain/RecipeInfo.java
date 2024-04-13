@@ -1,7 +1,9 @@
 package com.example.foodking.recipe.domain;
 
 import com.example.foodking.common.TimeEntity;
+import com.example.foodking.ingredient.domain.Ingredient;
 import com.example.foodking.recipe.common.RecipeInfoType;
+import com.example.foodking.recipeWayInfo.domain.RecipeWayInfo;
 import com.example.foodking.reply.domain.Reply;
 import com.example.foodking.user.domain.User;
 import lombok.AccessLevel;

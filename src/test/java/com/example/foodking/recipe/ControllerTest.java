@@ -4,15 +4,15 @@ import com.example.foodking.auth.JwtProvider;
 import com.example.foodking.config.SecurityConfig;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
+import com.example.foodking.ingredient.dto.request.SaveIngredientReq;
 import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.controller.RecipeController;
-import com.example.foodking.recipe.dto.ingredient.request.SaveIngredientReqDTO;
-import com.example.foodking.recipe.dto.recipe.request.SaveRecipeReqDTO;
-import com.example.foodking.recipe.dto.recipe.response.ReadRecipeResDTO;
-import com.example.foodking.recipe.dto.recipeInfo.request.SaveRecipeInfoReqDTO;
-import com.example.foodking.recipe.dto.recipeWayInfo.request.SaveRecipeWayInfoReqDTO;
+import com.example.foodking.recipe.dto.recipe.request.SaveRecipeReq;
+import com.example.foodking.recipe.dto.recipe.response.ReadRecipeRes;
+import com.example.foodking.recipe.dto.recipeInfo.request.SaveRecipeInfoReq;
 import com.example.foodking.recipe.service.RecipePagingService;
 import com.example.foodking.recipe.service.RecipeService;
+import com.example.foodking.recipeWayInfo.dto.request.SaveRecipeWayInfoReqDTO;
 import com.example.foodking.reply.common.ReplySortType;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,14 +54,14 @@ public class ControllerTest {
     private JwtProvider jwtProvider;
     @Autowired
     private MockMvc mockMvc;
-    private List<SaveIngredientReqDTO> saveIngredientReqDTOList;
+    private List<SaveIngredientReq> saveIngredientReqList;
     private List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList;
-    private SaveRecipeReqDTO saveRecipeReqDTO;
-    private SaveRecipeInfoReqDTO saveRecipeInfoReqDTO;
+    private SaveRecipeReq saveRecipeReq;
+    private SaveRecipeInfoReq saveRecipeInfoReq;
 
     @BeforeEach
     void beforeEach(){
-        this.saveRecipeInfoReqDTO = SaveRecipeInfoReqDTO.builder()
+        this.saveRecipeInfoReq = SaveRecipeInfoReq.builder()
                 .recipeInfoType(RecipeInfoType.KOREAN)
                 .recipeName("테스트레시피 이름")
                 .recipeTip("테스트레시피 팁")
@@ -70,16 +70,16 @@ public class ControllerTest {
                 .ingredentCost(30L)
                 .build();
 
-        SaveIngredientReqDTO saveIngredientReqDTO1 = SaveIngredientReqDTO.builder()
+        SaveIngredientReq saveIngredientReq1 = SaveIngredientReq.builder()
                 .ingredientName("재료명1")
                 .ingredientAmount("재료 수량1")
                 .build();
-        SaveIngredientReqDTO saveIngredientReqDTO2 = SaveIngredientReqDTO.builder()
+        SaveIngredientReq saveIngredientReq2 = SaveIngredientReq.builder()
                 .ingredientName("재료명2")
                 .ingredientAmount("재료 수량2")
                 .build();
 
-        this.saveIngredientReqDTOList = new ArrayList<>(List.of(saveIngredientReqDTO1, saveIngredientReqDTO2));
+        this.saveIngredientReqList = new ArrayList<>(List.of(saveIngredientReq1, saveIngredientReq2));
 
         SaveRecipeWayInfoReqDTO saveRecipeWayInfoReqDTO1 = SaveRecipeWayInfoReqDTO.builder()
                 .recipeOrder(1L)
@@ -91,9 +91,9 @@ public class ControllerTest {
                 .build();
         this.saveRecipeWayInfoReqDTOList = new ArrayList<>(List.of(saveRecipeWayInfoReqDTO1, saveRecipeWayInfoReqDTO2));
 
-        this.saveRecipeReqDTO = SaveRecipeReqDTO.builder()
-                .saveRecipeInfoReqDTO(saveRecipeInfoReqDTO)
-                .saveIngredientReqDTOList(saveIngredientReqDTOList)
+        this.saveRecipeReq = SaveRecipeReq.builder()
+                .saveRecipeInfoReq(saveRecipeInfoReq)
+                .saveIngredientReqList(saveIngredientReqList)
                 .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
                 .build();
     }
@@ -105,7 +105,7 @@ public class ControllerTest {
         //given
         makeAuthentication();
         Gson gson = new Gson();
-        String requestBody = gson.toJson(saveRecipeReqDTO);
+        String requestBody = gson.toJson(saveRecipeReq);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -115,7 +115,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("레시피 등록완료"))
                 .andDo(print());
 
-        verify(recipeService,times(1)).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
+        verify(recipeService,times(1)).addRecipe(any(SaveRecipeReq.class),any(Long.class));
     }
 
     @Test
@@ -124,7 +124,7 @@ public class ControllerTest {
     public void addRecipeInfoFail() throws Exception {
         //given
         Gson gson = new Gson();
-        String requestBody = gson.toJson(saveRecipeReqDTO);
+        String requestBody = gson.toJson(saveRecipeReq);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -134,7 +134,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
 
-        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
+        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReq.class),any(Long.class));
     }
 
     @Test
@@ -143,12 +143,12 @@ public class ControllerTest {
     public void addRecipeInfoFai2() throws Exception {
         //given
         makeAuthentication();
-        SaveRecipeReqDTO saveRecipeReqDTO = SaveRecipeReqDTO.builder()
-                .saveIngredientReqDTOList(saveIngredientReqDTOList)
+        SaveRecipeReq saveRecipeReq = SaveRecipeReq.builder()
+                .saveIngredientReqList(saveIngredientReqList)
                 .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
                 .build();
         Gson gson = new Gson();
-        String requestBody = gson.toJson(saveRecipeReqDTO);
+        String requestBody = gson.toJson(saveRecipeReq);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -158,7 +158,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
 
-        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
+        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReq.class),any(Long.class));
     }
 
     @Test
@@ -168,8 +168,8 @@ public class ControllerTest {
         //given
         makeAuthentication();
         Gson gson = new Gson();
-        String requestBody = gson.toJson(saveRecipeReqDTO);
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(recipeService).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
+        String requestBody = gson.toJson(saveRecipeReq);
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(recipeService).addRecipe(any(SaveRecipeReq.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -179,7 +179,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
 
-        verify(recipeService,times(1)).addRecipe(any(SaveRecipeReqDTO.class),any(Long.class));
+        verify(recipeService,times(1)).addRecipe(any(SaveRecipeReq.class),any(Long.class));
     }
 
     @Test
@@ -188,7 +188,7 @@ public class ControllerTest {
         //given
         makeAuthentication();
         Gson gson = new Gson();
-        String requestbody = gson.toJson(saveRecipeReqDTO);
+        String requestbody = gson.toJson(saveRecipeReq);
 
         //when, then
         this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
@@ -198,7 +198,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("레시피 수정완료"))
                 .andDo(print());
 
-        verify(recipeService,times(1)).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
+        verify(recipeService,times(1)).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -206,7 +206,7 @@ public class ControllerTest {
     public void updateRecipeFail1() throws Exception {
         //given
         Gson gson = new Gson();
-        String requestbody = gson.toJson(saveRecipeReqDTO);
+        String requestbody = gson.toJson(saveRecipeReq);
 
         //when, then
         this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
@@ -216,14 +216,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
 
-        verify(recipeService,times(0)).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
+        verify(recipeService,times(0)).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
     @DisplayName("레시피 수정 테스트 -> (실패 : 입력값 공백)")
     public void updateRecipeFail2() throws Exception {
         //given
-        SaveRecipeInfoReqDTO saveRecipeInfoReqDTO = SaveRecipeInfoReqDTO.builder()
+        SaveRecipeInfoReq saveRecipeInfoReq = SaveRecipeInfoReq.builder()
                 .recipeInfoType(RecipeInfoType.KOREAN)
                 .recipeName("")
                 .recipeTip("")
@@ -232,13 +232,13 @@ public class ControllerTest {
                 .ingredentCost(null)
                 .build();
 
-        SaveRecipeReqDTO saveRecipeReqDTO = SaveRecipeReqDTO.builder()
-                .saveRecipeInfoReqDTO(saveRecipeInfoReqDTO)
-                .saveIngredientReqDTOList(saveIngredientReqDTOList)
+        SaveRecipeReq saveRecipeReq = SaveRecipeReq.builder()
+                .saveRecipeInfoReq(saveRecipeInfoReq)
+                .saveIngredientReqList(saveIngredientReqList)
                 .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
                 .build();
         Gson gson = new Gson();
-        String requestbody = gson.toJson(saveRecipeReqDTO);
+        String requestbody = gson.toJson(saveRecipeReq);
         makeAuthentication();
 
         //when, then
@@ -249,7 +249,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
 
-        verify(recipeService,times(0)).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
+        verify(recipeService,times(0)).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -257,7 +257,7 @@ public class ControllerTest {
     public void updateRecipeFail3() throws Exception {
         //given
         Gson gson = new Gson();
-        String requestbody = gson.toJson(saveRecipeReqDTO);
+        String requestbody = gson.toJson(saveRecipeReq);
         makeAuthentication();
 
         //when, then
@@ -267,7 +267,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
                 .andDo(print());
 
-        verify(recipeService,times(0)).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
+        verify(recipeService,times(0)).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -275,7 +275,7 @@ public class ControllerTest {
     public void updateRecipeFail4() throws Exception {
         //given
         Gson gson = new Gson();
-        String requestbody = gson.toJson(saveRecipeReqDTO);
+        String requestbody = gson.toJson(saveRecipeReq);
         makeAuthentication();
 
         //when, then
@@ -286,7 +286,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."))
                 .andDo(print());
 
-        verify(recipeService,times(0)).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
+        verify(recipeService,times(0)).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -294,9 +294,9 @@ public class ControllerTest {
     public void updateRecipeFail6() throws Exception {
         //given
         Gson gson = new Gson();
-        String requestbody = gson.toJson(saveRecipeReqDTO);
+        String requestbody = gson.toJson(saveRecipeReq);
         makeAuthentication();
-        doThrow(new CommondException(NOT_EXIST_RECIPEINFO)).when(recipeService).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
+        doThrow(new CommondException(NOT_EXIST_RECIPEINFO)).when(recipeService).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
@@ -306,7 +306,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
                 .andDo(print());
 
-        verify(recipeService,times(1)).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
+        verify(recipeService,times(1)).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -314,9 +314,9 @@ public class ControllerTest {
     public void updateRecipeFail7() throws Exception {
         //given
         Gson gson = new Gson();
-        String requestbody = gson.toJson(saveRecipeReqDTO);
+        String requestbody = gson.toJson(saveRecipeReq);
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_RECIPE)).when(recipeService).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
+        doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_RECIPE)).when(recipeService).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
@@ -326,7 +326,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("해당 레시피에 대해 권한이 없습니다"))
                 .andDo(print());
 
-        verify(recipeService,times(1)).updateRecipe(any(SaveRecipeReqDTO.class),any(Long.class),any(Long.class));
+        verify(recipeService,times(1)).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -430,8 +430,8 @@ public class ControllerTest {
     public void readRecipeSuccess() throws Exception {
         // given
         makeAuthentication();
-        ReadRecipeResDTO readRecipeResDTO = ReadRecipeResDTO.builder().build();
-        given(recipeService.readRecipe(any(Long.class),any(Long.class),any())).willReturn(readRecipeResDTO);
+        ReadRecipeRes readRecipeRes = ReadRecipeRes.builder().build();
+        given(recipeService.readRecipe(any(Long.class),any(Long.class),any())).willReturn(readRecipeRes);
 
         //when, then
         this.mockMvc.perform(get("/recipes/{recipeInfoId}",1L)

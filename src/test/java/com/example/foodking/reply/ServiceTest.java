@@ -7,7 +7,7 @@ import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.example.foodking.reply.common.ReplySortType;
 import com.example.foodking.reply.domain.Reply;
-import com.example.foodking.reply.dto.response.ReadReplyResDTO;
+import com.example.foodking.reply.dto.response.ReadReplyRes;
 import com.example.foodking.reply.repository.ReplyRepository;
 import com.example.foodking.reply.service.ReplyService;
 import com.example.foodking.user.domain.User;
@@ -254,7 +254,7 @@ public class ServiceTest {
         replyList.add(reply3);
 
         // when
-        List<ReadReplyResDTO> result = replyService.readReply(recipeInfoSpy,1L, ReplySortType.LATEST);
+        List<ReadReplyRes> result = replyService.readReply(recipeInfoSpy,1L, ReplySortType.LATEST);
 
         // then
         verify(emotionService,times(3)).readReplyEmotionCnt(any(Reply.class));
@@ -293,7 +293,7 @@ public class ServiceTest {
         replyList.add(reply3);
 
         // when
-        List<ReadReplyResDTO> result = replyService.readReply(recipeInfoSpy,1L,ReplySortType.LIKE);
+        List<ReadReplyRes> result = replyService.readReply(recipeInfoSpy,1L,ReplySortType.LIKE);
 
         // then
         verify(emotionService,times(3)).readReplyEmotionCnt(any(Reply.class));

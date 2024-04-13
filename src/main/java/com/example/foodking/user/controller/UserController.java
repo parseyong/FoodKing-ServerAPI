@@ -27,16 +27,16 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResDTO> login(@RequestBody @Valid LoginReqDTO loginReqDTO){
+    public ResponseEntity<CommonResDTO> login(@RequestBody @Valid LoginReq loginReq){
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(CommonResDTO.of("로그인 성공!",userService.login(loginReqDTO)));
+                .body(CommonResDTO.of("로그인 성공!",userService.login(loginReq)));
     }
 
     @PostMapping("/users")
-    public ResponseEntity<CommonResDTO> addUser(@RequestBody @Valid AddUserReqDTO addUserReqDTO){
+    public ResponseEntity<CommonResDTO> addUser(@RequestBody @Valid AddUserReq addUserReq){
 
-        userService.addUser(addUserReqDTO);
+        userService.addUser(addUserReq);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("회원가입 완료",null));
     }
 
@@ -66,9 +66,9 @@ public class UserController {
 
     // 새로운 비밀번호를 생성해 반환하므로 patch요청으로 받는다.
     @PatchMapping("/password/find")
-    public ResponseEntity<CommonResDTO> findPassword(@RequestBody @Valid FindPwdReqDTO findPwdReqDTO){
+    public ResponseEntity<CommonResDTO> findPassword(@RequestBody @Valid FindPwdReq findPwdReq){
 
-        String password = userService.findPassword(findPwdReqDTO);
+        String password = userService.findPassword(findPwdReq);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("비밀번호 찾기성공",password));
     }
 
@@ -82,18 +82,18 @@ public class UserController {
     @PatchMapping("/users")
     public ResponseEntity<CommonResDTO> updateUser(
             @AuthenticationPrincipal final Long userId,
-            @RequestBody @Valid UpdateUserInfoReqDTO updateUserInfoReqDTO){
+            @RequestBody @Valid UpdateUserInfoReq updateUserInfoReq){
 
-        userService.updateUser(updateUserInfoReqDTO,userId);
+        userService.updateUser(updateUserInfoReq,userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 변경 성공",null));
     }
 
     @DeleteMapping("/users")
     public ResponseEntity<CommonResDTO> deleteUser(
-            @RequestBody @Valid DeleteUserReqDTO deleteUserReqDTO,
+            @RequestBody @Valid DeleteUserReq deleteUserReq,
             HttpServletRequest request){
 
-        userService.deleteUser(deleteUserReqDTO,request.getHeader("Authorization"));
+        userService.deleteUser(deleteUserReq,request.getHeader("Authorization"));
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저 삭제완료",null));
     }
 }

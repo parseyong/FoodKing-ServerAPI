@@ -5,8 +5,8 @@ import com.example.foodking.config.SecurityConfig;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.controller.CoolSmsController;
-import com.example.foodking.user.dto.request.CheckAuthNumberReqDTO;
-import com.example.foodking.user.dto.request.SendAuthNumberReqDTO;
+import com.example.foodking.user.dto.request.CheckAuthNumberReq;
+import com.example.foodking.user.dto.request.SendAuthNumberReq;
 import com.example.foodking.user.service.CoolSmsService;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
@@ -48,8 +48,8 @@ public class ControllerTest {
     public void sendMessageSuccess() throws Exception {
         //given
         Gson gson = new Gson();
-        SendAuthNumberReqDTO sendAuthNumberReqDTO = new SendAuthNumberReqDTO("01056962173");
-        String requestBody = gson.toJson(sendAuthNumberReqDTO);
+        SendAuthNumberReq sendAuthNumberReq = new SendAuthNumberReq("01056962173");
+        String requestBody = gson.toJson(sendAuthNumberReq);
 
         //when,then
         this.mockMvc.perform(post("/send/messages")
@@ -67,8 +67,8 @@ public class ControllerTest {
     public void sendMessageFail1() throws Exception {
         //given
         Gson gson = new Gson();
-        SendAuthNumberReqDTO sendAuthNumberReqDTO = new SendAuthNumberReqDTO("번호아님");
-        String requestBody = gson.toJson(sendAuthNumberReqDTO);
+        SendAuthNumberReq sendAuthNumberReq = new SendAuthNumberReq("번호아님");
+        String requestBody = gson.toJson(sendAuthNumberReq);
 
         given(coolSmsService.sendMessage(any(String.class)))
                 .willThrow(new CommondException(ExceptionCode.NOT_PHONENUM));
@@ -90,8 +90,8 @@ public class ControllerTest {
     public void sendMessageFail2() throws Exception {
         //given
         Gson gson = new Gson();
-        SendAuthNumberReqDTO sendAuthNumberReqDTO = new SendAuthNumberReqDTO("01056962173");
-        String requestBody = gson.toJson(sendAuthNumberReqDTO);
+        SendAuthNumberReq sendAuthNumberReq = new SendAuthNumberReq("01056962173");
+        String requestBody = gson.toJson(sendAuthNumberReq);
 
         given(coolSmsService.sendMessage(any(String.class)))
                 .willThrow(new CommondException(ExceptionCode.COOLSMS_EXCEPTION));
@@ -113,8 +113,8 @@ public class ControllerTest {
     public void sendMessageFail4() throws Exception {
         //given
         Gson gson = new Gson();
-        SendAuthNumberReqDTO sendAuthNumberReqDTO = new SendAuthNumberReqDTO("");
-        String requestBody = gson.toJson(sendAuthNumberReqDTO);
+        SendAuthNumberReq sendAuthNumberReq = new SendAuthNumberReq("");
+        String requestBody = gson.toJson(sendAuthNumberReq);
 
         //when,then
         this.mockMvc.perform(post("/send/messages")
@@ -132,12 +132,12 @@ public class ControllerTest {
     @DisplayName("인증번호 확인 테스트 -> (성공)")
     public void authNumCheckSuccess() throws Exception {
         //given
-        CheckAuthNumberReqDTO checkAuthNumberReqDTO = CheckAuthNumberReqDTO.builder()
+        CheckAuthNumberReq checkAuthNumberReq = CheckAuthNumberReq.builder()
                 .phoneNum("01056962173")
                 .authenticationNumber("1234")
                 .build();
         Gson gson = new Gson();
-        String requestBody = gson.toJson(checkAuthNumberReqDTO);
+        String requestBody = gson.toJson(checkAuthNumberReq);
 
         //when ,then
         this.mockMvc.perform(post("/auth/messages")
@@ -146,19 +146,19 @@ public class ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("인증 성공!"))
                 .andDo(print());
-        verify(coolSmsService,times(1)).authNumCheck(any(CheckAuthNumberReqDTO.class));
+        verify(coolSmsService,times(1)).authNumCheck(any(CheckAuthNumberReq.class));
     }
 
     @Test
     @DisplayName("인증번호 확인 테스트 -> (실패 : 입력값 공백)")
     public void authNumCheckFail1() throws Exception {
         //given
-        CheckAuthNumberReqDTO checkAuthNumberReqDTO = CheckAuthNumberReqDTO.builder()
+        CheckAuthNumberReq checkAuthNumberReq = CheckAuthNumberReq.builder()
                 .phoneNum("")
                 .authenticationNumber("")
                 .build();
         Gson gson = new Gson();
-        String requestBody = gson.toJson(checkAuthNumberReqDTO);
+        String requestBody = gson.toJson(checkAuthNumberReq);
 
         //when ,then
         this.mockMvc.perform(post("/auth/messages")
@@ -168,21 +168,21 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.phoneNum").value("전화번호를 입력하세요"))
                 .andDo(print());
-        verify(coolSmsService,times(0)).authNumCheck(any(CheckAuthNumberReqDTO.class));
+        verify(coolSmsService,times(0)).authNumCheck(any(CheckAuthNumberReq.class));
     }
 
     @Test
     @DisplayName("인증번호 확인 테스트 -> (실패 : 인증번호 불일치)")
     public void authNumCheckFail2() throws Exception {
         //given
-        CheckAuthNumberReqDTO checkAuthNumberReqDTO = CheckAuthNumberReqDTO.builder()
+        CheckAuthNumberReq checkAuthNumberReq = CheckAuthNumberReq.builder()
                 .phoneNum("01056962173")
                 .authenticationNumber("1234")
                 .build();
         Gson gson = new Gson();
-        String requestBody = gson.toJson(checkAuthNumberReqDTO);
+        String requestBody = gson.toJson(checkAuthNumberReq);
         doThrow(new CommondException(ExceptionCode.SMS_AUTHENTICATION_FAIL))
-                .when(coolSmsService).authNumCheck(any(CheckAuthNumberReqDTO.class));
+                .when(coolSmsService).authNumCheck(any(CheckAuthNumberReq.class));
 
 
         //when ,then
@@ -192,6 +192,6 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("인증번호가 올바르지 않습니다"))
                 .andDo(print());
-        verify(coolSmsService,times(1)).authNumCheck(any(CheckAuthNumberReqDTO.class));
+        verify(coolSmsService,times(1)).authNumCheck(any(CheckAuthNumberReq.class));
     }
 }
