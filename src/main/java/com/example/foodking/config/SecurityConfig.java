@@ -34,9 +34,10 @@ public class SecurityConfig {
         http
                 .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers("/login","/messages","/nickname/check","/email/check","/email/find","/password/find",
-                        "/api/v1/auth/**","/", "/v2/api-docs", "/swagger-resources/**", "/swagger-ui/index.html",
-                        "/swagger-ui.html","/webjars/**", "/swagger/**").permitAll()
+                .antMatchers("/login","/send/messages","/auth/messages","/nickname/check","/email/check",
+                        "/email/find","/password/find", "/api/v1/auth/**","/", "/v2/api-docs",
+                        "/swagger-resources/**", "/swagger-ui/index.html", "/swagger-ui.html","/webjars/**",
+                        "/swagger/**").permitAll()
                 .antMatchers(HttpMethod.POST,"/users").permitAll()
                 .antMatchers(HttpMethod.POST,"/refreshToken/reissue").permitAll()
                 .antMatchers("/**").hasRole("USER")

@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 @Builder // 테스트를 위한 빌더추가
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class PhoneAuthReqDTO {
+public class CheckAuthNumberReqDTO {
 
     @NotBlank(message = "전화번호를 입력하세요")
     private String phoneNum;

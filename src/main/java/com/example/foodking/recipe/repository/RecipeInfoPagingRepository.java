@@ -9,7 +9,8 @@ import java.util.List;
 
 public interface RecipeInfoPagingRepository {
 
-    List<ReadRecipeInfoResDTO> findRecipeInfoPaging(Pageable pageable, OrderSpecifier[] createOrderSpecifier, BooleanBuilder builder);
+    List<ReadRecipeInfoResDTO> findRecipeInfoPagingByCondition
+            (Pageable pageable, OrderSpecifier[] createOrderSpecifier, BooleanBuilder builder, Object condition);
 
     Long findRecipeInfoTotalCnt(BooleanBuilder builder,Object condition);
 }

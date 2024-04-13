@@ -4,7 +4,6 @@ import com.example.foodking.common.CommonResDTO;
 import com.example.foodking.reply.service.ReplyService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +16,6 @@ import javax.validation.constraints.NotBlank;
 @Validated
 @RequiredArgsConstructor
 @Api(tags = "Reply")
-@Log4j2
 public class ReplyController {
 
     private final ReplyService replyService;
@@ -47,7 +45,6 @@ public class ReplyController {
             @AuthenticationPrincipal final Long userId,
             @PathVariable final Long replyId){
 
-        log.info(userId);
         replyService.deleteReply(userId,replyId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("댓글 삭제완료",null));
     }

@@ -25,20 +25,12 @@ public class UserController {
 
     private final UserService userService;
 
+
     @PostMapping("/login")
     public ResponseEntity<CommonResDTO> login(@RequestBody @Valid LoginReqDTO loginReqDTO){
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResDTO.of("로그인 성공!",userService.login(loginReqDTO)));
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<CommonResDTO> logOut(
-            @AuthenticationPrincipal final Long userId,
-            HttpServletRequest request){
-
-        userService.logOut(userId,request.getHeader("Authorization"));
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("로그아웃 성공!",null));
     }
 
     @PostMapping("/users")
@@ -72,7 +64,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이메일 찾기 성공",email));
     }
 
-    @GetMapping("/password/find")
+    // 새로운 비밀번호를 생성해 반환하므로 patch요청으로 받는다.
+    @PatchMapping("/password/find")
     public ResponseEntity<CommonResDTO> findPassword(@RequestBody @Valid FindPwdReqDTO findPwdReqDTO){
 
         String password = userService.findPassword(findPwdReqDTO);
@@ -96,8 +89,11 @@ public class UserController {
     }
 
     @DeleteMapping("/users")
-    public ResponseEntity<CommonResDTO> deleteUser(@RequestBody @Valid DeleteUserReqDTO deleteUserReqDTO){
-        userService.deleteUser(deleteUserReqDTO);
+    public ResponseEntity<CommonResDTO> deleteUser(
+            @RequestBody @Valid DeleteUserReqDTO deleteUserReqDTO,
+            HttpServletRequest request){
+
+        userService.deleteUser(deleteUserReqDTO,request.getHeader("Authorization"));
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저 삭제완료",null));
     }
 }

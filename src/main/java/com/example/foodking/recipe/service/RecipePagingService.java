@@ -8,7 +8,6 @@ import com.example.foodking.recipe.dto.recipeInfo.request.ReadRecipeInfoPagingRe
 import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoPagingResDTO;
 import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoResDTO;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
-import com.example.foodking.user.domain.User;
 import com.example.foodking.user.repository.UserRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
@@ -50,7 +49,7 @@ public class RecipePagingService {
 
         // 쿼리 실행
         List<ReadRecipeInfoResDTO> readRecipeInfoResDTOList =
-                recipeInfoRepository.findRecipeInfoPaging(pageable ,createOrderSpecifier(recipeSortType), builder);
+                recipeInfoRepository.findRecipeInfoPagingByCondition(pageable ,createOrderSpecifier(recipeSortType), builder, condition);
 
         // 존재하지 않는 페이지일 경우 예외를 던짐
         if(readRecipeInfoResDTOList.size() == 0)
@@ -69,16 +68,13 @@ public class RecipePagingService {
         }
         else if(condition instanceof String && condition.equals("mine")){
             // 자신이 쓴 레시피 조회 시
-            User user = findByUserId(userId);
-            builder.and(recipeInfo.user.eq(findByUserId(userId)));
+            builder.and(recipeInfo.user.userId.eq(userId));
         }
         else if(condition instanceof String && condition.equals("like")){
             // 좋아요 누른 레시피 조회 시
-            User user = findByUserId(userId);
-            builder.and(recipeEmotion.user.eq(user));
+            builder.and(recipeEmotion.user.userId.eq(userId));
         }
 
-        // 위 3가지 조회방법에 키워드 검색을 같이 사용할 경우 or 단순 키워드검색을 사용할 경우
         if(searchKeyword != null){
             builder.and(recipeInfo.recipeName.contains(searchKeyword));
         }
@@ -109,8 +105,4 @@ public class RecipePagingService {
         return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);
     }
 
-    private User findByUserId(Long userId){
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
-    }
 }

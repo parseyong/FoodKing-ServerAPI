@@ -10,7 +10,6 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@Log4j2
 @RequiredArgsConstructor
 public class JwtProvider {
 
@@ -55,9 +54,27 @@ public class JwtProvider {
         accessSecretKey = Base64.getEncoder().encodeToString(accessSecretKey.getBytes());
         refreshSecretKey = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes());
     }
-    
+
+    @Transactional
+    public void logOut(Long userId, String accessToken){
+
+        //Bearer 제거
+        accessToken = accessToken.substring(7);
+
+        //accessToken을 블랙리스트에 추가
+        blackListRedis.opsForValue().set(
+                RedissonPrefix.BLACK_LIST_REDIS + accessToken,
+                String.valueOf(userId),
+                validAccessTokenTime,
+                TimeUnit.MILLISECONDS);
+
+        //tokenRedis에서 refreshToekn삭제
+        tokenRedis.delete(RedissonPrefix.TOKEN_REDIS + String.valueOf(userId));
+    }
+
     // 로그인 성공 시 토큰을 생성해서 반환하는 메소드
     public String createAccessToken(Long userId, Collection<? extends GrantedAuthority> roleList) {
+
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
         claims.put("roleList", roleList);
         Date now = new Date();
@@ -71,6 +88,7 @@ public class JwtProvider {
     }
 
     public String createRefreshToken(Long userId, Collection<? extends GrantedAuthority> roleList) {
+
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
         claims.put("roleList", roleList);
         Date now = new Date();
@@ -93,7 +111,10 @@ public class JwtProvider {
     }
     
     // 토큰 재발급
-    public LoginTokenResDTO reissueToken(String refreshToken){
+    public LoginTokenResDTO reissueToken(HttpServletRequest request){
+
+        String refreshToken = resolveRefreshToken(request);
+
         // refreshToken의 유효성검사
         if(!validateRefreshToken(refreshToken))
             throw new CommondException(ExceptionCode.LOGIN_FAIL);
@@ -117,6 +138,7 @@ public class JwtProvider {
 
     // Http헤더에서 AccessToken을 가져오는 메소드
     public String resolveAccessToken(HttpServletRequest request) {
+
         String token = request.getHeader("Authorization");
 
         if(token == null || !token.substring(0,7).equals("Bearer "))
@@ -125,8 +147,15 @@ public class JwtProvider {
         return token.substring(7);
     }
 
+    // Http헤더에서 AccessToken을 가져오는 메소드
+    public String resolveRefreshToken(HttpServletRequest request) {
+
+        return request.getHeader("RefreshToken");
+    }
+
     // 토큰에서 추출한 userId값을 통해 인증객체를 생성하는 메소드
     public Authentication getAuthenticationByAccessToken(String token) {
+
         User user = (User) customUserDetailsService.loadUserByUsername(this.getUserIdByAccessToken(token));
         return new UsernamePasswordAuthenticationToken(user.getUserId(),user.getPassword(),user.getAuthorities());
     }
@@ -157,13 +186,13 @@ public class JwtProvider {
 
     // AccessToken에서 userId값을 추출하는 메소드
     private String getUserIdByAccessToken(String token) {
-        log.info(token);
+
         return Jwts.parser().setSigningKey(accessSecretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
     // RefreshToken에서 userId값을 추출하는 메소드
     private String getUserIdByRefreshToken(String token) {
-        log.info(token);
+
         return Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(token).getBody().getSubject();
     }
 }

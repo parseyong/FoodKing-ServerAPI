@@ -2,7 +2,7 @@ package com.example.foodking.user.service;
 
 import com.example.foodking.common.RedissonPrefix;
 import com.example.foodking.exception.CommondException;
-import com.example.foodking.user.dto.request.PhoneAuthReqDTO;
+import com.example.foodking.user.dto.request.CheckAuthNumberReqDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.java_sdk.api.Message;
@@ -80,16 +80,16 @@ public class CoolSmsService {
 
     @Transactional
     //해당 전화번호에 발급된 인증번호에 대한 인증을 실행하는 메소드
-    public void authNumCheck(PhoneAuthReqDTO phoneAuthReqDTO) {
+    public void authNumCheck(CheckAuthNumberReqDTO checkAuthNumberReqDTO) {
 
         String authenticationNum = authNumberRedis.opsForValue()
-                .get(RedissonPrefix.AUTH_NUM_REDIS + phoneAuthReqDTO.getPhoneNum());
+                .get(RedissonPrefix.AUTH_NUM_REDIS + checkAuthNumberReqDTO.getPhoneNum());
 
-        if(authenticationNum == null || !authenticationNum.equals(phoneAuthReqDTO.getAuthenticationNumber()))
+        if(authenticationNum == null || !authenticationNum.equals(checkAuthNumberReqDTO.getAuthenticationNumber()))
             throw new CommondException(SMS_AUTHENTICATION_FAIL);
 
         isAuthNumberRedis.opsForValue().set(
-                RedissonPrefix.IS_AUTH_NUM_REDIS + phoneAuthReqDTO.getPhoneNum(),
+                RedissonPrefix.IS_AUTH_NUM_REDIS + checkAuthNumberReqDTO.getPhoneNum(),
                 "true",
                 10,
                 TimeUnit.MINUTES);

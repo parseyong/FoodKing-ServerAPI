@@ -554,7 +554,7 @@ public class ControllerTest {
         given(userService.findPassword(any(FindPwdReqDTO.class))).willReturn("12345");
 
         //when,then
-        this.mockMvc.perform(get("/password/find")
+        this.mockMvc.perform(patch("/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -578,7 +578,7 @@ public class ControllerTest {
         given(userService.findPassword(any(FindPwdReqDTO.class))).willReturn("12345");
 
         //when,then
-        this.mockMvc.perform(get("/password/find")
+        this.mockMvc.perform(patch("/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -601,7 +601,7 @@ public class ControllerTest {
         given(userService.findPassword(any(FindPwdReqDTO.class))).willReturn("12345");
 
         //when,then
-        this.mockMvc.perform(get("/password/find")
+        this.mockMvc.perform(patch("/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -626,7 +626,7 @@ public class ControllerTest {
                 .when(userService).findPassword(any(FindPwdReqDTO.class));
 
         //when,then
-        this.mockMvc.perform(get("/password/find")
+        this.mockMvc.perform(patch("/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -651,7 +651,7 @@ public class ControllerTest {
                 .willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         //when,then
-        this.mockMvc.perform(get("/password/find")
+        this.mockMvc.perform(patch("/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -675,7 +675,7 @@ public class ControllerTest {
                 .willThrow(new CommondException(ExceptionCode.ACCESS_FAIL_USER));
 
         //when,then
-        this.mockMvc.perform(get("/password/find")
+        this.mockMvc.perform(patch("/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isForbidden())
@@ -899,7 +899,7 @@ public class ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("유저 삭제완료"))
                 .andDo(print());
-        verify(userService,times(1)).deleteUser(any(DeleteUserReqDTO.class));
+        verify(userService,times(1)).deleteUser(any(DeleteUserReqDTO.class),any());
     }
 
     @Test
@@ -922,7 +922,7 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
-        verify(userService,times(0)).deleteUser(any(DeleteUserReqDTO.class));
+        verify(userService,times(0)).deleteUser(any(DeleteUserReqDTO.class),any());
     }
 
     @Test
@@ -939,7 +939,7 @@ public class ControllerTest {
         Gson gson = new Gson();
         String requestBody = gson.toJson(deleteUserReqDTO);
         doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT))
-                .when(userService).deleteUser(any(DeleteUserReqDTO.class));
+                .when(userService).deleteUser(any(DeleteUserReqDTO.class),any());
 
         //when,then
         this.mockMvc.perform(delete("/users")
@@ -949,7 +949,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("비밀번호가 일치하지 않습니다."))
                 .andExpect(jsonPath("$.data.password").value("비밀번호가 일치하지 않습니다."))
                 .andDo(print());
-        verify(userService,times(1)).deleteUser(any(DeleteUserReqDTO.class));
+        verify(userService,times(1)).deleteUser(any(DeleteUserReqDTO.class),any());
     }
 
     @Test
@@ -966,7 +966,7 @@ public class ControllerTest {
         Gson gson = new Gson();
         String requestBody = gson.toJson(deleteUserReqDTO);
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER))
-                .when(userService).deleteUser(any(DeleteUserReqDTO.class));
+                .when(userService).deleteUser(any(DeleteUserReqDTO.class),any());
 
         //when,then
         this.mockMvc.perform(delete("/users")
@@ -975,7 +975,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
-        verify(userService,times(1)).deleteUser(any(DeleteUserReqDTO.class));
+        verify(userService,times(1)).deleteUser(any(DeleteUserReqDTO.class),any());
     }
 
     @Test
@@ -999,7 +999,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
-        verify(userService,times(0)).deleteUser(any(DeleteUserReqDTO.class));
+        verify(userService,times(0)).deleteUser(any(DeleteUserReqDTO.class),any());
     }
 
     @Test
@@ -1023,7 +1023,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
-        verify(userService,times(0)).deleteUser(any(DeleteUserReqDTO.class));
+        verify(userService,times(0)).deleteUser(any(DeleteUserReqDTO.class),any());
     }
 
     public void makeAuthentication(){

@@ -49,7 +49,7 @@ public class ServiceTest {
     private AddUserReqDTO addUserReqDTO;
     private UpdateUserInfoReqDTO updateUserInfoReqDTO;
     private DeleteUserReqDTO deleteUserReqDTO;
-    private PhoneAuthReqDTO phoneAuthReqDTO;
+    private CheckAuthNumberReqDTO checkAuthNumberReqDTO;
     private FindPwdReqDTO findPwdReqDTO;
 
     @BeforeEach
@@ -81,7 +81,7 @@ public class ServiceTest {
                 .email("test@google.com")
                 .password("1234")
                 .build();
-        this.phoneAuthReqDTO = PhoneAuthReqDTO.builder()
+        this.checkAuthNumberReqDTO = CheckAuthNumberReqDTO.builder()
                 .phoneNum("01056962173")
                 .authenticationNumber("1234")
                 .build();
@@ -462,7 +462,7 @@ public class ServiceTest {
         given(passwordEncoder.matches(any(String.class),any(String.class))).willReturn(true);
 
         //when
-        userService.deleteUser(deleteUserReqDTO);
+        userService.deleteUser(deleteUserReqDTO, "accessToken");
 
         //then
         verify(userRepository,times(1)).delete(any(User.class));
@@ -478,7 +478,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            userService.deleteUser(deleteUserReqDTO);
+            userService.deleteUser(deleteUserReqDTO, "accessToken");
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
@@ -497,7 +497,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            userService.deleteUser(deleteUserReqDTO);
+            userService.deleteUser(deleteUserReqDTO, "accessToken");
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.PASSWORD_NOT_COLLECT);

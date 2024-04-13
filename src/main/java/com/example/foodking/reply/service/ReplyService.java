@@ -31,6 +31,7 @@ public class ReplyService {
 
     @Transactional
     public Long addReply(Long userId, Long recipeInfoId, String content){
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
         RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
@@ -45,6 +46,7 @@ public class ReplyService {
     }
 
     public List<ReadReplyResDTO> readReply(RecipeInfo recipeInfo, Long userId, ReplySortType replySortType){
+
         List<Reply> replyList = recipeInfo.getReplyList();
         List<ReadReplyResDTO> readReplyResDTOList = replyList.stream()
                 .map(entity -> {
@@ -62,6 +64,7 @@ public class ReplyService {
 
     @Transactional
     public void deleteReply(Long userId, Long replyId){
+
         Reply reply = findReplyById(replyId);
 
         if(!isMyReply(userId,reply.getUser()))
@@ -71,6 +74,7 @@ public class ReplyService {
 
     @Transactional
     public void updateReply(Long userId, Long replyId, String content){
+
         Reply reply = findReplyById(replyId);
 
         if(!isMyReply(userId,reply.getUser()))

@@ -1,7 +1,6 @@
 package com.example.foodking.user.service;
 
 import com.example.foodking.auth.JwtProvider;
-import com.example.foodking.common.RedissonPrefix;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.domain.User;
@@ -11,13 +10,9 @@ import com.example.foodking.user.dto.response.ReadUserInfoResDTO;
 import com.example.foodking.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -32,13 +27,10 @@ public class UserService {
 
     private final CoolSmsService coolSmsService;
 
-    @Qualifier("tokenRedis")
-    private final RedisTemplate<String,String> tokenRedis;
 
-    @Qualifier("blackListRedis")
-    private final RedisTemplate<String,String> blackListRedis;
-
-
+    // setEnableTransactionSupport(true);를 통해 레디스의 트랜잭션과 jpa의 트랜잭션이 공유되어
+    // jpa에 예외 발생 시 레디스의 데이터에 롤백이 발생하도록 @Transactional 추가
+    @Transactional
     public LoginTokenResDTO login(LoginReqDTO loginReqDTO){
         User user = userRepository.findUserByEmail(loginReqDTO.getEmail())
                 .orElseThrow(() -> new CommondException(ExceptionCode.LOGIN_FAIL));
@@ -49,19 +41,6 @@ public class UserService {
                 .accessToken(jwtProvider.createAccessToken(user.getUserId(), user.getAuthorities()))
                 .refreshToken(jwtProvider.createRefreshToken(user.getUserId(),user.getAuthorities()))
                 .build();
-    }
-
-    @Transactional
-    public void logOut(Long userId, String accessToken){
-        accessToken = accessToken.substring(7);
-
-        blackListRedis.opsForValue().set(
-                RedissonPrefix.BLACK_LIST_REDIS + accessToken,
-                String.valueOf(userId),
-                jwtProvider.validAccessTokenTime,
-                TimeUnit.MILLISECONDS);
-
-        tokenRedis.delete(RedissonPrefix.TOKEN_REDIS + String.valueOf(userId));
     }
 
     @Transactional
@@ -77,7 +56,7 @@ public class UserService {
         if(nickNameDuplicatedChecking(addUserReqDTO.getNickName()))
             throw new CommondException(ExceptionCode.NICKNAME_DUPLICATED);
 
-        // 휴대폰번호로 가입된 계정이 있는 지 체크
+        // 휴대폰번호로 가입된 계정이 있는 지 체크, unique로 등록했더라도 서버단에서 한번 검증을 한 뒤 db에 넘긴다.
         if(userRepository.existsByPhoneNum(addUserReqDTO.getPhoneNum()))
             throw new CommondException(ExceptionCode.PHONE_NUMBER_DUPLICATED);
         
@@ -103,6 +82,7 @@ public class UserService {
         return userRepository.existsByNickName(nickName);
     }
 
+    @Transactional
     public String findEmail(String phoneNum){
         // 인증여부 확인
         coolSmsService.isAuthenticatedNum(phoneNum);
@@ -168,12 +148,18 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(DeleteUserReqDTO deleteUserReqDTO){
+    public void deleteUser(DeleteUserReqDTO deleteUserReqDTO, String accessToken){
         User user = userRepository.findUserByEmail(deleteUserReqDTO.getEmail())
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
 
-        // 로그인여부와 상관없이 회원탈퇴 시 비밀번호를 입력해야한다.
+        // 로그인여부와 상관없이 회원탈퇴 시 비밀번호를 다시 입력해야한다.
         isMatchPassword(deleteUserReqDTO.getPassword(), user.getPassword(), ExceptionCode.PASSWORD_NOT_COLLECT);
+
+        //Bearer 제거
+        accessToken = accessToken.substring(7);
+
+        //해당 유저에 발급된 토큰으로 회원인증이 불가능하도록 로그아웃 진행
+        jwtProvider.logOut(user.getUserId(), accessToken);
         userRepository.delete(user);
     }
 
