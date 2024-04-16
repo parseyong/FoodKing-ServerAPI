@@ -35,7 +35,7 @@ public class Reply extends TimeEntity {
     private RecipeInfo recipeInfo;
 
     @Builder
-    public Reply(String content, User user, RecipeInfo recipeInfo){
+    private Reply(String content, User user, RecipeInfo recipeInfo){
         this.content=content;
         this.user=user;
         this.recipeInfo=recipeInfo;

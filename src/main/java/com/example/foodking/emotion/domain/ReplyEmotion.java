@@ -36,7 +36,7 @@ public class ReplyEmotion {
     @JoinColumn(name = "reply_id",nullable = false)
     private Reply reply;
     @Builder
-    public ReplyEmotion(EmotionType emotionType, User user, Reply reply){
+    private ReplyEmotion(EmotionType emotionType, User user, Reply reply){
         this.emotionType=emotionType;
         this.reply=reply;
         this.user=user;

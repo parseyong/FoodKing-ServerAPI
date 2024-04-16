@@ -43,7 +43,7 @@ public class User implements UserDetails {
     private List<RecipeInfo> recipeInfoList;
 
     @Builder
-    public User(String email, String password, String nickName, String phoneNum){
+    private User(String email, String password, String nickName, String phoneNum){
         this.email=email;
         this.password=password;
         this.nickName=nickName;

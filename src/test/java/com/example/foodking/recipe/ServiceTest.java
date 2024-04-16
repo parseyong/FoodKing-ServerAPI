@@ -343,7 +343,8 @@ public class ServiceTest {
     @Test
     @DisplayName("엔티티 -> DTO 변환 테스트")
     public void toDTOTest(){
-        ReadRecipeInfoRes readRecipeInfoRes = ReadRecipeInfoRes.toDTO(recipeInfo,1L,2L);
+        ReadRecipeInfoRes readRecipeInfoRes = ReadRecipeInfoRes.toDTO
+                (recipeInfo,1L,2L,1L, "writerNickName");
         assertThat(readRecipeInfoRes.getCalogy()).isEqualTo(recipeInfo.getCalogy());
         assertThat(readRecipeInfoRes.getRecipeName()).isEqualTo(recipeInfo.getRecipeName());
         assertThat(readRecipeInfoRes.getEmotionCnt()).isEqualTo(2L);

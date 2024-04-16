@@ -36,7 +36,7 @@ public class RecipeEmotion {
     @JoinColumn(name = "recipe_info_id",nullable = false)
     private RecipeInfo recipeInfo;
     @Builder
-    public RecipeEmotion(EmotionType emotionType,User user, RecipeInfo recipeInfo){
+    private RecipeEmotion(EmotionType emotionType,User user, RecipeInfo recipeInfo){
         this.emotionType=emotionType;
         this.recipeInfo=recipeInfo;
         this.user=user;

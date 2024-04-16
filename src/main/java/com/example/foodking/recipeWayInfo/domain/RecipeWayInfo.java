@@ -29,7 +29,7 @@ public class RecipeWayInfo {
     private RecipeInfo recipeInfo;
 
     @Builder
-    public RecipeWayInfo(String recipeWay, Long recipeOrder, RecipeInfo recipeInfo){
+    private RecipeWayInfo(String recipeWay, Long recipeOrder, RecipeInfo recipeInfo){
         this.recipeWay=recipeWay;
         this.recipeOrder=recipeOrder;
         this.recipeInfo=recipeInfo;
