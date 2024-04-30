@@ -137,6 +137,23 @@ public class ControllerTest {
     }
 
     @Test
+    @DisplayName("댓글 이모션 토글 실패 : 인증실패")
+    public void replyEmotiontoggleTest7() throws Exception {
+        //given
+
+        //when,then
+        this.mockMvc.perform(post("/replys/emotions/{replyId}/{emotionType}",1L,"Like")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("emotionType","Like"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
+                .andDo(print());
+
+        verify(emotionService,times(0))
+                .toggleReplyEmotion(any(Long.class),any(Long.class),any(EmotionType.class));
+    }
+
+    @Test
     @DisplayName("레시피 이모션 토글 테스트 -> 성공")
     public void recipeEmotiontoggleTest1() throws Exception {
         //given
@@ -222,6 +239,22 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(emotionService,times(1))
+                .toggleRecipeInfoEmotion(any(Long.class),any(Long.class),any(EmotionType.class));
+    }
+
+    @Test
+    @DisplayName("댓글 이모션 토글 실패 : 인증실패")
+    public void recipeEmotiontoggleTest7() throws Exception {
+        //given
+
+        //when,then
+        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}/{emotionType}",1L,"Like")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
+                .andDo(print());
+
+        verify(emotionService,times(0))
                 .toggleRecipeInfoEmotion(any(Long.class),any(Long.class),any(EmotionType.class));
     }
 

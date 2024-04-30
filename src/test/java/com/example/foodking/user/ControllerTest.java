@@ -93,7 +93,6 @@ public class ControllerTest {
                 .accessToken("access")
                 .refreshToken("refresh")
                 .build();
-        String accessToken = "test";
         given(userService.login(any(LoginReq.class))).willReturn(loginTokenResDTO);
 
         Gson gson = new Gson();
@@ -125,7 +124,6 @@ public class ControllerTest {
                 .accessToken("access")
                 .refreshToken("refresh")
                 .build();
-        String accessToken = "test";
         given(userService.login(any(LoginReq.class))).willReturn(loginTokenResDTO);
 
         Gson gson = new Gson();
@@ -1026,7 +1024,7 @@ public class ControllerTest {
         verify(userService,times(0)).deleteUser(any(DeleteUserReq.class),any());
     }
 
-    public void makeAuthentication(){
+    private void makeAuthentication(){
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 

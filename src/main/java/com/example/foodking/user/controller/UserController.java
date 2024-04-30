@@ -25,7 +25,6 @@ public class UserController {
 
     private final UserService userService;
 
-
     @PostMapping("/login")
     public ResponseEntity<CommonResDTO> login(@RequestBody @Valid LoginReq loginReq){
 

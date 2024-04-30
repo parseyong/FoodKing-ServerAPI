@@ -412,7 +412,7 @@ public class ControllerTest {
         verify(replyService,times(1)).deleteReply(any(Long.class),any(Long.class));
     }
 
-    public void makeAuthentication(){
+    private void makeAuthentication(){
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 

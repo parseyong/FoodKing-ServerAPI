@@ -18,7 +18,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 @RestController
 @Validated
@@ -61,7 +60,7 @@ public class RecipeController {
     public ResponseEntity<CommonResDTO> readRecipe(
             @AuthenticationPrincipal final Long userId,
             @PathVariable final Long recipeInfoId,
-            @RequestParam(name = "sort") @NotNull(message ="정렬타입을 입력해주세요") ReplySortType replySortType){
+            @RequestParam(name = "sort") ReplySortType replySortType){
 
         ReadRecipeRes readRecipeRes = recipeService.readRecipe(userId,recipeInfoId,replySortType);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("레시피 상세정보 조회완료", readRecipeRes));
@@ -72,7 +71,7 @@ public class RecipeController {
             @AuthenticationPrincipal final Long userId,
             @PathVariable(name = "recipeType") final RecipeInfoType recipeInfoType,
             @PathVariable final Long pageNum,
-            @RequestParam @NotNull(message ="정렬타입을 입력해주세요") RecipeSortType recipeSortType,
+            @RequestParam RecipeSortType recipeSortType,
             @RequestParam(required = false) String searchKeyword){
 
         ReadRecipeInfoPagingReq readRecipeInfoPagingReq = ReadRecipeInfoPagingReq.builder()
@@ -82,15 +81,15 @@ public class RecipeController {
                 .condition(recipeInfoType)
                 .userId(userId)
                 .build();
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("레시피 타입 조회성공"
-                , recipePagingService.readRecipeInfoPagingByCondition(readRecipeInfoPagingReq)));
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("레시피 타입 조회성공",
+                recipePagingService.readRecipeInfoPagingByCondition(readRecipeInfoPagingReq)));
     }
 
     @GetMapping("/recipes/mine/{pageNum}")
     public ResponseEntity<CommonResDTO> readMyRecipeInfoPaging(
             @AuthenticationPrincipal final Long userId,
             @PathVariable final Long pageNum,
-            @RequestParam @NotNull(message ="정렬타입을 입력해주세요") RecipeSortType recipeSortType,
+            @RequestParam RecipeSortType recipeSortType,
             @RequestParam(required = false) String searchKeyword){
 
         ReadRecipeInfoPagingReq readRecipeInfoPagingReq = ReadRecipeInfoPagingReq.builder()
@@ -100,15 +99,15 @@ public class RecipeController {
                 .condition("mine")
                 .userId(userId)
                 .build();
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("내가 쓴 레시피 조회성공"
-                , recipePagingService.readRecipeInfoPagingByCondition(readRecipeInfoPagingReq)));
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("내가 쓴 레시피 조회성공",
+                recipePagingService.readRecipeInfoPagingByCondition(readRecipeInfoPagingReq)));
     }
 
     @GetMapping("/recipes/like/{pageNum}")
     public ResponseEntity<CommonResDTO> readLikeRecipeInfoPaging(
             @AuthenticationPrincipal final Long userId,
             @PathVariable final Long pageNum,
-            @RequestParam @NotNull(message ="정렬타입을 입력해주세요") RecipeSortType recipeSortType,
+            @RequestParam RecipeSortType recipeSortType,
             @RequestParam(required = false) String searchKeyword){
 
         ReadRecipeInfoPagingReq readRecipeInfoPagingReq = ReadRecipeInfoPagingReq.builder()
@@ -118,8 +117,8 @@ public class RecipeController {
                 .condition("like")
                 .userId(userId)
                 .build();
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("좋아요 누른 레시피 조회성공"
-                , recipePagingService.readLikedRecipeInfoPaging(readRecipeInfoPagingReq)));
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("좋아요 누른 레시피 조회성공",
+                recipePagingService.readLikedRecipeInfoPaging(readRecipeInfoPagingReq)));
     }
 
 }

@@ -338,7 +338,7 @@ public class ControllerTest {
         verify(recipeImageService,times(1)).deleteImage(any(Long.class),any(Long.class));
     }
     
-    public void makeAuthentication(){
+    private void makeAuthentication(){
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 

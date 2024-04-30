@@ -21,7 +21,7 @@ public class JwtController {
     private final JwtProvider jwtProvider;
 
     @PostMapping("/refreshToken/reissue")
-    public ResponseEntity<CommonResDTO> reissueToken(HttpServletRequest request){
+    public ResponseEntity<CommonResDTO> reissueToken(final HttpServletRequest request){
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResDTO.of("로그인 성공!",jwtProvider.reissueToken(request)));
@@ -30,7 +30,7 @@ public class JwtController {
     @PostMapping("/logout")
     public ResponseEntity<CommonResDTO> logOut(
             @AuthenticationPrincipal final Long userId,
-            HttpServletRequest request){
+            final HttpServletRequest request){
 
         jwtProvider.logOut(userId,request.getHeader("Authorization"));
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("로그아웃 성공!",null));

@@ -62,9 +62,11 @@ public class RecipeService {
 
         // 레시피 정보수정
         updateRecipeInfo(recipeInfo, saveRecipeReq.getSaveRecipeInfoReq());
+
         // 조리법 수정
         recipeWayInfoService.updateRecipeWayInfoList
                 (saveRecipeReq.getSaveRecipeWayInfoReqDTOList(), recipeInfo);
+
         // 재료 수정
         ingredientService.updateIngredientList
                 (saveRecipeReq.getSaveIngredientReqList(), recipeInfo);

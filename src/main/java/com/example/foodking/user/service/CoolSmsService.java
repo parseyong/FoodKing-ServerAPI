@@ -25,8 +25,6 @@ import static com.example.foodking.exception.ExceptionCode.*;
 @RequiredArgsConstructor
 public class CoolSmsService {
 
-    private final RedisTemplate<String,String> authRedis;
-
     @Value("${CoolSMS.Api.Key}")
     private String apiKey; // 발급받은 api_key
     @Value("${CoolSMS.Api.Secret}")
@@ -35,6 +33,7 @@ public class CoolSmsService {
     private String callId; // 발신자 번호
     private Message coolSms;
 
+    private final RedisTemplate<String,String> authRedis;
     @PostConstruct
     protected void init() {
         coolSms = new  Message(apiKey,apiSecret);

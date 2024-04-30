@@ -13,7 +13,6 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,21 +32,20 @@ public class RecipePagingService {
 
     public ReadRecipeInfoPagingRes readRecipeInfoPagingByCondition(ReadRecipeInfoPagingReq readRecipeInfoPagingReq){
 
-        Object condition = readRecipeInfoPagingReq.getCondition();
-        String searchKeyword = readRecipeInfoPagingReq.getSearchKeyword();
-        Long userId = readRecipeInfoPagingReq.getUserId();
-        RecipeSortType recipeSortType = readRecipeInfoPagingReq.getRecipeSortType();
-        Pageable pageable= PageRequest.of((int) (readRecipeInfoPagingReq.getPageNum()-1),10);
-
         // 조건(condition)에 따라 동적으로 WHERE절을 생성
-        BooleanBuilder builder = getBuilder(condition,searchKeyword,userId);
+        BooleanBuilder builder = getBuilder(
+                readRecipeInfoPagingReq.getCondition(),
+                readRecipeInfoPagingReq.getSearchKeyword(),
+                readRecipeInfoPagingReq.getUserId());
 
         // 해당 조건에 대한 전체 결과 수 측정
         Long recipeCnt = recipeInfoRepository.findRecipeInfoTotalCnt(builder);
 
         // 쿼리 실행
-        List<ReadRecipeInfoRes> readRecipeInfoResDTOList =
-                recipeInfoRepository.findRecipeInfoPagingByCondition(builder,createOrderSpecifier(recipeSortType),pageable);
+        List<ReadRecipeInfoRes> readRecipeInfoResDTOList = recipeInfoRepository.findRecipeInfoPagingByCondition(
+                        builder,
+                        createOrderSpecifier(readRecipeInfoPagingReq.getRecipeSortType()),
+                        PageRequest.of((int) (readRecipeInfoPagingReq.getPageNum()-1),10));
 
         // 존재하지 않는 페이지일 경우 예외를 던짐
         if(readRecipeInfoResDTOList.size() == 0)
@@ -58,17 +56,17 @@ public class RecipePagingService {
 
     public ReadRecipeInfoPagingRes readLikedRecipeInfoPaging(ReadRecipeInfoPagingReq readRecipeInfoPagingReq){
 
-        String searchKeyword = readRecipeInfoPagingReq.getSearchKeyword();
-        Long userId = readRecipeInfoPagingReq.getUserId();
-        RecipeSortType recipeSortType = readRecipeInfoPagingReq.getRecipeSortType();
-        Pageable pageable= PageRequest.of((int) (readRecipeInfoPagingReq.getPageNum()-1),10);
-
         // 해당 조건에 대한 전체 결과 수 측정
-        Long recipeCnt = recipeInfoRepository.findLikedRecipeInfoCnt(searchKeyword,userId);
+        Long recipeCnt = recipeInfoRepository.findLikedRecipeInfoCnt(
+                readRecipeInfoPagingReq.getSearchKeyword(),
+                readRecipeInfoPagingReq.getUserId());
 
         // 쿼리 실행
-        List<ReadRecipeInfoRes> readRecipeInfoResDTOList =
-                recipeInfoRepository.findLikedRecipeInfoList(createOrderSpecifier(recipeSortType),searchKeyword,pageable,userId);
+        List<ReadRecipeInfoRes> readRecipeInfoResDTOList = recipeInfoRepository.findLikedRecipeInfoList(
+                        createOrderSpecifier(readRecipeInfoPagingReq.getRecipeSortType()),
+                        readRecipeInfoPagingReq.getSearchKeyword(),
+                        PageRequest.of((int) (readRecipeInfoPagingReq.getPageNum()-1),10),
+                        readRecipeInfoPagingReq.getUserId());
 
         // 존재하지 않는 페이지일 경우 예외를 던짐
         if(readRecipeInfoResDTOList.size() == 0)
