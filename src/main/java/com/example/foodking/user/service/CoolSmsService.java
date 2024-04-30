@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -26,11 +25,7 @@ import static com.example.foodking.exception.ExceptionCode.*;
 @RequiredArgsConstructor
 public class CoolSmsService {
 
-    @Qualifier("authNumberRedis")
-    private final RedisTemplate<String,String> authNumberRedis;
-
-    @Qualifier("isAuthNumberRedis")
-    private final RedisTemplate<String,String> isAuthNumberRedis;
+    private final RedisTemplate<String,String> authRedis;
 
     @Value("${CoolSMS.Api.Key}")
     private String apiKey; // 발급받은 api_key
@@ -64,7 +59,7 @@ public class CoolSmsService {
         try {
             coolSms.send(params);
             //인증번호 확인을 위해 발급된 인증번호를 key-value(전화번호-인증번호)형태로 저장, 60초 후 자동 소멸
-            authNumberRedis.opsForValue().set(
+            authRedis.opsForValue().set(
                     RedissonPrefix.AUTH_NUM_REDIS + phoneNum,
                     String.valueOf(authenticationNumber),
                     60,
@@ -82,13 +77,13 @@ public class CoolSmsService {
     //해당 전화번호에 발급된 인증번호에 대한 인증을 실행하는 메소드
     public void authNumCheck(CheckAuthNumberReq checkAuthNumberReq) {
 
-        String authenticationNum = authNumberRedis.opsForValue()
+        String authenticationNum = authRedis.opsForValue()
                 .get(RedissonPrefix.AUTH_NUM_REDIS + checkAuthNumberReq.getPhoneNum());
 
         if(authenticationNum == null || !authenticationNum.equals(checkAuthNumberReq.getAuthenticationNumber()))
             throw new CommondException(SMS_AUTHENTICATION_FAIL);
 
-        isAuthNumberRedis.opsForValue().set(
+        authRedis.opsForValue().set(
                 RedissonPrefix.IS_AUTH_NUM_REDIS + checkAuthNumberReq.getPhoneNum(),
                 "true",
                 10,
@@ -97,7 +92,7 @@ public class CoolSmsService {
 
     // 해당 전화번호가 인증이 완료된 전화번호인지 체크
     public boolean isAuthenticatedNum(String phoneNum){
-        String isAuth = isAuthNumberRedis.opsForValue().get(RedissonPrefix.IS_AUTH_NUM_REDIS + phoneNum);
+        String isAuth = authRedis.opsForValue().get(RedissonPrefix.IS_AUTH_NUM_REDIS + phoneNum);
 
         if(isAuth == null){
             throw new CommondException(SMS_NOT_AUTHENTICATION);
@@ -107,7 +102,7 @@ public class CoolSmsService {
 
     @Transactional
     public void deleteAuthInfo(String phoneNum){
-        authNumberRedis.delete(RedissonPrefix.AUTH_NUM_REDIS + phoneNum);
-        isAuthNumberRedis.delete(RedissonPrefix.IS_AUTH_NUM_REDIS + phoneNum);
+        authRedis.delete(RedissonPrefix.AUTH_NUM_REDIS + phoneNum);
+        authRedis.delete(RedissonPrefix.IS_AUTH_NUM_REDIS + phoneNum);
     }
 }

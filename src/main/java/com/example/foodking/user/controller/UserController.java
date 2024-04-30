@@ -91,7 +91,7 @@ public class UserController {
     @DeleteMapping("/users")
     public ResponseEntity<CommonResDTO> deleteUser(
             @RequestBody @Valid DeleteUserReq deleteUserReq,
-            HttpServletRequest request){
+            final HttpServletRequest request){
 
         userService.deleteUser(deleteUserReq,request.getHeader("Authorization"));
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저 삭제완료",null));

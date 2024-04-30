@@ -5,7 +5,6 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,8 +63,7 @@ public class RedisConfig {
     }
 
     @Bean
-    @Qualifier("authNumberRedis")
-    public RedisTemplate<String, String> authNumberRedis() {
+    public RedisTemplate<String, String> authRedis() {
 
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(authRedisConnectionFactory());
@@ -79,52 +77,6 @@ public class RedisConfig {
     }
 
     @Bean
-    @Qualifier("isAuthNumberRedis")
-    public RedisTemplate<String, String> isAuthNumberRedis() {
-
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(authRedisConnectionFactory());
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
-        redisTemplate.setEnableTransactionSupport(true);
-
-        return redisTemplate;
-    }
-
-    @Bean
-    @Qualifier("tokenRedis")
-    public RedisTemplate<String, String> tokenRedis() {
-
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(authRedisConnectionFactory());
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
-        redisTemplate.setEnableTransactionSupport(true);
-
-        return redisTemplate;
-    }
-
-    @Bean
-    @Qualifier("blackListRedis")
-    public RedisTemplate<String,String> blackListRedis() {
-
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(authRedisConnectionFactory());
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
-        redisTemplate.setEnableTransactionSupport(true);
-
-        return redisTemplate;
-    }
-
-    @Bean
-    @Qualifier("cacheRedis")
     public RedisTemplate<String, Object> cacheRedis() {
         // 캐시서버 포트를 열어놓고 잘 열리는지 테스트하기 위해 임시로 생성해 둠
 
