@@ -29,16 +29,18 @@ public class DistributedLockAop {
         
         // joinPoint의 메소드 서명 가져오기
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        
+
         // jointPoint의 메소드 객체 가져오기
         Method method = signature.getMethod();
         
+        // jointPoint의 메소드 파라미터 값 가져오기
+        Object[] args = joinPoint.getArgs();
+
         // 메소드에 선언된 @DistributedLock 어노테이션 정보 가져오기
         DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
 
         // SpringELParser를 통해 파라미터값에 따라 동적으로 키를 생성해 키의 중복을 방지한다.
-        String key = REDISSON_LOCK_PREFIX + CustomSpringELParser.getDynamicValue
-                (signature.getParameterNames(), joinPoint.getArgs(), distributedLock.key());
+        String key = REDISSON_LOCK_PREFIX + method.getName() + args[1];
 
         // lock 획득시도
         RLock rLock = redissonClient.getLock(key);
