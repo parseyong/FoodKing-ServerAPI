@@ -1,5 +1,7 @@
 package com.example.foodking.aop.distributedLock;
 
+import com.example.foodking.exception.CommondException;
+import com.example.foodking.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -48,13 +50,14 @@ public class DistributedLockAop {
             // lock획득에 실패하면 pub/sub기반으로 lock재획득을 시도한다. waitTime이 초과되면 InterruptedException 발생
             if (!available) {
                 log.info("락 획득 실패");
-                return false;
+                throw new CommondException(ExceptionCode.LOCK_CAPTURE_FAIL);
             }
 
             // lock을 얻었다면 트랜잭션을 시작한다.
             return aopForTransaction.proceed(joinPoint);
         } catch (InterruptedException e) {
             // waitTime이나 leaseTime등의 이유로 interrupted 발생 시
+            log.info("Interrupted lock");
             throw new InterruptedException();
 
         } finally {
@@ -62,8 +65,8 @@ public class DistributedLockAop {
             // 따라서 완전히 독립된 상태로 트랜잭션이 실행되는게 아니므로 자식트랜잭션에서 예외처리를 해주지않으면 부모트랜잭션에게도 예외가 전파된다.
             // 그렇게 때문에 finally로 lock해제를 묶어주어야 한다.
             try {
-                log.info("락 반환");
                 rLock.unlock();
+                log.info("락 반환");
             } catch (IllegalMonitorStateException e) {
                 log.info("Redisson Lock Already UnLock");
             }

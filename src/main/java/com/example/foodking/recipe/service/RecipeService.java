@@ -20,6 +20,7 @@ import com.example.foodking.reply.service.ReplyService;
 import com.example.foodking.user.domain.User;
 import com.example.foodking.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 @Transactional(readOnly = true)
 public class RecipeService {
 
