@@ -4,6 +4,7 @@ import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.common.RecipeSortType;
+import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.dto.recipeInfo.request.ReadRecipeInfoPagingReq;
 import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoPagingRes;
 import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoRes;
@@ -43,9 +44,9 @@ public class RecipePagingService {
 
         // 쿼리 실행
         List<ReadRecipeInfoRes> readRecipeInfoResDTOList = recipeInfoRepository.findRecipeInfoPagingByCondition(
-                        builder,
-                        createOrderSpecifier(readRecipeInfoPagingReq.getRecipeSortType()),
-                        PageRequest.of((int) (readRecipeInfoPagingReq.getPageNum()-1),10));
+                builder,
+                createOrderSpecifier(readRecipeInfoPagingReq.getRecipeSortType()),
+                PageRequest.of((int) (readRecipeInfoPagingReq.getPageNum()-1),10));
 
         // 존재하지 않는 페이지일 경우 예외를 던짐
         if(readRecipeInfoResDTOList.size() == 0)

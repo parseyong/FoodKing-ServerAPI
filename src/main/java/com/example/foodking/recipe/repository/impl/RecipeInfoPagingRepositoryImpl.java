@@ -11,6 +11,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import static com.example.foodking.recipe.domain.QRecipeInfo.recipeInfo;
 import static com.example.foodking.user.domain.QUser.user;
 
 @Repository
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class RecipeInfoPagingRepositoryImpl implements RecipeInfoPagingRepository {
 
