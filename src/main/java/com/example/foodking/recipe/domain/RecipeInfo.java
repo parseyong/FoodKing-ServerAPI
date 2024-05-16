@@ -59,7 +59,7 @@ public class RecipeInfo extends TimeEntity {
     @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<RecipeWayInfo> recipeWayInfoList;
 
-    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Ingredient> ingredientList;
 
     @Builder
@@ -100,13 +100,6 @@ public class RecipeInfo extends TimeEntity {
     public void changeRecipeTip(String recipeTip){
         this.recipeTip=recipeTip;
     }
-    public void changeRecipeWayInfoList(List<RecipeWayInfo> recipeWayInfoList){
-        this.recipeWayInfoList=recipeWayInfoList;
-    }
-    public void changeIngredientList(List<Ingredient> ingredientList){
-        this.ingredientList=ingredientList;
-    }
-
     public void addVisitCnt(){
         this.visitCnt += 1;
     }

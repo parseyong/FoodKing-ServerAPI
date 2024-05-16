@@ -4,7 +4,6 @@ import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.common.RecipeSortType;
-import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.dto.recipeInfo.request.ReadRecipeInfoPagingReq;
 import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoPagingRes;
 import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoRes;

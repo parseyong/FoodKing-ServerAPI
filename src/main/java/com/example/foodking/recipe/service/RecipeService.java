@@ -20,7 +20,6 @@ import com.example.foodking.reply.service.ReplyService;
 import com.example.foodking.user.domain.User;
 import com.example.foodking.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +28,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Log4j2
 @Transactional(readOnly = true)
 public class RecipeService {
 
@@ -88,13 +86,9 @@ public class RecipeService {
     @DistributedLock(key = "#recipeId")
     public ReadRecipeRes readRecipe(Long userId, Long recipeInfoId, ReplySortType replySortType){
 
-        // querydsl로 필요한 데이터를 4개의 쿼리로 모두 가져올 예정
-        // 1.레시피info 정보 및 좋아요 수
-        // 2.댓글 총 수와 댓글페이징결과 및 각 댓글의 좋아요 수
-        // 3.재료 정보
-        // 4.조리법 정보
-
         RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
+        
+        // 조회수 1 증가
         recipeInfo.addVisitCnt();
 
         Long replyCnt = (long)recipeInfo.getReplyList().size();

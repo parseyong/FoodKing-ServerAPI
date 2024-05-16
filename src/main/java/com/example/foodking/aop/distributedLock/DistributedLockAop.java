@@ -40,7 +40,7 @@ public class DistributedLockAop {
         DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
 
         // SpringELParser를 통해 파라미터값에 따라 동적으로 키를 생성해 키의 중복을 방지한다.
-        String key = REDISSON_LOCK_PREFIX + method.getName() + args[1];
+        String key = REDISSON_LOCK_PREFIX + distributedLock.key() + method.getName() + args[1];
 
         // lock 획득시도
         RLock rLock = redissonClient.getLock(key);
