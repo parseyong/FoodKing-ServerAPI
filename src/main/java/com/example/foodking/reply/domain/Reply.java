@@ -25,12 +25,15 @@ public class Reply extends TimeEntity {
     @Column(nullable = false)
     private String content;
 
-    @ManyToOne
+    @Column(nullable = false, name = "like_cnt")
+    private Long likeCnt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_info_id",nullable = false)
     private RecipeInfo recipeInfo;
 
@@ -39,9 +42,17 @@ public class Reply extends TimeEntity {
         this.content=content;
         this.user=user;
         this.recipeInfo=recipeInfo;
+        this.likeCnt = 0L;
     }
 
     public void changeContent(String content){
         this.content=content;
+    }
+    public void liking(){
+        this.likeCnt += 1;
+    }
+    public void unLiking(){
+        if(likeCnt > 0 )
+            this.likeCnt -=1;
     }
 }

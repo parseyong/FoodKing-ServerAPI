@@ -83,7 +83,8 @@ public class RecipeService {
         recipeInfoRepository.delete(recipeInfo);
     }
 
-    @DistributedLock(key = "#recipeId")
+    @Transactional
+    @DistributedLock(key = "#LockRecipe")
     public ReadRecipeRes readRecipe(Long userId, Long recipeInfoId, ReplySortType replySortType){
 
         RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);

@@ -1,5 +1,6 @@
 package com.example.foodking.emotion.service;
 
+import com.example.foodking.aop.distributedLock.DistributedLock;
 import com.example.foodking.emotion.common.EmotionType;
 import com.example.foodking.emotion.domain.RecipeEmotion;
 import com.example.foodking.emotion.domain.ReplyEmotion;
@@ -39,6 +40,7 @@ public class EmotionService {
     */
 
     @Transactional
+    @DistributedLock(key = "#LockReplyEmotion")
     public void toggleReplyEmotion(Long userId, Long replyId, EmotionType emotionType){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
@@ -53,6 +55,7 @@ public class EmotionService {
                     .reply(reply)
                     .build();
             replyEmotionRepository.save(replyEmotion);
+            reply.liking();
         }
         else{
             ReplyEmotion replyEmotion = result.get();
@@ -60,10 +63,13 @@ public class EmotionService {
                 throw new CommondException(ExceptionCode.ACCESS_FAIL_EMOTION);
 
             replyEmotionRepository.delete(result.get());
+            reply.unLiking();
         }
+        replyRepository.save(reply);
     }
 
     @Transactional
+    @DistributedLock(key = "#LockRecipeEmotion")
     public void toggleRecipeInfoEmotion(Long userId, Long recipeInfoId, EmotionType emotionType){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
@@ -78,6 +84,7 @@ public class EmotionService {
                     .recipeInfo(recipeInfo)
                     .build();
             recipeEmotionRepository.save(recipeEmotion);
+            recipeInfo.liking();
         }
         else{
             RecipeEmotion recipeEmotion = result.get();
@@ -85,7 +92,9 @@ public class EmotionService {
                 throw new CommondException(ExceptionCode.ACCESS_FAIL_EMOTION);
 
             recipeEmotionRepository.delete(recipeEmotion);
+            recipeInfo.unLiking();
         }
+        recipeInfoRepository.save(recipeInfo);
     }
 
     public Long readReplyEmotionCnt(Reply reply){

@@ -49,17 +49,20 @@ public class RecipeInfo extends TimeEntity {
     @Column(nullable = false, name = "visit_cnt")
     private Long visitCnt;
 
+    @Column(nullable = false, name = "like_cnt")
+    private Long likeCnt;
+
     @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private List<Reply> replyList;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<RecipeWayInfo> recipeWayInfoList;
 
-    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     private List<Ingredient> ingredientList;
 
     @Builder
@@ -75,6 +78,7 @@ public class RecipeInfo extends TimeEntity {
         this.recipeWayInfoList=recipeWayInfoList;
         this.ingredientList=ingredientList;
         this.visitCnt = 0L;
+        this.likeCnt = 0L;
     }
     public void changeRecipeName(String recipeName){
         this.recipeName = recipeName;
@@ -102,5 +106,12 @@ public class RecipeInfo extends TimeEntity {
     }
     public void addVisitCnt(){
         this.visitCnt += 1;
+    }
+    public void liking(){
+        this.likeCnt += 1;
+    }
+    public void unLiking(){
+        if(likeCnt > 0 )
+            this.likeCnt -=1;
     }
 }

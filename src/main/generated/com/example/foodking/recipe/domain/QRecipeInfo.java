@@ -32,6 +32,8 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final ListPath<com.example.foodking.ingredient.domain.Ingredient, com.example.foodking.ingredient.domain.QIngredient> ingredientList = this.<com.example.foodking.ingredient.domain.Ingredient, com.example.foodking.ingredient.domain.QIngredient>createList("ingredientList", com.example.foodking.ingredient.domain.Ingredient.class, com.example.foodking.ingredient.domain.QIngredient.class, PathInits.DIRECT2);
 
+    public final NumberPath<Long> likeCnt = createNumber("likeCnt", Long.class);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modDate = _super.modDate;
 

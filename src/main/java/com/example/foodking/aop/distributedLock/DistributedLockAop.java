@@ -56,6 +56,7 @@ public class DistributedLockAop {
             }
 
             // lock을 얻었다면 트랜잭션을 시작한다.
+            log.info(key);
             return aopForTransaction.proceed(joinPoint);
         } catch (InterruptedException e) {
             // waitTime이나 leaseTime등의 이유로 interrupted 발생 시
