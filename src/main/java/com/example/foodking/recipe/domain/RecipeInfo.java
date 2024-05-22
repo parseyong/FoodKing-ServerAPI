@@ -17,6 +17,12 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = {
+        @Index(name = "like_index_recipe", columnList = "like_cnt, recipe_info_id"),
+        @Index(name = "date_index_recipe", columnList = "reg_date, recipe_info_id"),
+        @Index(name = "time_index_recipe", columnList = "cooking_time, recipe_info_id"),
+        @Index(name = "calogy_index_recipe", columnList = "calogy, recipe_info_id")
+})
 public class RecipeInfo extends TimeEntity {
 
     @Id

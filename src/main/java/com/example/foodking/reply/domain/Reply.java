@@ -15,6 +15,10 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = {
+        @Index(name = "like_index_reply", columnList = "like_cnt, reply_id"),
+        @Index(name = "date_index_reply", columnList = "reg_date, reply_id")
+})
 public class Reply extends TimeEntity {
 
     @Id
