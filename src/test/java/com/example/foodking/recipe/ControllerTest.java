@@ -445,18 +445,20 @@ public class ControllerTest {
         // given
         makeAuthentication();
         ReadRecipeRes readRecipeRes = ReadRecipeRes.builder().build();
-        given(recipeService.readRecipe(any(Long.class),any(Long.class),any())).willReturn(readRecipeRes);
+        given(recipeService.readRecipe(any(Long.class),any(Long.class),any(),any(),any())).willReturn(readRecipeRes);
 
         //when, then
         this.mockMvc.perform(get("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("sort", String.valueOf(ReplySortType.LIKE)))
+                        .param("sort", String.valueOf(ReplySortType.LIKE))
+                        .param("lastId", "1")
+                        .param("lastValue","12"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("레시피 상세정보 조회완료"))
                 .andExpect(jsonPath("$.data").isNotEmpty())
                 .andDo(print());
 
-        verify(recipeService,times(1)).readRecipe(any(Long.class),any(Long.class),any());
+        verify(recipeService,times(1)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
@@ -472,7 +474,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
 
-        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any());
+        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
@@ -489,7 +491,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
                 .andDo(print());
 
-        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any());
+        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
@@ -506,7 +508,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."))
                 .andDo(print());
 
-        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any());
+        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
@@ -523,7 +525,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("sort이 ReplySortType타입이여야 합니다."))
                 .andDo(print());
 
-        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any());
+        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
@@ -540,7 +542,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.sort")
                         .value("Required request parameter 'sort' for method parameter type ReplySortType is not present(관리자에게 문의하세요)"))
                 .andDo(print());
-        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any());
+        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
@@ -548,18 +550,20 @@ public class ControllerTest {
     public void readRecipeFail6() throws Exception {
         // given
         makeAuthentication();
-        given(recipeService.readRecipe(any(Long.class),any(Long.class),any()))
+        given(recipeService.readRecipe(any(Long.class),any(Long.class),any(),any(),any()))
                 .willThrow(new CommondException(NOT_EXIST_RECIPEINFO));
 
         //when, then
         this.mockMvc.perform(get("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("sort", String.valueOf(ReplySortType.LIKE)))
+                        .param("sort", String.valueOf(ReplySortType.LIKE))
+                        .param("lastId", "1")
+                        .param("lastValue","12"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
                 .andDo(print());
 
-        verify(recipeService,times(1)).readRecipe(any(Long.class),any(Long.class),any());
+        verify(recipeService,times(1)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test

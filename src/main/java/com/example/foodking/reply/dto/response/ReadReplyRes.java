@@ -26,13 +26,13 @@ public class ReadReplyRes {
 
     private LocalDateTime modDate;
 
-    public static ReadReplyRes toDTO(Reply reply, String writerNickname , boolean isMyReply, Long emotionCnt){
+    public static ReadReplyRes toDTO(Reply reply, String writerNickname , boolean isMyReply){
         return ReadReplyRes.builder()
                 .content(reply.getContent())
                 .writerNickname(writerNickname)
                 .replyId(reply.getReplyId())
                 .isMyReply(isMyReply)
-                .emotionCnt(emotionCnt)
+                .emotionCnt(reply.getLikeCnt())
                 .regDate(reply.getRegDate())
                 .modDate(reply.getModDate())
                 .build();

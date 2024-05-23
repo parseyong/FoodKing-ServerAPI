@@ -1,6 +1,5 @@
 package com.example.foodking.reply.service;
 
-import com.example.foodking.emotion.service.EmotionService;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.recipe.domain.RecipeInfo;
@@ -11,13 +10,18 @@ import com.example.foodking.reply.dto.response.ReadReplyRes;
 import com.example.foodking.reply.repository.ReplyRepository;
 import com.example.foodking.user.domain.User;
 import com.example.foodking.user.repository.UserRepository;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.example.foodking.reply.domain.QReply.reply;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +29,6 @@ import java.util.stream.Collectors;
 public class ReplyService {
 
     private final ReplyRepository replyRepository;
-    private final EmotionService emotionService;
     private final UserRepository userRepository;
     private final RecipeInfoRepository recipeInfoRepository;
 
@@ -45,27 +48,12 @@ public class ReplyService {
         return replyRepository.save(reply).getReplyId();
     }
 
-    public List<ReadReplyRes> readReply(RecipeInfo recipeInfo, Long userId, ReplySortType replySortType){
-
-        List<Reply> replyList = recipeInfo.getReplyList();
-
-        List<ReadReplyRes> readReplyResList = replyList.stream()
-                .map(entity -> {
-                    
-                    // 각 댓글의 좋아요 개수 가져오기
-                    Long replyEmotionCnt = emotionService.readReplyEmotionCnt(entity);
-                    // 댓글 작성자 정보 가져오기
-                    User user = entity.getUser();
-                    // 자신이 쓴 댓글인지 여부 반환
-                    if(isMyReply(userId,user))
-                        return ReadReplyRes.toDTO(entity, user.getNickName(), true,replyEmotionCnt);
-                    else
-                        return ReadReplyRes.toDTO(entity, user.getNickName(), false,replyEmotionCnt);
-                })
-                .sorted(getComparator(replySortType))
-                .collect(Collectors.toList());
-        
-        return readReplyResList;
+    public List<ReadReplyRes> readReply(Long recipeId, Long userId, ReplySortType replySortType, Long lastId, Object lastValue){
+        return replyRepository.findReplyList(
+                getBuilder(recipeId, replySortType, lastId, lastValue),
+                createOrderSpecifier(replySortType),
+                userId
+        );
     }
 
     @Transactional
@@ -101,14 +89,37 @@ public class ReplyService {
         return true;
     }
 
-    private Comparator<ReadReplyRes> getComparator(ReplySortType replySortType) {
-        switch (replySortType) {
-            case LIKE:
-                return Comparator.comparing(ReadReplyRes::getEmotionCnt).reversed();
-            // 다른 정렬 기준에 따른 case 추가
-            default:
-                return Comparator.comparing(ReadReplyRes::getRegDate);
+    // 동적으로 쿼리의 WHERE절을 생성하는 메소드
+    private BooleanBuilder getBuilder(Long recipeId, ReplySortType replySortType, Long lastId, Object lastValue){
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(reply.recipeInfo.recipeInfoId.eq(recipeId));
+
+        if(replySortType.equals(ReplySortType.LATEST)){
+            builder.and(reply.regDate.loe((LocalDateTime) lastValue));
+            builder.and(reply.replyId.gt(lastId));
         }
+        else {
+            builder.and(reply.likeCnt.loe(Long.valueOf(String.valueOf(lastValue))));
+            builder.and(reply.replyId.gt(lastId));
+        }
+
+        return builder;
     }
 
+    // 정렬 조건을 동적으로 생성하는 메소드
+    private OrderSpecifier[] createOrderSpecifier(ReplySortType replySortType) {
+
+        List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
+
+        if(replySortType.equals(ReplySortType.LATEST)){
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, reply.regDate));
+        }
+        else{
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, reply.likeCnt));
+        }
+
+        orderSpecifiers.add(new OrderSpecifier(Order.ASC, reply.replyId));
+        return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);
+    }
 }

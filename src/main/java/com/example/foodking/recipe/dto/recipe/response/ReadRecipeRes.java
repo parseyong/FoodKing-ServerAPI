@@ -21,6 +21,4 @@ public class ReadRecipeRes {
     private List<ReadReplyRes> readReplyResList;
     private String recipeTip;
     private boolean isMyRecipe;
-    private Long visitCnt;
-
 }

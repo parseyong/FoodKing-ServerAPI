@@ -1,7 +1,6 @@
 package com.example.foodking.recipe.service;
 
 import com.example.foodking.aop.distributedLock.DistributedLock;
-import com.example.foodking.emotion.service.EmotionService;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.ingredient.dto.response.ReadIngredientRes;
@@ -34,7 +33,6 @@ public class RecipeService {
     private final RecipeInfoRepository recipeInfoRepository;
     private final UserRepository userRepository;
     private final ReplyService replyService;
-    private final EmotionService emotionService;
     private final IngredientService ingredientService;
     private final RecipeWayInfoService recipeWayInfoService;
 
@@ -85,18 +83,11 @@ public class RecipeService {
 
     @Transactional
     @DistributedLock(key = "#LockRecipe")
-    public ReadRecipeRes readRecipe(Long userId, Long recipeInfoId, ReplySortType replySortType){
+    public ReadRecipeRes readRecipe(Long userId, Long recipeInfoId, ReplySortType replySortType,Long lastId, Object lastValue){
 
-        RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
-        
-        // 조회수 1 증가
-        recipeInfo.addVisitCnt();
+        ReadRecipeInfoRes readRecipeInfoRes = recipeInfoRepository.findRecipeInfo(recipeInfoId);
 
-        Long replyCnt = (long)recipeInfo.getReplyList().size();
-        Long emotionCnt = emotionService.readRecipeEmotionCnt(recipeInfo);
-        User writer = recipeInfo.getUser();
-
-        ReadRecipeInfoRes readRecipeInfoRes = ReadRecipeInfoRes.toDTO(recipeInfo,replyCnt,emotionCnt, writer.getUserId(), writer.getNickName());
+        RecipeInfo recipeInfo = readRecipeInfoRes.getRecipeInfo();
 
         List<ReadRecipeWayInfoResDTO> readRecipeWayInfoResDTOList = recipeInfo.getRecipeWayInfoList().stream()
                 .map(entity -> ReadRecipeWayInfoResDTO.toDTO(entity))
@@ -106,8 +97,9 @@ public class RecipeService {
                 .map(entity -> ReadIngredientRes.toDTO(entity))
                 .collect(Collectors.toList());
 
-        List<ReadReplyRes> readReplyResList = replyService.readReply(recipeInfo,userId,replySortType);
+        List<ReadReplyRes> readReplyResList = replyService.readReply(recipeInfoId,userId,replySortType, lastId, lastValue);
 
+        recipeInfo.addVisitCnt();
         recipeInfoRepository.save(recipeInfo);
 
         return ReadRecipeRes.builder()
@@ -117,8 +109,12 @@ public class RecipeService {
                 .readIngredientResList(readIngredientResList)
                 .recipeTip(recipeInfo.getRecipeTip())
                 .isMyRecipe(recipeInfo.getUser().getUserId() == userId)
-                .visitCnt(recipeInfo.getVisitCnt())
                 .build();
+    }
+
+    public static void isMyRecipe(Long userId, User user, ExceptionCode exceptionCode){
+        if( user ==null || !userId.equals(user.getUserId()) )
+            throw new CommondException(exceptionCode);
     }
 
     private void updateRecipeInfo(RecipeInfo recipeInfo, SaveRecipeInfoReq saveRecipeInfoReq){
@@ -130,13 +126,4 @@ public class RecipeService {
         recipeInfo.changeRecipeTip(saveRecipeInfoReq.getRecipeTip());
     }
 
-    private RecipeInfo findRecipeInfoById(Long recipeInfoId){
-        return recipeInfoRepository.findById(recipeInfoId)
-                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
-    }
-
-    public static void isMyRecipe(Long userId, User user, ExceptionCode exceptionCode){
-        if( user ==null || !userId.equals(user.getUserId()) )
-            throw new CommondException(exceptionCode);
-    }
 }

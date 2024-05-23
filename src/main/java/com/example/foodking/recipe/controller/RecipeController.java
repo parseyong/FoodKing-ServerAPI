@@ -60,9 +60,11 @@ public class RecipeController {
     public ResponseEntity<CommonResDTO> readRecipe(
             @AuthenticationPrincipal final Long userId,
             @PathVariable final Long recipeInfoId,
-            @RequestParam(name = "sort") ReplySortType replySortType){
+            @RequestParam(name = "sort") ReplySortType replySortType,
+            @RequestParam(name = "lastId") Long lastId,
+            @RequestParam(name = "lastValue") Object lastValue){
 
-        ReadRecipeRes readRecipeRes = recipeService.readRecipe(userId,recipeInfoId,replySortType);
+        ReadRecipeRes readRecipeRes = recipeService.readRecipe(userId,recipeInfoId,replySortType, lastId,lastValue);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("레시피 상세정보 조회완료", readRecipeRes));
     }
 

@@ -3,7 +3,7 @@ package com.example.foodking.recipe.repository.impl;
 import com.example.foodking.recipe.domain.QRecipeInfo;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoRes;
-import com.example.foodking.recipe.repository.RecipeInfoPagingRepository;
+import com.example.foodking.recipe.repository.RecipeInfoQdslRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
@@ -18,12 +18,13 @@ import java.util.stream.Collectors;
 
 import static com.example.foodking.emotion.domain.QRecipeEmotion.recipeEmotion;
 import static com.example.foodking.recipe.domain.QRecipeInfo.recipeInfo;
+import static com.example.foodking.reply.domain.QReply.reply;
 import static com.example.foodking.user.domain.QUser.user;
 
 @Repository
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class RecipeInfoPagingRepositoryImpl implements RecipeInfoPagingRepository {
+public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -48,7 +49,7 @@ public class RecipeInfoPagingRepositoryImpl implements RecipeInfoPagingRepositor
                     Long emotionCnt = entity.get(recipeEmotion.count());
                     Long writerUserId = entity.get(user.userId);
                     String writerNickName = entity.get(user.nickName);
-                    return ReadRecipeInfoRes.toDTO(recipeInfo,replyCnt,emotionCnt,writerUserId,writerNickName);
+                    return ReadRecipeInfoRes.toDTO(recipeInfo,replyCnt,writerUserId,writerNickName);
                 })
                 .collect(Collectors.toList());
     }
@@ -64,6 +65,7 @@ public class RecipeInfoPagingRepositoryImpl implements RecipeInfoPagingRepositor
     @Override
     public List<ReadRecipeInfoRes> findLikedRecipeInfoList(OrderSpecifier[] orderSpecifier, String searchKeyword, Pageable pageable, Long userId) {
         BooleanBuilder builder = new BooleanBuilder();
+
         if(searchKeyword != null)
             builder.and(recipeInfo.recipeName.contains(searchKeyword));
 
@@ -94,7 +96,7 @@ public class RecipeInfoPagingRepositoryImpl implements RecipeInfoPagingRepositor
                     Long emotionCnt = entity.get(recipeEmotion.count());
                     Long writerUserId = entity.get(user.userId);
                     String writerNickName = entity.get(user.nickName);
-                    return ReadRecipeInfoRes.toDTO(recipeInfo,replyCnt,emotionCnt,writerUserId,writerNickName);
+                    return ReadRecipeInfoRes.toDTO(recipeInfo,replyCnt,writerUserId,writerNickName);
                 })
                 .collect(Collectors.toList());
     }
@@ -102,6 +104,7 @@ public class RecipeInfoPagingRepositoryImpl implements RecipeInfoPagingRepositor
     @Override
     public Long findLikedRecipeInfoCnt(String searchKeyword, Long userId) {
         BooleanBuilder builder = new BooleanBuilder();
+
         if(searchKeyword != null)
             builder.and(recipeInfo.recipeName.contains(searchKeyword));
 
@@ -112,6 +115,23 @@ public class RecipeInfoPagingRepositoryImpl implements RecipeInfoPagingRepositor
                 .join(recipeInfo).on(recipeEmotion.recipeInfo.recipeInfoId.eq(recipeInfo.recipeInfoId))
                 .where(builder)
                 .fetchOne();
+    }
+
+    @Override
+    public ReadRecipeInfoRes findRecipeInfo(Long recipeinfoId) {
+        Tuple result = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId)
+                .from(recipeInfo)
+                .join(user).on(recipeInfo.user.userId.eq(user.userId))
+                .where(recipeInfo.recipeInfoId.eq(recipeinfoId))
+                .fetchOne();
+
+        Long replyCnt = jpaQueryFactory.select(reply.count())
+                .from(reply)
+                .where(reply.recipeInfo.recipeInfoId.eq(recipeinfoId))
+                .fetchOne();
+
+        return ReadRecipeInfoRes.toDTO
+                (result.get(recipeInfo),replyCnt,result.get(user.userId),result.get(user.nickName));
     }
 
 }

@@ -5,9 +5,7 @@ import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
-import com.example.foodking.reply.common.ReplySortType;
 import com.example.foodking.reply.domain.Reply;
-import com.example.foodking.reply.dto.response.ReadReplyRes;
 import com.example.foodking.reply.repository.ReplyRepository;
 import com.example.foodking.reply.service.ReplyService;
 import com.example.foodking.user.domain.User;
@@ -20,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -228,81 +225,4 @@ public class ServiceTest {
         }
     }
 
-    @Test
-    @DisplayName("댓글 조회 테스트 -> (성공 : 시간순 정렬)")
-    public void readReplySuccess1(){
-        // given
-        reply.changeContent("댓글1");
-        Reply reply1 = spy(reply);
-        reply.changeContent("댓글2");
-        Reply reply2 = spy(reply);
-        reply.changeContent("댓글3");
-        Reply reply3 = spy(reply);
-        RecipeInfo recipeInfoSpy = spy(recipeInfo);
-
-        given(reply1.getRegDate()).willReturn(LocalDateTime.of(2024,02,02,06,10));
-        given(reply2.getRegDate()).willReturn(LocalDateTime.of(2024,02,02,06,17));
-        given(reply3.getRegDate()).willReturn(LocalDateTime.of(2024,02,02,06,5));
-        given(recipeInfoSpy.getReplyList()).willReturn(replyList);
-        given(user.getUserId()).willReturn(1L);
-
-        given(emotionService.readReplyEmotionCnt(reply1)).willReturn(3L);
-        given(emotionService.readReplyEmotionCnt(reply2)).willReturn(1L);
-        given(emotionService.readReplyEmotionCnt(reply3)).willReturn(2L);
-        replyList.add(reply1);
-        replyList.add(reply2);
-        replyList.add(reply3);
-
-        // when
-        List<ReadReplyRes> result = replyService.readReply(recipeInfoSpy,1L, ReplySortType.LATEST);
-
-        // then
-        verify(emotionService,times(3)).readReplyEmotionCnt(any(Reply.class));
-        assertThat(result.size()).isEqualTo(3);
-        assertThat(result.get(0).getRegDate()).isEqualTo(LocalDateTime.of(2024,02,02,06,5));
-        assertThat(result.get(1).getRegDate()).isEqualTo(LocalDateTime.of(2024,02,02,06,10));
-        assertThat(result.get(2).getRegDate()).isEqualTo(LocalDateTime.of(2024,02,02,06,17));
-        assertThat(result.get(0).isMyReply()).isTrue();
-        assertThat(result.get(1).isMyReply()).isTrue();
-        assertThat(result.get(2).isMyReply()).isTrue();
-    }
-
-    @Test
-    @DisplayName("댓글 조회 테스트 -> (성공 : 좋아요순 정렬)")
-    public void readReplySuccess2(){
-        // given
-        reply.changeContent("댓글1");
-        Reply reply1 = spy(reply);
-        reply.changeContent("댓글2");
-        Reply reply2 = spy(reply);
-        reply.changeContent("댓글3");
-        Reply reply3 = spy(reply);
-        RecipeInfo recipeInfoSpy = spy(recipeInfo);
-
-        given(reply1.getRegDate()).willReturn(LocalDateTime.of(2024,02,02,06,10));
-        given(reply2.getRegDate()).willReturn(LocalDateTime.of(2024,02,02,06,17));
-        given(reply3.getRegDate()).willReturn(LocalDateTime.of(2024,02,02,06,5));
-        given(recipeInfoSpy.getReplyList()).willReturn(replyList);
-        given(user.getUserId()).willReturn(1L);
-
-        given(emotionService.readReplyEmotionCnt(reply1)).willReturn(3L);
-        given(emotionService.readReplyEmotionCnt(reply2)).willReturn(1L);
-        given(emotionService.readReplyEmotionCnt(reply3)).willReturn(2L);
-        replyList.add(reply1);
-        replyList.add(reply2);
-        replyList.add(reply3);
-
-        // when
-        List<ReadReplyRes> result = replyService.readReply(recipeInfoSpy,1L,ReplySortType.LIKE);
-
-        // then
-        verify(emotionService,times(3)).readReplyEmotionCnt(any(Reply.class));
-        assertThat(result.size()).isEqualTo(3);
-        assertThat(result.get(0).getEmotionCnt()).isEqualTo(3L);
-        assertThat(result.get(1).getEmotionCnt()).isEqualTo(2L);
-        assertThat(result.get(2).getEmotionCnt()).isEqualTo(1L);
-        assertThat(result.get(0).isMyReply()).isTrue();
-        assertThat(result.get(1).isMyReply()).isTrue();
-        assertThat(result.get(2).isMyReply()).isTrue();
-    }
 }

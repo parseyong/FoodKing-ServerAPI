@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.concurrent.CountDownLatch;
 
+import static org.mockito.ArgumentMatchers.any;
+
 @SpringBootTest
 public class DistributedLockTest {
 
@@ -31,7 +33,7 @@ public class DistributedLockTest {
             executorService.submit(() -> {
                 try {
                     // 분산락 적용 메서드 호출 (락의 key는 쿠폰의 name으로 설정)
-                    recipeService.readRecipe(1L,1L, ReplySortType.LATEST);
+                    recipeService.readRecipe(1L,1L, ReplySortType.LATEST,any(),any());
                 } finally {
                     latch.countDown();
                 }

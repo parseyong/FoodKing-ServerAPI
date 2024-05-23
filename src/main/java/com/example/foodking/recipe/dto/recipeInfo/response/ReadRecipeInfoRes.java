@@ -2,6 +2,7 @@ package com.example.foodking.recipe.dto.recipeInfo.response;
 
 import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.domain.RecipeInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,9 +29,12 @@ public class ReadRecipeInfoRes {
     private Long writerUserId;
     private String writerNickName;
 
-    public static ReadRecipeInfoRes toDTO(RecipeInfo recipeInfo, Long replyCnt, Long emotionCnt,
-                                          Long writerUserId, String writerNickName){
+    @JsonIgnore
+    private RecipeInfo recipeInfo;
+
+    public static ReadRecipeInfoRes toDTO(RecipeInfo recipeInfo, Long replyCnt, Long writerUserId, String writerNickName){
         return ReadRecipeInfoRes.builder()
+                .recipeInfo(recipeInfo)
                 .calogy(recipeInfo.getCalogy())
                 .recipeInfoType(recipeInfo.getRecipeInfoType())
                 .recipeName(recipeInfo.getRecipeName())
@@ -39,7 +43,7 @@ public class ReadRecipeInfoRes {
                 .recipeInfoId(recipeInfo.getRecipeInfoId())
                 .recipeImageUrl(recipeInfo.getRecipeImage())
                 .replyCnt(replyCnt)
-                .emotionCnt(emotionCnt)
+                .emotionCnt(recipeInfo.getLikeCnt())
                 .regDate(recipeInfo.getRegDate())
                 .modDate(recipeInfo.getModDate())
                 .visitCnt(recipeInfo.getVisitCnt())
