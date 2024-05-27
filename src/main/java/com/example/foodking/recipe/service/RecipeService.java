@@ -83,12 +83,16 @@ public class RecipeService {
 
     @Transactional
     @DistributedLock(key = "#LockRecipe")
-    public ReadRecipeRes readRecipe(Long userId, Long recipeInfoId,
+    public Object readRecipe(Long userId, Long recipeInfoId,
                                     ReplySortType replySortType,
                                     Long lastId, Object lastValue){
 
-        ReadRecipeInfoRes readRecipeInfoRes = recipeInfoRepository.findRecipeInfo(recipeInfoId);
+        // 만약 첫번째 페이지를 요청했다면 레시피정보를 가져와야하지만
+        // 첫번째페이지가 아니라면 레시피정보를 가져올 필요가 없이 댓글정보만 가져오면 된다.
+        if(lastId != null && lastValue != null)
+            return replyService.readReply(recipeInfoId, userId, replySortType, lastId, lastValue);
 
+        ReadRecipeInfoRes readRecipeInfoRes = recipeInfoRepository.findRecipeInfo(recipeInfoId);
         RecipeInfo recipeInfo = readRecipeInfoRes.getRecipeInfo();
 
         List<ReadRecipeWayInfoResDTO> readRecipeWayInfoResDTOList = recipeInfo.getRecipeWayInfoList().stream()
@@ -99,8 +103,7 @@ public class RecipeService {
                 .map(entity -> ReadIngredientRes.toDTO(entity))
                 .collect(Collectors.toList());
 
-        List<ReadReplyRes> readReplyResList = replyService.readReply(recipeInfoId,userId,replySortType, lastId, lastValue);
-
+        List<ReadReplyRes> readReplyResList = replyService.readReply(recipeInfoId, userId, replySortType, lastId, lastValue);
         recipeInfo.addVisitCnt();
         recipeInfoRepository.save(recipeInfo);
 
@@ -112,6 +115,7 @@ public class RecipeService {
                 .recipeTip(recipeInfo.getRecipeTip())
                 .isMyRecipe(recipeInfo.getUser().getUserId() == userId)
                 .build();
+
     }
 
     public static void isMyRecipe(Long userId, User user, ExceptionCode exceptionCode){

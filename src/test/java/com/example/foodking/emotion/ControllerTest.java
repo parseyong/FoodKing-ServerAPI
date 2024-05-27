@@ -52,7 +52,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(post("/replies/emotions/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("emotionType" , "Like"))
+                        .param("emotionType" , "LIKE"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("댓글이모션 토글 완료"))
                 .andDo(print());
@@ -108,7 +108,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(post("/replies/emotions/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("emotionType","Like"))
+                        .param("emotionType","LIKE"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 댓글입니다"))
                 .andDo(print());
@@ -128,7 +128,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(post("/replies/emotions/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("emotionType","Like"))
+                        .param("emotionType","LIKE"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 이모션에 대한 권한이 없습니다"))
                 .andDo(print());
@@ -163,7 +163,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("emotionType", "Like"))
+                        .param("emotionType", "LIKE"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("레시피이모션 토글 완료"))
                 .andDo(print());
@@ -219,7 +219,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("emotionType","Like"))
+                        .param("emotionType","LIKE"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
                 .andDo(print());
@@ -239,7 +239,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("emotionType","Like"))
+                        .param("emotionType","LIKE"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 이모션에 대한 권한이 없습니다"))
                 .andDo(print());

@@ -9,7 +9,6 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,24 +28,22 @@ public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<ReadRecipeInfoRes> findRecipeInfoPagingByCondition(BooleanBuilder builder, OrderSpecifier[] orderSpecifier, Pageable pageable) {
+    public List<ReadRecipeInfoRes> findRecipeInfoPagingByCondition(BooleanBuilder builder, OrderSpecifier[] orderSpecifier) {
 
-        List<Tuple> result = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId,recipeEmotion.count())
-                    .from(recipeInfo)
-                    .leftJoin(recipeEmotion).on(recipeInfo.recipeInfoId.eq(recipeEmotion.recipeInfo.recipeInfoId))
-                    .join(user).on(recipeInfo.user.userId.eq(user.userId))
-                    .where(builder)
-                    .groupBy(recipeInfo)
-                    .orderBy(orderSpecifier)
-                    .offset(pageable.getOffset()) // 시작지점
-                    .limit(pageable.getPageSize()) //페이지의 크기
-                    .fetch();
+        List<Tuple> result = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId,reply.count())
+                .from(recipeInfo)
+                .join(user).on(recipeInfo.user.userId.eq(user.userId))
+                .join(reply).on(recipeInfo.recipeInfoId.eq(reply.recipeInfo.recipeInfoId))
+                .where(builder)
+                .groupBy(recipeInfo)
+                .orderBy(orderSpecifier)
+                .limit(10) //페이지의 크기
+                .fetch();
 
         return result.stream()
                 .map(entity -> {
                     RecipeInfo recipeInfo = entity.get(QRecipeInfo.recipeInfo);
-                    Long replyCnt = (long) recipeInfo.getReplyList().size();
-                    Long emotionCnt = entity.get(recipeEmotion.count());
+                    Long replyCnt = entity.get(reply.count());
                     Long writerUserId = entity.get(user.userId);
                     String writerNickName = entity.get(user.nickName);
                     return ReadRecipeInfoRes.toDTO(recipeInfo,replyCnt,writerUserId,writerNickName);
@@ -63,7 +60,7 @@ public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
     }
 
     @Override
-    public List<ReadRecipeInfoRes> findLikedRecipeInfoList(OrderSpecifier[] orderSpecifier, String searchKeyword, Pageable pageable, Long userId) {
+    public List<ReadRecipeInfoRes> findLikedRecipeInfoList(OrderSpecifier[] orderSpecifier, String searchKeyword, Long userId) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if(searchKeyword != null)
@@ -76,8 +73,7 @@ public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
                 .join(recipeInfo).on(recipeEmotion.recipeInfo.recipeInfoId.eq(recipeInfo.recipeInfoId))
                 .where(builder)
                 .orderBy(orderSpecifier)
-                .offset(pageable.getOffset()) // 시작지점
-                .limit(pageable.getPageSize()) //페이지의 크기
+                .limit(10) //페이지의 크기
                 .fetch();
 
         List<Tuple> result = jpaQueryFactory.select(recipeInfo,user.userId,user.nickName,recipeEmotion.count())
@@ -119,19 +115,16 @@ public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
 
     @Override
     public ReadRecipeInfoRes findRecipeInfo(Long recipeinfoId) {
-        Tuple result = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId)
+        Tuple result = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId,reply.count())
                 .from(recipeInfo)
                 .join(user).on(recipeInfo.user.userId.eq(user.userId))
+                .join(reply).on(reply.recipeInfo.recipeInfoId.eq(recipeInfo.recipeInfoId))
                 .where(recipeInfo.recipeInfoId.eq(recipeinfoId))
-                .fetchOne();
-
-        Long replyCnt = jpaQueryFactory.select(reply.count())
-                .from(reply)
-                .where(reply.recipeInfo.recipeInfoId.eq(recipeinfoId))
+                .groupBy(recipeInfo)
                 .fetchOne();
 
         return ReadRecipeInfoRes.toDTO
-                (result.get(recipeInfo),replyCnt,result.get(user.userId),result.get(user.nickName));
+                (result.get(recipeInfo),result.get(reply.count()),result.get(user.userId),result.get(user.nickName));
     }
 
 }

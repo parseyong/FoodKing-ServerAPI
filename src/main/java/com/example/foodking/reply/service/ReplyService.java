@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,7 +100,7 @@ public class ReplyService {
         builder.and(reply.recipeInfo.recipeInfoId.eq(recipeId));
 
         if(replySortType.equals(ReplySortType.LATEST) && lastId != null && lastValue != null){
-            builder.and(reply.regDate.loe((LocalDateTime) lastValue));
+            builder.and(reply.regDate.loe(LocalDateTime.parse((String)lastValue, DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
             builder.and(reply.replyId.gt(lastId));
         }
         else if(replySortType.equals(ReplySortType.LIKE) && lastId != null && lastValue != null){

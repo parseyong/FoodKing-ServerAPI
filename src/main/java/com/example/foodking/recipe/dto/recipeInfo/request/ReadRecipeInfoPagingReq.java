@@ -33,6 +33,8 @@ public class ReadRecipeInfoPagingReq {
 
     private Object condition;
 
-    private Long pageNum;
+    private Long lastId;
+
+    private Object lastValue;
 
 }

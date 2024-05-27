@@ -12,14 +12,14 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.foodking.emotion.domain.QRecipeEmotion.recipeEmotion;
 import static com.example.foodking.recipe.domain.QRecipeInfo.recipeInfo;
 
 
@@ -32,20 +32,13 @@ public class RecipePagingService {
 
     public ReadRecipeInfoPagingRes readRecipeInfoPagingByCondition(ReadRecipeInfoPagingReq readRecipeInfoPagingReq){
 
-        // 조건(condition)에 따라 동적으로 WHERE절을 생성
-        BooleanBuilder builder = getBuilder(
-                readRecipeInfoPagingReq.getCondition(),
-                readRecipeInfoPagingReq.getSearchKeyword(),
-                readRecipeInfoPagingReq.getUserId());
-
         // 해당 조건에 대한 전체 결과 수 측정
-        Long recipeCnt = recipeInfoRepository.findRecipeInfoTotalCnt(builder);
+        Long recipeCnt = recipeInfoRepository.findRecipeInfoTotalCnt(getBuilderForCount(readRecipeInfoPagingReq));
 
         // 쿼리 실행
         List<ReadRecipeInfoRes> readRecipeInfoResDTOList = recipeInfoRepository.findRecipeInfoPagingByCondition(
-                builder,
-                createOrderSpecifier(readRecipeInfoPagingReq.getRecipeSortType()),
-                PageRequest.of((int) (readRecipeInfoPagingReq.getPageNum()-1),10));
+                getBuilderForPaging(readRecipeInfoPagingReq),
+                createOrderSpecifier(readRecipeInfoPagingReq.getRecipeSortType()));
 
         // 존재하지 않는 페이지일 경우 예외를 던짐
         if(readRecipeInfoResDTOList.size() == 0)
@@ -65,7 +58,6 @@ public class RecipePagingService {
         List<ReadRecipeInfoRes> readRecipeInfoResDTOList = recipeInfoRepository.findLikedRecipeInfoList(
                         createOrderSpecifier(readRecipeInfoPagingReq.getRecipeSortType()),
                         readRecipeInfoPagingReq.getSearchKeyword(),
-                        PageRequest.of((int) (readRecipeInfoPagingReq.getPageNum()-1),10),
                         readRecipeInfoPagingReq.getUserId());
 
         // 존재하지 않는 페이지일 경우 예외를 던짐
@@ -76,8 +68,9 @@ public class RecipePagingService {
     }
 
     // 동적으로 쿼리의 WHERE절을 생성하는 메소드
-    private BooleanBuilder getBuilder(Object condition, String searchKeyword, Long userId){
+    private BooleanBuilder getBuilderForPaging(ReadRecipeInfoPagingReq readRecipeInfoPagingReq){
         BooleanBuilder builder = new BooleanBuilder();
+        Object condition = readRecipeInfoPagingReq.getCondition();
 
         if(condition instanceof RecipeInfoType){
             // 레시피 타입으로 레시피 조회 시
@@ -85,12 +78,61 @@ public class RecipePagingService {
         }
         else if(condition instanceof String && condition.equals("mine")){
             // 자신이 쓴 레시피 조회 시
-            builder.and(recipeInfo.user.userId.eq(userId));
+            builder.and(recipeInfo.user.userId.eq(readRecipeInfoPagingReq.getUserId()));
         }
 
-        if(searchKeyword != null){
-            builder.and(recipeInfo.recipeName.contains(searchKeyword));
+        if(readRecipeInfoPagingReq.getSearchKeyword() != null){
+            builder.and(recipeInfo.recipeName.contains(readRecipeInfoPagingReq.getSearchKeyword()));
         }
+        
+        // lastId와 lastValue가 null이 아니라면 첫번째 페이지가 아니기 때문에 where절 추가
+        if(readRecipeInfoPagingReq.getLastId() != null && readRecipeInfoPagingReq.getLastValue() != null){
+            RecipeSortType recipeSortType = readRecipeInfoPagingReq.getRecipeSortType();
+
+            if(recipeSortType.equals(RecipeSortType.LIKE)){
+                builder.and(recipeInfo.likeCnt.loe(Long.valueOf(String.valueOf(readRecipeInfoPagingReq.getLastValue()))));
+                builder.and(recipeInfo.recipeInfoId.gt(readRecipeInfoPagingReq.getLastId()));
+            }
+            else if(recipeSortType.equals(RecipeSortType.VISIT)){
+                builder.and(recipeInfo.visitCnt.loe(Long.valueOf(String.valueOf(readRecipeInfoPagingReq.getLastValue()))));
+                builder.and(recipeInfo.recipeInfoId.gt(readRecipeInfoPagingReq.getLastId()));
+            }
+            else if(recipeSortType.equals(RecipeSortType.CALOGY)){
+                builder.and(recipeInfo.calogy.goe(Long.valueOf(String.valueOf(readRecipeInfoPagingReq.getLastValue()))));
+                builder.and(recipeInfo.recipeInfoId.gt(readRecipeInfoPagingReq.getLastId()));
+            }
+            else if(recipeSortType.equals(RecipeSortType.COOKTIME)){
+                builder.and(recipeInfo.cookingTime.goe(Long.valueOf(String.valueOf(readRecipeInfoPagingReq.getLastValue()))));
+                builder.and(recipeInfo.recipeInfoId.gt(readRecipeInfoPagingReq.getLastId()));
+            }
+            else {
+                builder.and(recipeInfo.regDate.loe(LocalDateTime.parse(
+                        (String) readRecipeInfoPagingReq.getLastValue(), DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+                builder.and(recipeInfo.recipeInfoId.gt(readRecipeInfoPagingReq.getLastId()));
+            }
+
+        }
+        
+        return builder;
+    }
+
+    private BooleanBuilder getBuilderForCount(ReadRecipeInfoPagingReq readRecipeInfoPagingReq){
+        BooleanBuilder builder = new BooleanBuilder();
+        Object condition = readRecipeInfoPagingReq.getCondition();
+
+        if(condition instanceof RecipeInfoType){
+            // 레시피 타입으로 레시피 조회 시
+            builder.and(recipeInfo.recipeInfoType.eq((RecipeInfoType) condition));
+        }
+        else if(condition instanceof String && condition.equals("mine")){
+            // 자신이 쓴 레시피 조회 시
+            builder.and(recipeInfo.user.userId.eq(readRecipeInfoPagingReq.getUserId()));
+        }
+
+        if(readRecipeInfoPagingReq.getSearchKeyword() != null){
+            builder.and(recipeInfo.recipeName.contains(readRecipeInfoPagingReq.getSearchKeyword()));
+        }
+
         return builder;
     }
 
@@ -112,9 +154,10 @@ public class RecipePagingService {
             orderSpecifiers.add(new OrderSpecifier(Order.DESC, recipeInfo.visitCnt));
         }
         else{
-            orderSpecifiers.add(new OrderSpecifier(Order.DESC, recipeEmotion.count()));
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, recipeInfo.likeCnt));
         }
 
+        orderSpecifiers.add(new OrderSpecifier(Order.ASC, recipeInfo.recipeInfoId));
         return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);
     }
 }

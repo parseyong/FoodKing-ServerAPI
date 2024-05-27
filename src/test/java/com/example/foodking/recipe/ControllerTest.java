@@ -573,7 +573,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when, then
-        this.mockMvc.perform(get("/recipes/{recipeType}/{pageNum}",RecipeInfoType.KOREAN,1L)
+        this.mockMvc.perform(get("/recipes/{recipeType}/list",RecipeInfoType.KOREAN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
                 .andExpect(status().isOk())
@@ -585,31 +585,13 @@ public class ControllerTest {
     }
 
     @Test
-    @DisplayName("레시피타입조회 페이징 테스트 -> (실패 : PathVariable타입예외)")
+    @DisplayName("레시피타입조회 페이징 테스트 -> (실패 : RecipeInfoType 타입 예외)")
     public void readRecipeInfoPagingByTypeFail1() throws Exception {
         // given
         makeAuthentication();
 
         //when, then
-        this.mockMvc.perform(get("/recipes/{recipeType}/{pageNum}",RecipeInfoType.KOREAN,"문자")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("pageNum이 Long타입이여야 합니다."))
-                .andDo(print());
-
-        verify(recipePagingService,times(0))
-                .readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class));
-    }
-
-    @Test
-    @DisplayName("레시피타입조회 페이징 테스트 -> (실패 : RecipeInfoType 타입 예외)")
-    public void readRecipeInfoPagingByTypeFail2() throws Exception {
-        // given
-        makeAuthentication();
-
-        //when, then
-        this.mockMvc.perform(get("/recipes/{recipeType}/{pageNum}","문자",1L)
+        this.mockMvc.perform(get("/recipes/{recipeType}/list","문자")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
                 .andExpect(status().isBadRequest())
@@ -622,12 +604,12 @@ public class ControllerTest {
 
     @Test
     @DisplayName("레시피타입조회 페이징 테스트 -> (실패 : RecipeSortType 타입 예외)")
-    public void readRecipeInfoPagingByTypeFail3() throws Exception {
+    public void readRecipeInfoPagingByTypeFail2() throws Exception {
         // given
         makeAuthentication();
 
         //when, then
-        this.mockMvc.perform(get("/recipes/{recipeType}/{pageNum}",RecipeInfoType.KOREAN,1L)
+        this.mockMvc.perform(get("/recipes/{recipeType}//list",RecipeInfoType.KOREAN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", "문자"))
                 .andExpect(status().isBadRequest())
@@ -640,11 +622,11 @@ public class ControllerTest {
 
     @Test
     @DisplayName("레시피타입조회 페이징 테스트 -> (실패 : 인증되지 않음)")
-    public void readRecipeInfoPagingByTypeFail4() throws Exception {
+    public void readRecipeInfoPagingByTypeFail3() throws Exception {
         // given
 
         //when, then
-        this.mockMvc.perform(get("/recipes/{recipeType}/{pageNum}",RecipeInfoType.KOREAN,1L)
+        this.mockMvc.perform(get("/recipes/{recipeType}//list",RecipeInfoType.KOREAN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
                 .andExpect(status().isUnauthorized())
@@ -657,14 +639,14 @@ public class ControllerTest {
 
     @Test
     @DisplayName("레시피타입조회 페이징 테스트 -> (실패 : 존재하지 않는 페이지)")
-    public void readRecipeInfoPagingByTypeFail5() throws Exception {
+    public void readRecipeInfoPagingByTypeFail4() throws Exception {
         // given
         makeAuthentication();
         given(recipePagingService.readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class)))
                 .willThrow(new CommondException(ExceptionCode.NOT_EXIST_PAGE));
 
         //when, then
-        this.mockMvc.perform(get("/recipes/{recipeType}/{pageNum}",RecipeInfoType.KOREAN,1L)
+        this.mockMvc.perform(get("/recipes/{recipeType}//list",RecipeInfoType.KOREAN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
                 .andExpect(status().isNotFound())
@@ -682,7 +664,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when, then
-        this.mockMvc.perform(get("/recipes/mine/{pageNum}",1L)
+        this.mockMvc.perform(get("/recipes/mine/list")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
                 .andExpect(status().isOk())
@@ -694,31 +676,13 @@ public class ControllerTest {
     }
 
     @Test
-    @DisplayName("내가 쓴 레시피 페이징조회 -> (실패 : PathVariable타입예외)")
+    @DisplayName("내가 쓴 레시피 페이징조회 -> (실패 : RecipeSortType 타입예외)")
     public void readMyRecipeInfoPagingFail1() throws Exception {
         // given
         makeAuthentication();
 
         //when, then
-        this.mockMvc.perform(get("/recipes/mine/{pageNum}","문자")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("pageNum이 Long타입이여야 합니다."))
-                .andDo(print());
-
-        verify(recipePagingService,times(0))
-                .readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class));
-    }
-
-    @Test
-    @DisplayName("내가 쓴 레시피 페이징조회 -> (실패 : RecipeSortType 타입예외)")
-    public void readMyRecipeInfoPagingFail2() throws Exception {
-        // given
-        makeAuthentication();
-
-        //when, then
-        this.mockMvc.perform(get("/recipes/mine/{pageNum}",1L)
+        this.mockMvc.perform(get("/recipes/mine/list")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", "문자"))
                 .andExpect(status().isBadRequest())
@@ -731,11 +695,11 @@ public class ControllerTest {
 
     @Test
     @DisplayName("내가 쓴 레시피 페이징조회 -> (실패 : 인증실패)")
-    public void readMyRecipeInfoPagingFail3() throws Exception {
+    public void readMyRecipeInfoPagingFail2() throws Exception {
         // given
 
         //when, then
-        this.mockMvc.perform(get("/recipes/mine/{pageNum}",1L)
+        this.mockMvc.perform(get("/recipes/mine/list")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
                 .andExpect(status().isUnauthorized())
@@ -748,14 +712,14 @@ public class ControllerTest {
 
     @Test
     @DisplayName("내가 쓴 레시피 페이징조회 -> (실패 : 존재하지않는 페이지)")
-    public void readMyRecipeInfoPagingFail4() throws Exception {
+    public void readMyRecipeInfoPagingFail3() throws Exception {
         // given
         makeAuthentication();
         given(recipePagingService.readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class)))
                 .willThrow(new CommondException(ExceptionCode.NOT_EXIST_PAGE));
 
         //when, then
-        this.mockMvc.perform(get("/recipes/mine/{pageNum}",1L)
+        this.mockMvc.perform(get("/recipes/mine/list")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
                 .andExpect(status().isNotFound())
@@ -773,7 +737,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when, then
-        this.mockMvc.perform(get("/recipes/like/{pageNum}",1L)
+        this.mockMvc.perform(get("/recipes/like/list")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
                 .andExpect(status().isOk())
@@ -785,31 +749,13 @@ public class ControllerTest {
     }
 
     @Test
-    @DisplayName("좋아요 누른 레시피 페이징조회 -> (실패 : PathVariable 타입예외)")
+    @DisplayName("좋아요 누른 레시피 페이징조회 -> (실패 : RecipeSortType 타입예외)")
     public void readLikeRecipeInfoPagingFail1() throws Exception {
         // given
         makeAuthentication();
 
         //when, then
-        this.mockMvc.perform(get("/recipes/like/{pageNum}","문자")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("pageNum이 Long타입이여야 합니다."))
-                .andDo(print());
-
-        verify(recipePagingService,times(0))
-                .readLikedRecipeInfoPaging(any(ReadRecipeInfoPagingReq.class));
-    }
-
-    @Test
-    @DisplayName("좋아요 누른 레시피 페이징조회 -> (실패 : RecipeSortType 타입예외)")
-    public void readLikeRecipeInfoPagingFail2() throws Exception {
-        // given
-        makeAuthentication();
-
-        //when, then
-        this.mockMvc.perform(get("/recipes/like/{pageNum}",1L)
+        this.mockMvc.perform(get("/recipes/like/list")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", "문자"))
                 .andExpect(status().isBadRequest())
@@ -822,11 +768,11 @@ public class ControllerTest {
 
     @Test
     @DisplayName("좋아요 누른 레시피 페이징조회 -> (실패 : 인증실패)")
-    public void readLikeRecipeInfoPagingFail3() throws Exception {
+    public void readLikeRecipeInfoPagingFail2() throws Exception {
         // given
 
         //when, then
-        this.mockMvc.perform(get("/recipes/like/{pageNum}",1L)
+        this.mockMvc.perform(get("/recipes/like/list")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
                 .andExpect(status().isUnauthorized())
@@ -839,14 +785,14 @@ public class ControllerTest {
 
     @Test
     @DisplayName("좋아요 누른 레시피 페이징조회 -> (실패 : 존재하지 않는 페이지)")
-    public void readLikeRecipeInfoPagingFail4() throws Exception {
+    public void readLikeRecipeInfoPagingFail3() throws Exception {
         // given
         makeAuthentication();
         given(recipePagingService.readLikedRecipeInfoPaging(any(ReadRecipeInfoPagingReq.class)))
                 .willThrow(new CommondException(ExceptionCode.NOT_EXIST_PAGE));
 
         //when, then
-        this.mockMvc.perform(get("/recipes/like/{pageNum}",1L)
+        this.mockMvc.perform(get("/recipes/like/list")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
                 .andExpect(status().isNotFound())

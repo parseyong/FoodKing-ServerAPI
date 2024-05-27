@@ -70,12 +70,12 @@ public class ServiceTest {
         this.replyEmotion = ReplyEmotion.builder()
                 .reply(reply)
                 .user(user)
-                .emotionType(EmotionType.Like)
+                .emotionType(EmotionType.LIKE)
                 .build();
         this.recipeEmotion = RecipeEmotion.builder()
                 .user(user)
                 .recipeInfo(recipeInfo)
-                .emotionType(EmotionType.Like)
+                .emotionType(EmotionType.LIKE)
                 .build();
     }
 
@@ -88,7 +88,7 @@ public class ServiceTest {
         given(replyRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(reply));
 
         // when
-        emotionService.toggleReplyEmotion(1L,1L,EmotionType.Like);
+        emotionService.toggleReplyEmotion(1L,1L,EmotionType.LIKE);
 
         // then
         verify(replyEmotionRepository,times(1)).findByReplyAndUser(any(Reply.class),any(User.class));
@@ -108,7 +108,7 @@ public class ServiceTest {
         given(user.getUserId()).willReturn(1L);
 
         // when
-        emotionService.toggleReplyEmotion(1L,1L,EmotionType.Like);
+        emotionService.toggleReplyEmotion(1L,1L,EmotionType.LIKE);
 
         // then
         verify(replyEmotionRepository,times(1)).findByReplyAndUser(any(Reply.class),any(User.class));
@@ -131,7 +131,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            emotionService.toggleReplyEmotion(2L,1L,EmotionType.Like);
+            emotionService.toggleReplyEmotion(2L,1L,EmotionType.LIKE);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(replyEmotionRepository,times(1)).findByReplyAndUser(any(Reply.class),any(User.class));
@@ -151,7 +151,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            emotionService.toggleReplyEmotion(1L,1L,EmotionType.Like);
+            emotionService.toggleReplyEmotion(1L,1L,EmotionType.LIKE);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(replyEmotionRepository,times(0)).findByReplyAndUser(any(Reply.class),any(User.class));
@@ -172,7 +172,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            emotionService.toggleReplyEmotion(1L,1L,EmotionType.Like);
+            emotionService.toggleReplyEmotion(1L,1L,EmotionType.LIKE);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(replyEmotionRepository,times(0)).findByReplyAndUser(any(Reply.class),any(User.class));
@@ -193,7 +193,7 @@ public class ServiceTest {
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         // when
-        emotionService.toggleRecipeInfoEmotion(1L,1L,EmotionType.Like);
+        emotionService.toggleRecipeInfoEmotion(1L,1L,EmotionType.LIKE);
 
         // then
         verify(recipeEmotionRepository,times(1)).findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class));
@@ -213,7 +213,7 @@ public class ServiceTest {
         given(recipeInfo.getUser().getUserId()).willReturn(1L);
 
         // when
-        emotionService.toggleRecipeInfoEmotion(1L,1L,EmotionType.Like);
+        emotionService.toggleRecipeInfoEmotion(1L,1L,EmotionType.LIKE);
 
         // then
         verify(recipeEmotionRepository,times(1)).findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class));
@@ -236,7 +236,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            emotionService.toggleRecipeInfoEmotion(2L,1L,EmotionType.Like);
+            emotionService.toggleRecipeInfoEmotion(2L,1L,EmotionType.LIKE);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(recipeEmotionRepository,times(1)).findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class));
@@ -256,7 +256,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            emotionService.toggleRecipeInfoEmotion(1L,1L,EmotionType.Like);
+            emotionService.toggleRecipeInfoEmotion(1L,1L,EmotionType.LIKE);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(recipeEmotionRepository,times(0)).findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class));
@@ -277,7 +277,7 @@ public class ServiceTest {
 
         // when, then
         try{
-            emotionService.toggleRecipeInfoEmotion(1L,1L,EmotionType.Like);
+            emotionService.toggleRecipeInfoEmotion(1L,1L,EmotionType.LIKE);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(recipeEmotionRepository,times(0)).findByRecipeInfoAndUser(any(RecipeInfo.class),any(User.class));
