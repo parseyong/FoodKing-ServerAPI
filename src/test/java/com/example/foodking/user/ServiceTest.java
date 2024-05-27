@@ -91,8 +91,8 @@ public class ServiceTest {
     public void loginSuccess(){
         //given
         User spyUser = spy(user);
-
         given(spyUser.getUserId()).willReturn(1L);
+
         given(userRepository.findUserByEmail(any(String.class))).willReturn(Optional.ofNullable(spyUser));
         given(jwtProvider.createAccessToken(any(Long.class),any())).willReturn("accessToken");
         given(jwtProvider.createRefreshToken(any(Long.class),any())).willReturn("refreshToken");

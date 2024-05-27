@@ -48,6 +48,8 @@ public class ControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private Gson gson = new Gson();
+
 
     @Test
     @DisplayName("로그인 테스트 -> (로그인성공)")
@@ -63,8 +65,6 @@ public class ControllerTest {
                 .build();
 
         given(userService.login(any(LoginReq.class))).willReturn(loginTokenResDTO);
-
-        Gson gson = new Gson();
         String requestBody = gson.toJson(loginReq);
 
         //when,then
@@ -89,13 +89,6 @@ public class ControllerTest {
                 .password("")
                 .build();
 
-        LoginTokenResDTO loginTokenResDTO = LoginTokenResDTO.builder()
-                .accessToken("access")
-                .refreshToken("refresh")
-                .build();
-        given(userService.login(any(LoginReq.class))).willReturn(loginTokenResDTO);
-
-        Gson gson = new Gson();
         String requestBody = gson.toJson(loginReq);
 
         //when,then
@@ -108,7 +101,6 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
         verify(userService,times(0)).login(any(LoginReq.class));
-
     }
 
     @Test
@@ -120,13 +112,6 @@ public class ControllerTest {
                 .password("1234")
                 .build();
 
-        LoginTokenResDTO loginTokenResDTO = LoginTokenResDTO.builder()
-                .accessToken("access")
-                .refreshToken("refresh")
-                .build();
-        given(userService.login(any(LoginReq.class))).willReturn(loginTokenResDTO);
-
-        Gson gson = new Gson();
         String requestBody = gson.toJson(loginReq);
 
         //when,then
@@ -149,9 +134,9 @@ public class ControllerTest {
                 .email("test@google.com")
                 .password("1234")
                 .build();
+
         given(userService.login(any(LoginReq.class))).willThrow(new CommondException(ExceptionCode.LOGIN_FAIL));
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(loginReq);
 
         //when,then
@@ -176,7 +161,7 @@ public class ControllerTest {
                 .password("1234")
                 .passwordRepeat("1234")
                 .build();
-        Gson gson = new Gson();
+
         String requestBody = gson.toJson(addUserReq);
 
         //when,then
@@ -201,7 +186,7 @@ public class ControllerTest {
                 .password("")
                 .passwordRepeat("")
                 .build();
-        Gson gson = new Gson();
+
         String requestBody = gson.toJson(addUserReq);
 
         //when,then
@@ -230,7 +215,7 @@ public class ControllerTest {
                 .password("1234")
                 .passwordRepeat("1234")
                 .build();
-        Gson gson = new Gson();
+
         String requestBody = gson.toJson(addUserReq);
 
         //when,then
@@ -255,9 +240,10 @@ public class ControllerTest {
                 .password("1234")
                 .passwordRepeat("1234")
                 .build();
+
         doThrow(new CommondException(ExceptionCode.EMAIL_DUPLICATED))
                 .when(userService).addUser(any(AddUserReq.class));
-        Gson gson = new Gson();
+
         String requestBody = gson.toJson(addUserReq);
 
         //when,then
@@ -282,9 +268,10 @@ public class ControllerTest {
                 .password("1234")
                 .passwordRepeat("1234")
                 .build();
+
         doThrow(new CommondException(ExceptionCode.NICKNAME_DUPLICATED))
                 .when(userService).addUser(any(AddUserReq.class));
-        Gson gson = new Gson();
+
         String requestBody = gson.toJson(addUserReq);
 
         //when,then
@@ -312,7 +299,7 @@ public class ControllerTest {
 
         doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT))
                 .when(userService).addUser(any(AddUserReq.class));
-        Gson gson = new Gson();
+
         String requestBody = gson.toJson(addUserReq);
 
         //when,then
@@ -337,8 +324,9 @@ public class ControllerTest {
                 .password("1234")
                 .passwordRepeat("1234")
                 .build();
+
         doThrow(new CommondException(SMS_NOT_AUTHENTICATION)).when(userService).addUser(any(AddUserReq.class));
-        Gson gson = new Gson();
+
         String requestBody = gson.toJson(addUserReq);
 
         //when,then
@@ -547,7 +535,6 @@ public class ControllerTest {
                 .phoneNum("01056962173")
                 .build();
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReq);
         given(userService.findPassword(any(FindPwdReq.class))).willReturn("12345");
 
@@ -571,7 +558,6 @@ public class ControllerTest {
                 .phoneNum("")
                 .build();
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReq);
         given(userService.findPassword(any(FindPwdReq.class))).willReturn("12345");
 
@@ -594,7 +580,6 @@ public class ControllerTest {
                 .phoneNum("01056962173")
                 .build();
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReq);
         given(userService.findPassword(any(FindPwdReq.class))).willReturn("12345");
 
@@ -618,7 +603,6 @@ public class ControllerTest {
                 .phoneNum("01056962173")
                 .build();
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReq);
         doThrow(new CommondException(ExceptionCode.SMS_NOT_AUTHENTICATION))
                 .when(userService).findPassword(any(FindPwdReq.class));
@@ -643,7 +627,6 @@ public class ControllerTest {
                 .phoneNum("01056962173")
                 .build();
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReq);
         given(userService.findPassword(any(FindPwdReq.class)))
                 .willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
@@ -667,7 +650,6 @@ public class ControllerTest {
                 .phoneNum("01056962173")
                 .build();
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(findPwdReq);
         given(userService.findPassword(any(FindPwdReq.class)))
                 .willThrow(new CommondException(ExceptionCode.ACCESS_FAIL_USER));
@@ -759,7 +741,7 @@ public class ControllerTest {
                 .newPassword("12345")
                 .nickName("new NickName")
                 .build();
-        Gson gson = new Gson();
+
         String requestBody = gson.toJson(updateUserInfoReq);
 
         //when,then
@@ -783,7 +765,7 @@ public class ControllerTest {
                 .newPassword("12345")
                 .nickName("new NickName")
                 .build();
-        Gson gson = new Gson();
+
         String requestBody = gson.toJson(updateUserInfoReq);
 
         //when,then
@@ -808,7 +790,7 @@ public class ControllerTest {
                 .newPassword("")
                 .nickName("")
                 .build();
-        Gson gson = new Gson();
+
         String requestBody = gson.toJson(updateUserInfoReq);
 
         //when,then
@@ -833,7 +815,7 @@ public class ControllerTest {
                 .newPassword("12345")
                 .nickName("new NickName")
                 .build();
-        Gson gson = new Gson();
+
         String requestBody = gson.toJson(updateUserInfoReq);
         doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT))
                 .when(userService).updateUser(any(UpdateUserInfoReq.class),any(Long.class));
@@ -861,7 +843,7 @@ public class ControllerTest {
                 .newPassword("12345")
                 .nickName("new NickName")
                 .build();
-        Gson gson = new Gson();
+
         String requestBody = gson.toJson(updateUserInfoReq);
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER))
                 .when(userService).updateUser(any(UpdateUserInfoReq.class),any(Long.class));
@@ -887,7 +869,6 @@ public class ControllerTest {
                 .password("1234")
                 .build();
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(deleteUserReq);
 
         //when,then
@@ -910,7 +891,6 @@ public class ControllerTest {
                 .password("1234")
                 .build();
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(deleteUserReq);
 
         //when,then
@@ -934,7 +914,6 @@ public class ControllerTest {
                 .password("1234")
                 .build();
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(deleteUserReq);
         doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT))
                 .when(userService).deleteUser(any(DeleteUserReq.class),any());
@@ -961,7 +940,6 @@ public class ControllerTest {
                 .password("1234")
                 .build();
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(deleteUserReq);
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER))
                 .when(userService).deleteUser(any(DeleteUserReq.class),any());
@@ -987,7 +965,6 @@ public class ControllerTest {
                 .password("")
                 .build();
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(deleteUserReq);
 
         //when,then
@@ -1011,7 +988,6 @@ public class ControllerTest {
                 .password("1234")
                 .build();
 
-        Gson gson = new Gson();
         String requestBody = gson.toJson(deleteUserReq);
 
         //when,then

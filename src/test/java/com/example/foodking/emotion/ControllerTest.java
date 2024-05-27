@@ -50,8 +50,9 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(post("/replys/emotions/{replyId}/{emotionType}",1L,"Like")
-                        .contentType(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(post("/replies/emotions/{replyId}",1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("emotionType" , "Like"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("댓글이모션 토글 완료"))
                 .andDo(print());
@@ -67,7 +68,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(post("/replys/emotions/{replyId}/{emotionType}",1L,"not")
+        this.mockMvc.perform(post("/replies/emotions/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("emotionType","test"))
                 .andExpect(status().isBadRequest())
@@ -85,7 +86,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(post("/replys/emotions/{replyId}/{emotionType}","test","Like")
+        this.mockMvc.perform(post("/replies/emotions/{replyId}","test")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("emotionType","Like"))
                 .andExpect(status().isBadRequest())
@@ -105,7 +106,7 @@ public class ControllerTest {
                 .when(emotionService).toggleReplyEmotion(any(Long.class),any(Long.class),any(EmotionType.class));
 
         //when,then
-        this.mockMvc.perform(post("/replys/emotions/{replyId}/{emotionType}",1L,"Like")
+        this.mockMvc.perform(post("/replies/emotions/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("emotionType","Like"))
                 .andExpect(status().isBadRequest())
@@ -125,7 +126,7 @@ public class ControllerTest {
                 .when(emotionService).toggleReplyEmotion(any(Long.class),any(Long.class),any(EmotionType.class));
 
         //when,then
-        this.mockMvc.perform(post("/replys/emotions/{replyId}/{emotionType}",1L,"Like")
+        this.mockMvc.perform(post("/replies/emotions/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("emotionType","Like"))
                 .andExpect(status().isForbidden())
@@ -142,7 +143,7 @@ public class ControllerTest {
         //given
 
         //when,then
-        this.mockMvc.perform(post("/replys/emotions/{replyId}/{emotionType}",1L,"Like")
+        this.mockMvc.perform(post("/replies/emotions/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("emotionType","Like"))
                 .andExpect(status().isUnauthorized())
@@ -160,8 +161,9 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}/{emotionType}",1L,"Like")
-                        .contentType(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}",1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("emotionType", "Like"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("레시피이모션 토글 완료"))
                 .andDo(print());
@@ -177,8 +179,9 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}/{emotionType}",1L,"not")
-                        .contentType(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}",1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("emotionType", "not"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("emotionType이 EmotionType타입이여야 합니다."))
                 .andDo(print());
@@ -194,8 +197,9 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}/{emotionType}","test","Like")
-                        .contentType(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}","test")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("emotionType","Like"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
                 .andDo(print());
@@ -213,8 +217,9 @@ public class ControllerTest {
                 .when(emotionService).toggleRecipeInfoEmotion(any(Long.class),any(Long.class),any(EmotionType.class));
 
         //when,then
-        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}/{emotionType}",1L,"Like")
-                        .contentType(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}",1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("emotionType","Like"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
                 .andDo(print());
@@ -232,8 +237,9 @@ public class ControllerTest {
                 .when(emotionService).toggleRecipeInfoEmotion(any(Long.class),any(Long.class),any(EmotionType.class));
 
         //when,then
-        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}/{emotionType}",1L,"Like")
-                        .contentType(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}",1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("emotionType","Like"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 이모션에 대한 권한이 없습니다"))
                 .andDo(print());
@@ -248,8 +254,9 @@ public class ControllerTest {
         //given
 
         //when,then
-        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}/{emotionType}",1L,"Like")
-                        .contentType(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(post("/recipes/emotions/{recipeInfoId}",1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("emotionType","Like"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());

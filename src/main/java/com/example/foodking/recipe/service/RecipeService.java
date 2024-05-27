@@ -83,7 +83,9 @@ public class RecipeService {
 
     @Transactional
     @DistributedLock(key = "#LockRecipe")
-    public ReadRecipeRes readRecipe(Long userId, Long recipeInfoId, ReplySortType replySortType,Long lastId, Object lastValue){
+    public ReadRecipeRes readRecipe(Long userId, Long recipeInfoId,
+                                    ReplySortType replySortType,
+                                    Long lastId, Object lastValue){
 
         ReadRecipeInfoRes readRecipeInfoRes = recipeInfoRepository.findRecipeInfo(recipeInfoId);
 

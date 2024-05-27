@@ -48,7 +48,10 @@ public class ReplyService {
         return replyRepository.save(reply).getReplyId();
     }
 
-    public List<ReadReplyRes> readReply(Long recipeId, Long userId, ReplySortType replySortType, Long lastId, Object lastValue){
+    public List<ReadReplyRes> readReply(Long recipeId, Long userId,
+                                        ReplySortType replySortType,
+                                        Long lastId, Object lastValue){
+
         return replyRepository.findReplyList(
                 getBuilder(recipeId, replySortType, lastId, lastValue),
                 createOrderSpecifier(replySortType),
@@ -95,11 +98,11 @@ public class ReplyService {
 
         builder.and(reply.recipeInfo.recipeInfoId.eq(recipeId));
 
-        if(replySortType.equals(ReplySortType.LATEST)){
+        if(replySortType.equals(ReplySortType.LATEST) && lastId != null && lastValue != null){
             builder.and(reply.regDate.loe((LocalDateTime) lastValue));
             builder.and(reply.replyId.gt(lastId));
         }
-        else {
+        else if(replySortType.equals(ReplySortType.LIKE) && lastId != null && lastValue != null){
             builder.and(reply.likeCnt.loe(Long.valueOf(String.valueOf(lastValue))));
             builder.and(reply.replyId.gt(lastId));
         }

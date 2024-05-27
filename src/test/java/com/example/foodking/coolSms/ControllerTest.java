@@ -52,7 +52,7 @@ public class ControllerTest {
         String requestBody = gson.toJson(sendAuthNumberReq);
 
         //when,then
-        this.mockMvc.perform(post("/send/messages")
+        this.mockMvc.perform(post("/messages/send")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -74,7 +74,7 @@ public class ControllerTest {
                 .willThrow(new CommondException(ExceptionCode.NOT_PHONENUM));
 
         //when,then
-        this.mockMvc.perform(post("/send/messages")
+        this.mockMvc.perform(post("/messages/send")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -97,7 +97,7 @@ public class ControllerTest {
                 .willThrow(new CommondException(ExceptionCode.COOLSMS_EXCEPTION));
 
         //when,then
-        this.mockMvc.perform(post("/send/messages")
+        this.mockMvc.perform(post("/messages/send")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isInternalServerError())
@@ -117,7 +117,7 @@ public class ControllerTest {
         String requestBody = gson.toJson(sendAuthNumberReq);
 
         //when,then
-        this.mockMvc.perform(post("/send/messages")
+        this.mockMvc.perform(post("/messages/send")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -140,7 +140,7 @@ public class ControllerTest {
         String requestBody = gson.toJson(checkAuthNumberReq);
 
         //when ,then
-        this.mockMvc.perform(post("/auth/messages")
+        this.mockMvc.perform(post("/messages/auth")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -161,7 +161,7 @@ public class ControllerTest {
         String requestBody = gson.toJson(checkAuthNumberReq);
 
         //when ,then
-        this.mockMvc.perform(post("/auth/messages")
+        this.mockMvc.perform(post("/messages/auth")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -186,7 +186,7 @@ public class ControllerTest {
 
 
         //when ,then
-        this.mockMvc.perform(post("/auth/messages")
+        this.mockMvc.perform(post("/messages/auth")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())

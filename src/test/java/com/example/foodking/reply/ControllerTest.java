@@ -46,14 +46,11 @@ public class ControllerTest {
     public void addReplySuccess() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = "{\n" +
-                "    \"content\" : \"test\"\n" +
-                "}";
 
         //when,then
-        this.mockMvc.perform(post("/{recipeInfoId}/replys",1L)
+        this.mockMvc.perform(post("/replies/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content","댓글내용"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("댓글 등록완료"))
                 .andDo(print());
@@ -65,14 +62,11 @@ public class ControllerTest {
     @DisplayName("댓글 등록 테스트 -> (실패 : 인증실패)")
     public void addReplyFail1() throws Exception {
         //given
-        String requestBody = "{\n" +
-                "    \"content\" : \"test\"\n" +
-                "}";
 
         //when,then
-        this.mockMvc.perform(post("/{recipeInfoId}/replys",1L)
+        this.mockMvc.perform(post("/replies/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content","댓글내용"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
@@ -85,17 +79,13 @@ public class ControllerTest {
     public void addReplyFail2() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = "{\n" +
-                "    \"content\" : \"\"\n" +
-                "}";
 
         //when,then
-        this.mockMvc.perform(post("/{recipeInfoId}/replys",1L)
+        this.mockMvc.perform(post("/replies/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content",""))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
-                .andExpect(jsonPath("$.data.content").value("댓글내용을 입력해주세요"))
+                .andExpect(jsonPath("$.message").value("댓글내용을 입력해주세요"))
                 .andDo(print());
 
         verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(String.class));
@@ -106,14 +96,11 @@ public class ControllerTest {
     public void addReplyFail3() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = "{\n" +
-                "    \"content\" : \"test\"\n" +
-                "}";
 
         //when,then
-        this.mockMvc.perform(post("/{recipeInfoId}/replys"," ")
+        this.mockMvc.perform(post("/replies/{recipeInfoId}"," ")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content","댓글내용"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
 
@@ -125,14 +112,11 @@ public class ControllerTest {
     public void addReplyFail4() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = "{\n" +
-                "    \"content\" : \"test\"\n" +
-                "}";
 
         //when,then
-        this.mockMvc.perform(post("/{recipeInfoId}/replys","ㅎㅇ")
+        this.mockMvc.perform(post("/replies/{recipeInfoId}","ㅎㅇ")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content","댓글내용"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."));
 
@@ -144,15 +128,12 @@ public class ControllerTest {
     public void addReplyFail5() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = "{\n" +
-                "    \"content\" : \"test\"\n" +
-                "}";
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
-        this.mockMvc.perform(post("/{recipeInfoId}/replys",1L)
+        this.mockMvc.perform(post("/replies/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content","댓글내용"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
@@ -165,15 +146,12 @@ public class ControllerTest {
     public void addReplyFail6() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = "{\n" +
-                "    \"content\" : \"test\"\n" +
-                "}";
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO)).when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
-        this.mockMvc.perform(post("/{recipeInfoId}/replys",1L)
+        this.mockMvc.perform(post("/replies/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content","댓글내용"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
                 .andDo(print());
@@ -186,14 +164,11 @@ public class ControllerTest {
     public void updateReplySuccess() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = "{\n" +
-                "    \"content\" : \"test\"\n" +
-                "}";
 
         //when,then
-        this.mockMvc.perform(patch("/replys/{replyId}",1L)
+        this.mockMvc.perform(patch("/replies/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content","댓글내용"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("댓글 수정완료"))
                 .andDo(print());
@@ -205,14 +180,11 @@ public class ControllerTest {
     @DisplayName("댓글 수정 테스트 -> (실패 : 인증실패)")
     public void updateReplyFail1() throws Exception {
         //given
-        String requestBody = "{\n" +
-                "    \"content\" : \"test\"\n" +
-                "}";
 
         //when,then
         this.mockMvc.perform(patch("/replys/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content","댓글내용"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
@@ -225,17 +197,13 @@ public class ControllerTest {
     public void updateReplyFail2() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = "{\n" +
-                "    \"content\" : \"\"\n" +
-                "}";
 
         //when,then
-        this.mockMvc.perform(patch("/replys/{replyId}",1L)
+        this.mockMvc.perform(patch("/replies/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content",""))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
-                .andExpect(jsonPath("$.data.content").value("댓글내용을 입력해주세요"))
+                .andExpect(jsonPath("$.message").value("댓글내용을 입력해주세요"))
                 .andDo(print());
 
         verify(replyService,times(0)).updateReply(any(Long.class),any(Long.class),any(String.class));
@@ -246,14 +214,11 @@ public class ControllerTest {
     public void updateReplyFail3() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = "{\n" +
-                "    \"content\" : \"test\"\n" +
-                "}";
 
         //when,then
-        this.mockMvc.perform(patch("/replys/{replyId}"," ")
+        this.mockMvc.perform(patch("/replies/{replyId}"," ")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content","댓글내용"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
 
@@ -265,14 +230,11 @@ public class ControllerTest {
     public void updateReplyFail4() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = "{\n" +
-                "    \"content\" : \"test\"\n" +
-                "}";
 
         //when,then
-        this.mockMvc.perform(patch("/replys/{replyId}","ㅎㅇ")
+        this.mockMvc.perform(patch("/replies/{replyId}","ㅎㅇ")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content","댓글내용"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("replyId이 Long타입이여야 합니다."));
 
@@ -284,15 +246,12 @@ public class ControllerTest {
     public void updateReplyFail5() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = "{\n" +
-                "    \"content\" : \"test\"\n" +
-                "}";
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_REPLY)).when(replyService).updateReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
-        this.mockMvc.perform(patch("/replys/{replyId}",1L)
+        this.mockMvc.perform(patch("/replies/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content","댓글내용"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 댓글입니다"));
 
@@ -304,15 +263,12 @@ public class ControllerTest {
     public void updateReplyFail6() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = "{\n" +
-                "    \"content\" : \"test\"\n" +
-                "}";
         doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_REPLY)).when(replyService).updateReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
-        this.mockMvc.perform(patch("/replys/{replyId}",1L)
+        this.mockMvc.perform(patch("/replies/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("content","댓글내용"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 댓글에 대한 권한이 없습니다"));
 
@@ -326,7 +282,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(delete("/replys/{replyId}",1L)
+        this.mockMvc.perform(delete("/replies/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("댓글 삭제완료"))
@@ -341,7 +297,7 @@ public class ControllerTest {
         //given
 
         //when,then
-        this.mockMvc.perform(delete("/replys/{replyId}",1L)
+        this.mockMvc.perform(delete("/replies/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
@@ -357,7 +313,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(delete("/replys/{replyId}"," ")
+        this.mockMvc.perform(delete("/replies/{replyId}"," ")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
@@ -372,7 +328,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(delete("/replys/{replyId}","ㅎㅇ")
+        this.mockMvc.perform(delete("/replies/{replyId}","ㅎㅇ")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("replyId이 Long타입이여야 합니다."));
@@ -388,7 +344,7 @@ public class ControllerTest {
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_REPLY)).when(replyService).deleteReply(any(Long.class),any(Long.class));
 
         //when,then
-        this.mockMvc.perform(delete("/replys/{replyId}",1L)
+        this.mockMvc.perform(delete("/replies/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 댓글입니다"));
@@ -404,7 +360,7 @@ public class ControllerTest {
         doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_REPLY)).when(replyService).deleteReply(any(Long.class),any(Long.class));
 
         //when,then
-        this.mockMvc.perform(delete("/replys/{replyId}",1L)
+        this.mockMvc.perform(delete("/replies/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 댓글에 대한 권한이 없습니다"));

@@ -23,7 +23,7 @@ public class CoolSmsController {
 
     private final CoolSmsService coolSmsService;
 
-    @PostMapping("/send/messages")
+    @PostMapping("/messages/send")
     public ResponseEntity<CommonResDTO> sendMessage(
             @RequestBody @Valid SendAuthNumberReq sendAuthNumberReq){
 
@@ -31,7 +31,7 @@ public class CoolSmsController {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("인증번호 전송",null));
     }
 
-    @PostMapping("/auth/messages")
+    @PostMapping("/messages/auth")
     public ResponseEntity<CommonResDTO> authNumCheck(@RequestBody @Valid CheckAuthNumberReq checkAuthNumberReq){
 
         coolSmsService.authNumCheck(checkAuthNumberReq);
