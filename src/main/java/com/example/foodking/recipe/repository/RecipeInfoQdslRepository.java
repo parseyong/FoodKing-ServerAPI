@@ -12,9 +12,9 @@ public interface RecipeInfoQdslRepository {
 
     Long findRecipeInfoTotalCnt(BooleanBuilder builder);
 
-    List<ReadRecipeInfoRes> findLikedRecipeInfoList(OrderSpecifier[] orderSpecifier, String searchKeyword, Long userId);
+    List<ReadRecipeInfoRes> findLikedRecipeInfoList(BooleanBuilder builder, OrderSpecifier[] orderSpecifier);
 
-    Long findLikedRecipeInfoCnt(String searchKeyword, Long userId);
+    Long findLikedRecipeInfoCnt(BooleanBuilder builder);
 
     ReadRecipeInfoRes findRecipeInfo(Long recipeinfoId);
 }

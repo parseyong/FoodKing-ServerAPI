@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.foodking.emotion.domain.QRecipeEmotion.recipeEmotion;
 import static com.example.foodking.recipe.domain.QRecipeInfo.recipeInfo;
 
 
@@ -50,15 +51,12 @@ public class RecipePagingService {
     public ReadRecipeInfoPagingRes readLikedRecipeInfoPaging(ReadRecipeInfoPagingReq readRecipeInfoPagingReq){
 
         // 해당 조건에 대한 전체 결과 수 측정
-        Long recipeCnt = recipeInfoRepository.findLikedRecipeInfoCnt(
-                readRecipeInfoPagingReq.getSearchKeyword(),
-                readRecipeInfoPagingReq.getUserId());
+        Long recipeCnt = recipeInfoRepository.findLikedRecipeInfoCnt(getBuilderForCount(readRecipeInfoPagingReq));
 
         // 쿼리 실행
         List<ReadRecipeInfoRes> readRecipeInfoResDTOList = recipeInfoRepository.findLikedRecipeInfoList(
-                        createOrderSpecifier(readRecipeInfoPagingReq.getRecipeSortType()),
-                        readRecipeInfoPagingReq.getSearchKeyword(),
-                        readRecipeInfoPagingReq.getUserId());
+                getBuilderForPaging(readRecipeInfoPagingReq),
+                createOrderSpecifier(readRecipeInfoPagingReq.getRecipeSortType()));
 
         // 존재하지 않는 페이지일 경우 예외를 던짐
         if(readRecipeInfoResDTOList.size() == 0)
@@ -79,6 +77,10 @@ public class RecipePagingService {
         else if(condition instanceof String && condition.equals("mine")){
             // 자신이 쓴 레시피 조회 시
             builder.and(recipeInfo.user.userId.eq(readRecipeInfoPagingReq.getUserId()));
+        }
+        else if(condition instanceof String && condition.equals("like")){
+            // 좋아요를 누른 레시피 조회 시
+            builder.and(recipeEmotion.user.userId.eq(readRecipeInfoPagingReq.getUserId()));
         }
 
         if(readRecipeInfoPagingReq.getSearchKeyword() != null){
@@ -127,6 +129,10 @@ public class RecipePagingService {
         else if(condition instanceof String && condition.equals("mine")){
             // 자신이 쓴 레시피 조회 시
             builder.and(recipeInfo.user.userId.eq(readRecipeInfoPagingReq.getUserId()));
+        }
+        else if(condition instanceof String && condition.equals("like")){
+            // 좋아요를 누른 레시피 조회 시
+            builder.and(recipeEmotion.user.userId.eq(readRecipeInfoPagingReq.getUserId()));
         }
 
         if(readRecipeInfoPagingReq.getSearchKeyword() != null){
