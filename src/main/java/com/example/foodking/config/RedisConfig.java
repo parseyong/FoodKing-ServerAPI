@@ -16,6 +16,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @RequiredArgsConstructor
+/*
+    setEnableTransactionSupport(true)를 통해 레디스의 트랜잭션과 jpa의 트랜잭션이 공유되게 하여
+    jpa에 예외 발생 시 레디스의 데이터에 롤백이 발생하도록 하였다.
+*/
+
 public class RedisConfig {
 
     @Value("${spring.redis.host}")

@@ -30,7 +30,7 @@ public class CoolSmsService {
     @Value("${CoolSMS.Api.Secret}")
     private String apiSecret; // 발급받은 api_secret
     @Value("${CoolSMS.Caller}")
-    private String callId; // 발신자 번호
+    private String caller; // 발신자 번호
     private Message coolSms;
 
     private final RedisTemplate<String,String> authRedis;
@@ -51,7 +51,7 @@ public class CoolSmsService {
 
         HashMap<String, String> params = new HashMap<>();
         params.put("to", phoneNum);    // 수신전화번호
-        params.put("from", callId);    // 발신전화번호. 테스트시에는 발신,수신 둘다 본인 번호로 하면 됨
+        params.put("from", caller);    // 발신전화번호. 테스트시에는 발신,수신 둘다 본인 번호로 하면 됨
         params.put("type", "sms");     // 타입
         params.put("text", "FoodKing 휴대폰인증 메시지 : 인증번호는" + "["+authenticationNumber+"]" + "입니다.");
 

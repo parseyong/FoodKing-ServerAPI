@@ -28,8 +28,6 @@ public class UserService {
     private final CoolSmsService coolSmsService;
 
 
-    // setEnableTransactionSupport(true);를 통해 레디스의 트랜잭션과 jpa의 트랜잭션이 공유되어
-    // jpa에 예외 발생 시 레디스의 데이터에 롤백이 발생하도록 @Transactional 추가
     @Transactional
     public LoginTokenResDTO login(LoginReq loginReq){
         User user = userRepository.findUserByEmail(loginReq.getEmail())
@@ -52,7 +50,13 @@ public class UserService {
         if(emailDuplicatedChecking(addUserReq.getEmail()))
            throw new CommondException(ExceptionCode.EMAIL_DUPLICATED);
 
-        // 닉네임 중복체크
+        /*
+            닉네임 중복여부 체크, unique무결성이 깨진다면 늦게 커밋된 트랜잭션은 롤백된다.
+            unique로 설정하여 동시성 문제가 발생하지 않고 늦은 트랜잭션은 락을 다시 회수할 필요가 없기때문에 분산락을 적용하지 않는다.
+            unique무결성 체크를 DB단에서 체크한다 해도 비즈니스로직으로 중복여부를 한번 더 체크해주는게 좋다.
+
+            Master-Slave DB구조이지만 UPDATE연산은 한개의 DB에서만 이루어지기 때문에 별도의 LOCK없이 로직을 수행한다.
+        */
         if(nickNameDuplicatedChecking(addUserReq.getNickName()))
             throw new CommondException(ExceptionCode.NICKNAME_DUPLICATED);
 
@@ -98,7 +102,10 @@ public class UserService {
     }
 
     @Transactional
-    // passwordEncoder는 단방향 해시이기때문에 인코딩된 데이터의 원래값을 역추적하기 어렵다. 따라서 새로운 비밀번호를 생성하고 반환한다.
+    /*
+        passwordEncoder는 단방향 해시이기때문에 인코딩된 데이터의 원래값을 역추적하기 어렵다.
+        따라서 새로운 비밀번호를 생성하고 반환한다.
+    */
     public String findPassword(FindPwdReq findPwdReq){
         // 인증여부 확인
         coolSmsService.isAuthenticatedNum(findPwdReq.getPhoneNum());
@@ -106,7 +113,8 @@ public class UserService {
         User user = userRepository.findUserByEmail(findPwdReq.getEmail())
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
 
-        if(user.getPhoneNum() != findPwdReq.getPhoneNum())
+        // 이메일과 연결된 유저의 휴대폰번호와 입력받은 휴대폰 번호가 일치하는 지 체크
+        if(!user.getPhoneNum().equals(findPwdReq.getPhoneNum()))
             throw new CommondException(ExceptionCode.ACCESS_FAIL_USER);
 
         // 임시 비밀번호 생성
@@ -134,9 +142,13 @@ public class UserService {
         // 비밀번호 일치여부 체크, 유저정보를 변경할 때 이전 비밀번호를 입력해야한다.
         isMatchPassword(updateUserInfoReq.getOldPassword(),user.getPassword(),ExceptionCode.PASSWORD_NOT_COLLECT);
 
-        // 닉네임 중복여부 체크, unique무결성이 깨진다면 늦게 커밋된 트랜잭션은 롤백된다.
-        // unique로 설정해놓았고 늦은 트랜잭션은 락을 다시 회수할 필요가 없기때문에 분산락을 적용하지 않는다.
-        // unique무결성 체크를 DB단에서 체크한다 해도 비즈니스로직으로 중복여부를 한번 더 체크해주는게 좋다.
+        /*
+            닉네임 중복여부 체크, unique무결성이 깨진다면 늦게 커밋된 트랜잭션은 롤백된다.
+            unique로 설정하여 동시성 문제가 발생하지 않고 늦은 트랜잭션은 락을 다시 회수할 필요가 없기때문에 분산락을 적용하지 않는다.
+            unique무결성 체크를 DB단에서 체크한다 해도 비즈니스로직으로 중복여부를 한번 더 체크해주는게 좋다.
+
+            Master-Slave DB구조이지만 UPDATE연산은 한개의 DB에서만 이루어지기 때문에 별도의 LOCK없이 로직을 수행한다.
+        */
         if(nickNameDuplicatedChecking(updateUserInfoReq.getNickName()))
             throw new CommondException(ExceptionCode.NICKNAME_DUPLICATED);
 
@@ -152,7 +164,7 @@ public class UserService {
         User user = userRepository.findUserByEmail(deleteUserReq.getEmail())
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
 
-        // 로그인여부와 상관없이 회원탈퇴 시 비밀번호를 다시 입력해야한다.
+        //회원탈퇴 시 비밀번호를 다시 입력해야한다.
         isMatchPassword(deleteUserReq.getPassword(), user.getPassword(), ExceptionCode.PASSWORD_NOT_COLLECT);
 
         //Bearer 제거

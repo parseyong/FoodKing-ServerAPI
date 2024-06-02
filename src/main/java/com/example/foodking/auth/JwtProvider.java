@@ -10,7 +10,6 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,14 +20,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@Log4j2
 @RequiredArgsConstructor
+// 이 클래스의 메소드중 트랜잭션이 필요한 메소드가 소수이기 때문에 클래스대신 메소드에 직접 선언해주었다.
 public class JwtProvider {
 
     @Value("${JWT.Access.SecretKey}")
@@ -49,8 +49,13 @@ public class JwtProvider {
 
     @PostConstruct
     protected void init() {
-        accessSecretKey = Base64.getEncoder().encodeToString(accessSecretKey.getBytes());
-        refreshSecretKey = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes());
+        /*
+            secretKey에 특수문자가 있을 경우 통신할 때 문자는 os가 알아서 바이너리로 바꾼다.
+            그러나 이러한 특수한 문자는 os마다 바꾸는 방법이 다를 수 있고 같은 secretKey를 쓰더라도 인증실패가 될 수 있다.
+            따라서 애플리케이션에서 안전한 문자로 바꿔서 os에 전달하여 이러한 문제를 해결할 수 있다.
+        */
+        accessSecretKey = Base64.getEncoder().encodeToString(accessSecretKey.getBytes(StandardCharsets.UTF_8));
+        refreshSecretKey = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes(StandardCharsets.UTF_8));
     }
 
     @Transactional
@@ -70,7 +75,7 @@ public class JwtProvider {
         authRedis.delete(RedissonPrefix.TOKEN_REDIS + String.valueOf(userId));
     }
 
-    // 로그인 성공 시 토큰을 생성해서 반환하는 메소드
+    // 로그인 성공 시 엑세스토큰을 생성해서 반환하는 메소드
     public String createAccessToken(Long userId, Collection<? extends GrantedAuthority> roleList) {
 
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
@@ -85,6 +90,7 @@ public class JwtProvider {
                 .compact();
     }
 
+    // 로그인 성공 시 리프레시토큰을 생성해서 반환하는 메소드
     public String createRefreshToken(Long userId, Collection<? extends GrantedAuthority> roleList) {
 
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
@@ -108,13 +114,14 @@ public class JwtProvider {
         return  refreshToken;
     }
     
-    // 토큰 재발급
+    // 토큰 재발급, 탈취에 대한 위험성을 최소화하기 위해 accessToken외에 refreshToken도 재발급을 한다.
+    @Transactional
     public LoginTokenResDTO reissueToken(HttpServletRequest request){
 
         String refreshToken = resolveRefreshToken(request);
 
         // refreshToken의 유효성검사
-        if(!validateRefreshToken(refreshToken))
+        if(refreshToken == null || !validateRefreshToken(refreshToken))
             throw new CommondException(ExceptionCode.LOGIN_FAIL);
 
         // refreshToken에서 userId값 추출
@@ -148,10 +155,16 @@ public class JwtProvider {
     // Http헤더에서 AccessToken을 가져오는 메소드
     public String resolveRefreshToken(HttpServletRequest request) {
 
-        return request.getHeader("RefreshToken");
+        String token = request.getHeader("RefreshToken");
+
+        if(token != null && token.length() > 7 )
+            return token.substring(7);
+
+        return null;
     }
 
     // 토큰에서 추출한 userId값을 통해 인증객체를 생성하는 메소드
+    @Transactional(readOnly = true)
     public Authentication getAuthenticationByAccessToken(String token) {
 
         User user = (User) customUserDetailsService.loadUserByUsername(this.getUserIdByAccessToken(token));
@@ -184,13 +197,11 @@ public class JwtProvider {
 
     // AccessToken에서 userId값을 추출하는 메소드
     private String getUserIdByAccessToken(String token) {
-
         return Jwts.parser().setSigningKey(accessSecretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
     // RefreshToken에서 userId값을 추출하는 메소드
     private String getUserIdByRefreshToken(String token) {
-
         return Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(token).getBody().getSubject();
     }
 }

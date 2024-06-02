@@ -18,7 +18,7 @@ import javax.validation.constraints.NotBlank;
     빌더 사용 시 @AllArgsConstructor을 쓰지않아도 컴파일 과정에서 생성자가 없다면 자동으로 모든 필드를
     파라미터로 가지는 생성자를 만들어 준다.
 
-    하지만 기본생성자가 필요하기도 하고 빌더가 쓰이지 않더라도 가독성을 위해 @AllArgsConstructor을 명시해주었다.
+    하지만 기본생성자가 필요하기도 하고 가독성을 위해 @AllArgsConstructor을 명시해주었다.
 */
 @Getter
 @Builder // 테스트를 위한 빌더추가

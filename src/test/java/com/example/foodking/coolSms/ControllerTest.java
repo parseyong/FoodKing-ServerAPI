@@ -6,7 +6,6 @@ import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.controller.CoolSmsController;
 import com.example.foodking.user.dto.request.CheckAuthNumberReq;
-import com.example.foodking.user.dto.request.SendAuthNumberReq;
 import com.example.foodking.user.service.CoolSmsService;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
@@ -42,19 +41,17 @@ public class ControllerTest {
     */
     @MockBean
     private JwtProvider jwtProvider;
+    private Gson gson = new Gson();
 
     @Test
     @DisplayName("문자보내기 테스트 -> (성공)")
     public void sendMessageSuccess() throws Exception {
         //given
-        Gson gson = new Gson();
-        SendAuthNumberReq sendAuthNumberReq = new SendAuthNumberReq("01056962173");
-        String requestBody = gson.toJson(sendAuthNumberReq);
 
         //when,then
-        this.mockMvc.perform(post("/messages/send")
+        this.mockMvc.perform(post("/message/send")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("phoneNum","01056962173"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("인증번호 전송"))
                 .andDo(print());
@@ -66,17 +63,13 @@ public class ControllerTest {
     @DisplayName("문자보내기 테스트 -> (실패 : 전화번호 형식 예외)")
     public void sendMessageFail1() throws Exception {
         //given
-        Gson gson = new Gson();
-        SendAuthNumberReq sendAuthNumberReq = new SendAuthNumberReq("번호아님");
-        String requestBody = gson.toJson(sendAuthNumberReq);
-
         given(coolSmsService.sendMessage(any(String.class)))
                 .willThrow(new CommondException(ExceptionCode.NOT_PHONENUM));
 
         //when,then
-        this.mockMvc.perform(post("/messages/send")
+        this.mockMvc.perform(post("/message/send")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("phoneNum","번호아님"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 전화번호 형식이 아닙니다"))
                 .andExpect(jsonPath("$.data.phoneNum").value("올바른 전화번호 형식이 아닙니다"))
@@ -89,17 +82,13 @@ public class ControllerTest {
     @DisplayName("문자보내기 테스트 -> (실패 : Coolsms 내부 문제)")
     public void sendMessageFail2() throws Exception {
         //given
-        Gson gson = new Gson();
-        SendAuthNumberReq sendAuthNumberReq = new SendAuthNumberReq("01056962173");
-        String requestBody = gson.toJson(sendAuthNumberReq);
-
         given(coolSmsService.sendMessage(any(String.class)))
                 .willThrow(new CommondException(ExceptionCode.COOLSMS_EXCEPTION));
 
         //when,then
-        this.mockMvc.perform(post("/messages/send")
+        this.mockMvc.perform(post("/message/send")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("phoneNum","01056962173"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value("인증시스템에 문제가 발생했습니다"))
                 .andDo(print());
@@ -107,22 +96,17 @@ public class ControllerTest {
         verify(coolSmsService,times(1)).sendMessage(any(String.class));
     }
 
-
     @Test
     @DisplayName("문자보내기 테스트 -> (실패 : 입력값 공백)")
     public void sendMessageFail4() throws Exception {
         //given
-        Gson gson = new Gson();
-        SendAuthNumberReq sendAuthNumberReq = new SendAuthNumberReq("");
-        String requestBody = gson.toJson(sendAuthNumberReq);
 
         //when,then
-        this.mockMvc.perform(post("/messages/send")
+        this.mockMvc.perform(post("/message/send")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .param("phoneNum",""))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
-                .andExpect(jsonPath("$.data.phoneNum").value("전화번호를 입력하세요"))
+                .andExpect(jsonPath("$.message").value("전화번호를 입력하세요"))
                 .andDo(print());
 
         verify(coolSmsService,times(0)).sendMessage(any(String.class));
@@ -136,11 +120,10 @@ public class ControllerTest {
                 .phoneNum("01056962173")
                 .authenticationNumber("1234")
                 .build();
-        Gson gson = new Gson();
         String requestBody = gson.toJson(checkAuthNumberReq);
 
         //when ,then
-        this.mockMvc.perform(post("/messages/auth")
+        this.mockMvc.perform(post("/message/auth")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -157,11 +140,10 @@ public class ControllerTest {
                 .phoneNum("")
                 .authenticationNumber("")
                 .build();
-        Gson gson = new Gson();
         String requestBody = gson.toJson(checkAuthNumberReq);
 
         //when ,then
-        this.mockMvc.perform(post("/messages/auth")
+        this.mockMvc.perform(post("/message/auth")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -179,14 +161,13 @@ public class ControllerTest {
                 .phoneNum("01056962173")
                 .authenticationNumber("1234")
                 .build();
-        Gson gson = new Gson();
         String requestBody = gson.toJson(checkAuthNumberReq);
         doThrow(new CommondException(ExceptionCode.SMS_AUTHENTICATION_FAIL))
                 .when(coolSmsService).authNumCheck(any(CheckAuthNumberReq.class));
 
 
         //when ,then
-        this.mockMvc.perform(post("/messages/auth")
+        this.mockMvc.perform(post("/message/auth")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
