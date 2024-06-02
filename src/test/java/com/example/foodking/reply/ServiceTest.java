@@ -5,7 +5,9 @@ import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
+import com.example.foodking.reply.common.ReplySortType;
 import com.example.foodking.reply.domain.Reply;
+import com.example.foodking.reply.dto.response.ReadReplyRes;
 import com.example.foodking.reply.repository.ReplyRepository;
 import com.example.foodking.reply.service.ReplyService;
 import com.example.foodking.user.domain.User;
@@ -119,6 +121,35 @@ public class ServiceTest {
             verify(replyRepository,times(0)).save(any(Reply.class));
             verify(userRepository,times(1)).findById(any(Long.class));
             verify(recipeInfoRepository,times(1)).findById(any(Long.class));
+        }
+    }
+
+    @Test
+    @DisplayName("댓글 조회 테스트 -> 성공")
+    public void readReplySuccess(){
+        //given
+        given(replyRepository.findReplyList(any(),any(),any(Long.class)))
+                .willReturn(List.of(ReadReplyRes.toDTO(reply,"test",true)));
+
+        //when
+        replyService.readReply(1L,1L, ReplySortType.LIKE,1L,12);
+
+        //then
+        verify(replyRepository,times(1)).findReplyList(any(),any(),any(Long.class));
+    }
+
+    @Test
+    @DisplayName("댓글 조회 테스트 -> (실패 : 존재하지 않는 페이지)")
+    public void readReplyFail(){
+        //given
+
+        //when,then
+        try{
+            replyService.readReply(1L,1L, ReplySortType.LIKE,1L,12);
+            fail("예외가 발생하지 않음");
+        }catch (CommondException ex){
+            assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_PAGE);
+            verify(replyRepository,times(1)).findReplyList(any(),any(),any(Long.class));
         }
     }
 

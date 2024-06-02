@@ -88,21 +88,25 @@ public class RecipeService {
                                     Long lastId, Object lastValue){
 
         // 만약 첫번째 페이지를 요청했다면 레시피정보를 가져와야하지만
-        // 첫번째페이지가 아니라면 레시피정보를 가져올 필요가 없이 댓글정보만 가져오면 된다.
+        // 첫번째 페이지가 아니라면 레시피정보를 가져올 필요가 없이 댓글정보만 가져오면 된다.
         if(lastId != null && lastValue != null)
             return replyService.readReply(recipeInfoId, userId, replySortType, lastId, lastValue);
-
+        
+        // 레시피 정보 가져오기
         ReadRecipeInfoRes readRecipeInfoRes = recipeInfoRepository.findRecipeInfo(recipeInfoId);
         RecipeInfo recipeInfo = readRecipeInfoRes.getRecipeInfo();
-
+        
+        // 조리법 리스트 가져오기
         List<ReadRecipeWayInfoResDTO> readRecipeWayInfoResDTOList = recipeInfo.getRecipeWayInfoList().stream()
                 .map(entity -> ReadRecipeWayInfoResDTO.toDTO(entity))
                 .collect(Collectors.toList());
-
+        
+        // 재료 리스트 가져오기
         List<ReadIngredientRes> readIngredientResList = recipeInfo.getIngredientList().stream()
                 .map(entity -> ReadIngredientRes.toDTO(entity))
                 .collect(Collectors.toList());
-
+        
+        // 댓글 페이징 조회
         List<ReadReplyRes> readReplyResList = replyService.readReply(recipeInfoId, userId, replySortType, lastId, lastValue);
         recipeInfo.addVisitCnt();
         recipeInfoRepository.save(recipeInfo);

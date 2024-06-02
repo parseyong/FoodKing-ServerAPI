@@ -24,7 +24,7 @@ public class RecipeWayInfo {
     @Column(nullable = false, name = "recipe_order")
     private Long recipeOrder;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_info_id",nullable = false)
     private RecipeInfo recipeInfo;
 

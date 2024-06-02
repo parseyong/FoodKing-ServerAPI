@@ -4,7 +4,6 @@ import com.example.foodking.common.TimeEntity;
 import com.example.foodking.ingredient.domain.Ingredient;
 import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipeWayInfo.domain.RecipeWayInfo;
-import com.example.foodking.reply.domain.Reply;
 import com.example.foodking.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -57,9 +56,6 @@ public class RecipeInfo extends TimeEntity {
 
     @Column(nullable = false, name = "like_cnt")
     private Long likeCnt;
-
-    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
-    private List<Reply> replyList;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",nullable = false)

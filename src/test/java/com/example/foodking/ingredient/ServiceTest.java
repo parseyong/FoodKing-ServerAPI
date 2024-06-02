@@ -61,7 +61,7 @@ public class ServiceTest {
     }
 
     @Test
-    @DisplayName("레시피 수정 테스트 -> (성공 : 재료가 늘어난 경우 0개->2개 )")
+    @DisplayName("재료 수정 테스트 -> (성공 : 재료가 늘어난 경우 0개->2개 )")
     public void updateIngredientSuccess(){
         //given
         RecipeInfo recipeInfo = RecipeInfo.builder()
@@ -79,7 +79,7 @@ public class ServiceTest {
     }
 
     @Test
-    @DisplayName("레시피 수정 테스트 -> (성공 : 재료가 줄어든 경우 2개->0개 )")
+    @DisplayName("재료 수정 테스트 -> (성공 : 재료가 줄어든 경우 2개->0개 )")
     public void updateIngredientSuccess2(){
         //given
         Ingredient ingredient1 = Ingredient.builder()

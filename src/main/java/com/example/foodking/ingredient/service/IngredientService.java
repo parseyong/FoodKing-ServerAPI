@@ -14,7 +14,6 @@ import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class IngredientService {
 
     private final IngredientRepository ingredientRepository;

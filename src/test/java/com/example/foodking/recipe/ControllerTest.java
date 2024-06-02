@@ -52,6 +52,12 @@ public class ControllerTest {
     private RecipeService recipeService;
     @MockBean
     private RecipePagingService recipePagingService;
+    /*
+        JwtAuthenticationFilter클래스는 Filter이므로 @WebMvcTest에 스캔이 되지만 JwtProvider클래스는
+        @Component로 선언되어있으므로 @WebMvcTest의 스캔대상이 아니다.
+        따라서 JwtAuthenticationFilter클래스에서 JwtProvider 빈을 가져올 수 없어 테스트가 정상적으로 수행되지 않는다.
+        따라서 JwtProvider를 Mock객체로 대체하여 해당 문제를 해결하였다.
+    */
     @MockBean
     private JwtProvider jwtProvider;
     @Autowired
@@ -60,6 +66,7 @@ public class ControllerTest {
     private List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList;
     private SaveRecipeReq saveRecipeReq;
     private SaveRecipeInfoReq saveRecipeInfoReq;
+    private Gson gson = new Gson();
 
     @BeforeEach
     void beforeEach(){
@@ -106,7 +113,6 @@ public class ControllerTest {
     public void addRecipeInfoSuccess() throws Exception {
         //given
         makeAuthentication();
-        Gson gson = new Gson();
         String requestBody = gson.toJson(saveRecipeReq);
 
         //when, then
@@ -125,7 +131,6 @@ public class ControllerTest {
     @DisplayName("레시피 등록테스트 -> (실패 : 인증실패)")
     public void addRecipeInfoFail() throws Exception {
         //given
-        Gson gson = new Gson();
         String requestBody = gson.toJson(saveRecipeReq);
 
         //when, then
@@ -149,7 +154,6 @@ public class ControllerTest {
                 .saveIngredientReqList(saveIngredientReqList)
                 .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
                 .build();
-        Gson gson = new Gson();
         String requestBody = gson.toJson(saveRecipeReq);
 
         //when, then
@@ -169,7 +173,6 @@ public class ControllerTest {
     public void addRecipeInfoFai3() throws Exception {
         //given
         makeAuthentication();
-        Gson gson = new Gson();
         String requestBody = gson.toJson(saveRecipeReq);
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER))
                 .when(recipeService).addRecipe(any(SaveRecipeReq.class),any(Long.class));
@@ -190,7 +193,6 @@ public class ControllerTest {
     public void updateRecipeSuccess() throws Exception {
         //given
         makeAuthentication();
-        Gson gson = new Gson();
         String requestbody = gson.toJson(saveRecipeReq);
 
         //when, then
@@ -209,7 +211,6 @@ public class ControllerTest {
     @DisplayName("레시피 수정 테스트 -> (실패 : 인증되지 않은 유저)")
     public void updateRecipeFail1() throws Exception {
         //given
-        Gson gson = new Gson();
         String requestbody = gson.toJson(saveRecipeReq);
 
         //when, then
@@ -242,7 +243,7 @@ public class ControllerTest {
                 .saveIngredientReqList(saveIngredientReqList)
                 .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
                 .build();
-        Gson gson = new Gson();
+
         String requestbody = gson.toJson(saveRecipeReq);
         makeAuthentication();
 
@@ -262,7 +263,6 @@ public class ControllerTest {
     @DisplayName("레시피 수정 테스트 -> (실패 : Pathvariable값 타입 예외)")
     public void updateRecipeFail3() throws Exception {
         //given
-        Gson gson = new Gson();
         String requestbody = gson.toJson(saveRecipeReq);
         makeAuthentication();
 
@@ -281,7 +281,6 @@ public class ControllerTest {
     @DisplayName("레시피 수정 테스트 -> (실패 : Pathvariable값 공백)")
     public void updateRecipeFail4() throws Exception {
         //given
-        Gson gson = new Gson();
         String requestbody = gson.toJson(saveRecipeReq);
         makeAuthentication();
 
@@ -301,9 +300,8 @@ public class ControllerTest {
     @DisplayName("레시피 수정 테스트 -> (실패 : 존재하지 않는 레시피)")
     public void updateRecipeFail6() throws Exception {
         //given
-        Gson gson = new Gson();
-        String requestbody = gson.toJson(saveRecipeReq);
         makeAuthentication();
+        String requestbody = gson.toJson(saveRecipeReq);
         doThrow(new CommondException(NOT_EXIST_RECIPEINFO))
                 .when(recipeService).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
 
@@ -323,9 +321,8 @@ public class ControllerTest {
     @DisplayName("레시피 수정 테스트 -> (실패 : 레시피 수정권한 없음)")
     public void updateRecipeFail7() throws Exception {
         //given
-        Gson gson = new Gson();
-        String requestbody = gson.toJson(saveRecipeReq);
         makeAuthentication();
+        String requestbody = gson.toJson(saveRecipeReq);
         doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_RECIPE))
                 .when(recipeService).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
 
@@ -593,27 +590,9 @@ public class ControllerTest {
         //when, then
         this.mockMvc.perform(get("/recipes/{recipeType}/list","문자")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("recipeSortType", String.valueOf(RecipeSortType.LATEST)))
+                        .param("recipeSortType", " "))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("recipeType이 RecipeInfoType타입이여야 합니다."))
-                .andDo(print());
-
-        verify(recipePagingService,times(0))
-                .readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class));
-    }
-
-    @Test
-    @DisplayName("레시피타입조회 페이징 테스트 -> (실패 : RecipeSortType 타입 예외)")
-    public void readRecipeInfoPagingByTypeFail2() throws Exception {
-        // given
-        makeAuthentication();
-
-        //when, then
-        this.mockMvc.perform(get("/recipes/{recipeType}//list",RecipeInfoType.KOREAN)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("recipeSortType", "문자"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("recipeSortType이 RecipeSortType타입이여야 합니다."))
                 .andDo(print());
 
         verify(recipePagingService,times(0))

@@ -14,7 +14,6 @@ import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class RecipeWayInfoService {
 
     private final RecipeWayInfoRepository recipeWayInfoRepository;

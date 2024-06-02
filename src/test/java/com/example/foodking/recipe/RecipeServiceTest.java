@@ -7,9 +7,11 @@ import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.dto.recipe.request.SaveRecipeReq;
 import com.example.foodking.recipe.dto.recipeInfo.request.SaveRecipeInfoReq;
+import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoRes;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.example.foodking.recipe.service.RecipeService;
 import com.example.foodking.recipeWayInfo.service.RecipeWayInfoService;
+import com.example.foodking.reply.common.ReplySortType;
 import com.example.foodking.reply.service.ReplyService;
 import com.example.foodking.user.domain.User;
 import com.example.foodking.user.repository.UserRepository;
@@ -21,6 +23,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -30,7 +33,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ServiceTest {
+public class RecipeServiceTest {
 
     @InjectMocks
     private RecipeService recipeService;
@@ -75,6 +78,8 @@ public class ServiceTest {
         this.recipeInfo = RecipeInfo.builder()
                 .user(user)
                 .recipeName("testName")
+                .recipeWayInfoList(new ArrayList<>())
+                .ingredientList(new ArrayList<>())
                 .calogy(1L)
                 .build();
     }
@@ -228,4 +233,36 @@ public class ServiceTest {
         }
     }
 
+    @Test
+    @DisplayName("레시피 조회 테스트 -> (성공: 첫번째 페이지인 경우)")
+    public void readRecipeSuccess(){
+        //given
+        ReadRecipeInfoRes readRecipeInfoRes = ReadRecipeInfoRes
+                .toDTO(recipeInfo,1L,1L,"writerNickName");
+        given(recipeInfoRepository.findRecipeInfo(any(Long.class))).willReturn(readRecipeInfoRes);
+
+        //when
+        recipeService.readRecipe(1L,1L, ReplySortType.LIKE,null,null);
+
+        //then
+        verify(replyService,times(1))
+                .readReply(any(Long.class),any(Long.class), any(ReplySortType.class),any(),any());
+        verify(recipeInfoRepository,times(1)).findRecipeInfo(any(Long.class));
+        verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
+    }
+
+    @Test
+    @DisplayName("레시피 조회 테스트 -> (성공: n번째 페이지인 경우)")
+    public void readRecipeSuccess2(){
+        //given
+
+        //when
+        recipeService.readRecipe(1L,1L, ReplySortType.LIKE,1L,12);
+
+        //then
+        verify(replyService,times(1))
+                .readReply(any(Long.class),any(Long.class), any(ReplySortType.class),any(Long.class),any());
+        verify(recipeInfoRepository,times(0)).findRecipeInfo(any(Long.class));
+        verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
+    }
 }

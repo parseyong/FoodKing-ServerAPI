@@ -36,6 +36,12 @@ public class ControllerTest {
 
     @MockBean
     private ReplyService replyService;
+    /*
+        JwtAuthenticationFilter클래스는 Filter이므로 @WebMvcTest에 스캔이 되지만 JwtProvider클래스는
+        @Component로 선언되어있으므로 @WebMvcTest의 스캔대상이 아니다.
+        따라서 JwtAuthenticationFilter클래스에서 JwtProvider 빈을 가져올 수 없어 테스트가 정상적으로 수행되지 않는다.
+        따라서 JwtProvider를 Mock객체로 대체하여 해당 문제를 해결하였다.
+    */
     @MockBean
     private JwtProvider jwtProvider;
     @Autowired
@@ -128,7 +134,8 @@ public class ControllerTest {
     public void addReplyFail5() throws Exception {
         //given
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER)).when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER))
+                .when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
         this.mockMvc.perform(post("/replies/{recipeInfoId}",1L)
@@ -146,7 +153,8 @@ public class ControllerTest {
     public void addReplyFail6() throws Exception {
         //given
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO)).when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO))
+                .when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
         this.mockMvc.perform(post("/replies/{recipeInfoId}",1L)
@@ -246,7 +254,8 @@ public class ControllerTest {
     public void updateReplyFail5() throws Exception {
         //given
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_REPLY)).when(replyService).updateReply(any(Long.class),any(Long.class),any(String.class));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_REPLY))
+                .when(replyService).updateReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
         this.mockMvc.perform(patch("/replies/{replyId}",1L)
@@ -263,7 +272,8 @@ public class ControllerTest {
     public void updateReplyFail6() throws Exception {
         //given
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_REPLY)).when(replyService).updateReply(any(Long.class),any(Long.class),any(String.class));
+        doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_REPLY))
+                .when(replyService).updateReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
         this.mockMvc.perform(patch("/replies/{replyId}",1L)
@@ -341,7 +351,8 @@ public class ControllerTest {
     public void deleteReplyFail4() throws Exception {
         //given
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.NOT_EXIST_REPLY)).when(replyService).deleteReply(any(Long.class),any(Long.class));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_REPLY))
+                .when(replyService).deleteReply(any(Long.class),any(Long.class));
 
         //when,then
         this.mockMvc.perform(delete("/replies/{replyId}",1L)
@@ -357,7 +368,8 @@ public class ControllerTest {
     public void deleteReplyFail5() throws Exception {
         //given
         makeAuthentication();
-        doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_REPLY)).when(replyService).deleteReply(any(Long.class),any(Long.class));
+        doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_REPLY))
+                .when(replyService).deleteReply(any(Long.class),any(Long.class));
 
         //when,then
         this.mockMvc.perform(delete("/replies/{replyId}",1L)

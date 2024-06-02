@@ -58,16 +58,15 @@ public class DistributedLockAop {
             // lock을 얻었다면 트랜잭션을 시작한다.
             log.info(key);
             return aopForTransaction.proceed(joinPoint);
+
         } catch (InterruptedException e) {
             // waitTime이나 leaseTime등의 이유로 interrupted 발생 시
             log.info("Interrupted lock");
-            throw new InterruptedException();
+            throw new CommondException(ExceptionCode.LOCK_CAPTURE_FAIL);
 
         } finally {
-            // 트랜잭션 전파범위를  REQUIRES_NEW로 설정해두었더라도 스프링에서 트랜잭션은 thread-local기반으로 실행된다.
-            // 따라서 완전히 독립된 상태로 트랜잭션이 실행되는게 아니므로 자식트랜잭션에서 예외처리를 해주지않으면 부모트랜잭션에게도 예외가 전파된다.
-            // 그렇게 때문에 finally로 lock해제를 묶어주어야 한다.
 
+            // 트랜잭션 커밋 이후 락이 해제되도록 finally절에 락 해제 선언
             if (rLock.isHeldByCurrentThread()) {
                 rLock.unlock();
             }

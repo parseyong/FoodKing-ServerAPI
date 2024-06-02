@@ -44,7 +44,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /*
-            RequestParam으로 받은 값이 존재하지 않을때 발생하는 예외처리 로직
+            RequestParam으로 받은 값이 존재하지 않을때 발생하는 예외처리 로직, ""이 아닌 null일때 해당 예외가 발생된다.
             Enum타입의 값을 받아올 경우 ""이 입력되어도 ConstraintViolationException이 아닌
             MissingServletRequestParameterException이 발생한다.
     */

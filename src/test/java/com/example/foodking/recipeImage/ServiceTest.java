@@ -83,12 +83,14 @@ public class ServiceTest {
         given(user.getUserId()).willReturn(1L);
         recipeInfo.addRecipeImage("C:/upload/testOldImage");
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
+
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
         MockMultipartFile oldImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
+
         File oldFile = new File(recipeInfo.getRecipeImage());
         oldImage.transferTo(oldFile);
         assertThat(oldFile.exists()).isTrue();

@@ -35,9 +35,9 @@ public enum ExceptionCode {
     ACCESS_FAIL_REPLY(HttpStatus.FORBIDDEN,"해당 댓글에 대한 권한이 없습니다",null),
 
     //EMOTION EXCEPTION
-    EXIST_LIKE(HttpStatus.BAD_REQUEST,"이미 좋아요를 눌렀습니다.",null),
     ACCESS_FAIL_EMOTION(HttpStatus.FORBIDDEN,"해당 이모션에 대한 권한이 없습니다",null),
 
+    //Lock Exception
     LOCK_CAPTURE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR,"서버에 요청이 많아 데이터반환에 실패했습니다. 다시 요청해주세요",null);
 
     private final HttpStatus status;

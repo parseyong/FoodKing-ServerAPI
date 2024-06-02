@@ -35,6 +35,7 @@ public class RecipeEmotion {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "recipe_info_id",nullable = false)
     private RecipeInfo recipeInfo;
+
     @Builder
     private RecipeEmotion(EmotionType emotionType,User user, RecipeInfo recipeInfo){
         this.emotionType=emotionType;

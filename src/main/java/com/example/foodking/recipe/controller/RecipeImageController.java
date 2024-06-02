@@ -7,19 +7,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@Validated
 @RequiredArgsConstructor
 @Api(value = "RecipeImage")
 public class RecipeImageController {
 
     private final RecipeImageService recipeImageService;
 
-    @PostMapping("/recipes/images/{recipeInfoId}")
+    @PostMapping("/recipes/{recipeInfoId}/image")
     public ResponseEntity<CommonResDTO> saveImage(
             @AuthenticationPrincipal final Long userId,
             @RequestParam(name = "recipeImage") MultipartFile recipeImage,
@@ -29,7 +27,7 @@ public class RecipeImageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("이미지 등록완료",null));
     }
 
-    @DeleteMapping("/recipes/images/{recipeInfoId}")
+    @DeleteMapping("/recipes/{recipeInfoId}/image")
     public ResponseEntity<CommonResDTO> deleteImage(
             @AuthenticationPrincipal final Long userId,
             @PathVariable final Long recipeInfoId) {

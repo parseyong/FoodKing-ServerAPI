@@ -35,6 +35,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({SecurityConfig.class, JwtProvider.class})
 public class ControllerTest {
 
+    /*
+        JwtAuthenticationFilter클래스는 Filter이므로 @WebMvcTest에 스캔이 되지만 JwtProvider클래스는
+        @Component로 선언되어있으므로 @WebMvcTest의 스캔대상이 아니다.
+        따라서 JwtAuthenticationFilter클래스에서 JwtProvider 빈을 가져올 수 없어 테스트가 정상적으로 수행되지 않는다.
+        따라서 JwtProvider를 Mock객체로 대체하여 해당 문제를 해결하였다.
+    */
     @MockBean
     private JwtProvider jwtProvider;
     @MockBean
@@ -88,7 +94,7 @@ public class ControllerTest {
         //when,then
         this.mockMvc.perform(post("/replies/emotions/{replyId}","test")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("emotionType","Like"))
+                        .param("emotionType","LIKE"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("replyId이 Long타입이여야 합니다."))
                 .andDo(print());

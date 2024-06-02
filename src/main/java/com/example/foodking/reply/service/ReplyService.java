@@ -53,11 +53,15 @@ public class ReplyService {
                                         ReplySortType replySortType,
                                         Long lastId, Object lastValue){
 
-        return replyRepository.findReplyList(
+        List<ReadReplyRes> replyResList = replyRepository.findReplyList(
                 getBuilder(recipeId, replySortType, lastId, lastValue),
                 createOrderSpecifier(replySortType),
-                userId
-        );
+                userId);
+
+        if(replyResList.size() == 0)
+            throw new CommondException(ExceptionCode.NOT_EXIST_PAGE);
+
+        return replyResList;
     }
 
     @Transactional
@@ -77,6 +81,7 @@ public class ReplyService {
 
         if(!isMyReply(userId,reply.getUser()))
             throw new CommondException(ExceptionCode.ACCESS_FAIL_REPLY);;
+
         reply.changeContent(content);
         replyRepository.save(reply);
     }
