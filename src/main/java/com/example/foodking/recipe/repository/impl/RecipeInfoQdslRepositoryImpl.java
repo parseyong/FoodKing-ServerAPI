@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 import static com.example.foodking.emotion.domain.QRecipeEmotion.recipeEmotion;
 import static com.example.foodking.recipe.domain.QRecipeInfo.recipeInfo;
-import static com.example.foodking.reply.domain.QReply.reply;
 import static com.example.foodking.user.domain.QUser.user;
 
 @Repository
@@ -30,12 +29,10 @@ public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
     @Override
     public List<ReadRecipeInfoRes> findRecipeInfoPagingByCondition(BooleanBuilder builder, OrderSpecifier[] orderSpecifier) {
 
-        List<Tuple> result = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId,reply.count())
+        List<Tuple> result = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId)
                 .from(recipeInfo)
                 .join(user).on(recipeInfo.user.userId.eq(user.userId))
-                .join(reply).on(recipeInfo.recipeInfoId.eq(reply.recipeInfo.recipeInfoId))
                 .where(builder)
-                .groupBy(recipeInfo)
                 .orderBy(orderSpecifier)
                 .limit(10) //페이지의 크기
                 .fetch();
@@ -43,10 +40,9 @@ public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
         return result.stream()
                 .map(entity -> {
                     RecipeInfo recipeInfo = entity.get(QRecipeInfo.recipeInfo);
-                    Long replyCnt = entity.get(reply.count());
                     Long writerUserId = entity.get(user.userId);
                     String writerNickName = entity.get(user.nickName);
-                    return ReadRecipeInfoRes.toDTO(recipeInfo,replyCnt,writerUserId,writerNickName);
+                    return ReadRecipeInfoRes.toDTO(recipeInfo,writerUserId,writerNickName);
                 })
                 .collect(Collectors.toList());
     }
@@ -81,12 +77,10 @@ public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
                 .limit(10) //페이지의 크기
                 .fetch();
 
-        List<Tuple> result = jpaQueryFactory.select(recipeInfo,user.userId,user.nickName,reply.count())
+        List<Tuple> result = jpaQueryFactory.select(recipeInfo,user.userId,user.nickName)
                 .from(recipeInfo)
                 .join(user).on(recipeInfo.user.userId.eq(user.userId))
-                .join(reply).on(recipeInfo.recipeInfoId.eq(reply.recipeInfo.recipeInfoId))
                 .where(recipeInfo.recipeInfoId.in(likedRecipeInfoIdList))
-                .groupBy(recipeInfo)
                 .orderBy(orderSpecifier)
                 .limit(10) //페이지의 크기
                 .fetch();
@@ -94,10 +88,9 @@ public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
         return result.stream()
                 .map(entity -> {
                     RecipeInfo recipeInfo = entity.get(QRecipeInfo.recipeInfo);
-                    Long replyCnt = entity.get(reply.count());
                     Long writerUserId = entity.get(user.userId);
                     String writerNickName = entity.get(user.nickName);
-                    return ReadRecipeInfoRes.toDTO(recipeInfo,replyCnt,writerUserId,writerNickName);
+                    return ReadRecipeInfoRes.toDTO(recipeInfo,writerUserId,writerNickName);
                 })
                 .collect(Collectors.toList());
     }
@@ -115,16 +108,14 @@ public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
 
     @Override
     public ReadRecipeInfoRes findRecipeInfo(Long recipeinfoId) {
-        Tuple result = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId,reply.count())
+        Tuple result = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId)
                 .from(recipeInfo)
                 .join(user).on(recipeInfo.user.userId.eq(user.userId))
-                .join(reply).on(reply.recipeInfo.recipeInfoId.eq(recipeInfo.recipeInfoId))
                 .where(recipeInfo.recipeInfoId.eq(recipeinfoId))
-                .groupBy(recipeInfo)
                 .fetchOne();
 
         return ReadRecipeInfoRes.toDTO
-                (result.get(recipeInfo),result.get(reply.count()),result.get(user.userId),result.get(user.nickName));
+                (result.get(recipeInfo),result.get(user.userId),result.get(user.nickName));
     }
 
 }

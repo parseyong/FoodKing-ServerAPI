@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class RecipeService {
 
     private final RecipeInfoRepository recipeInfoRepository;
@@ -81,7 +80,6 @@ public class RecipeService {
         recipeInfoRepository.delete(recipeInfo);
     }
 
-    @Transactional
     @DistributedLock(key = "#LockRecipe")
     public Object readRecipe(Long userId, Long recipeInfoId,
                                     ReplySortType replySortType,

@@ -32,7 +32,7 @@ public class ReadRecipeInfoRes {
     @JsonIgnore
     private RecipeInfo recipeInfo;
 
-    public static ReadRecipeInfoRes toDTO(RecipeInfo recipeInfo, Long replyCnt, Long writerUserId, String writerNickName){
+    public static ReadRecipeInfoRes toDTO(RecipeInfo recipeInfo, Long writerUserId, String writerNickName){
         return ReadRecipeInfoRes.builder()
                 .recipeInfo(recipeInfo)
                 .calogy(recipeInfo.getCalogy())
@@ -42,7 +42,7 @@ public class ReadRecipeInfoRes {
                 .ingredentCost(recipeInfo.getIngredientCost())
                 .recipeInfoId(recipeInfo.getRecipeInfoId())
                 .recipeImageUrl(recipeInfo.getRecipeImage())
-                .replyCnt(replyCnt)
+                .replyCnt((long) recipeInfo.getReplyList().size())
                 .emotionCnt(recipeInfo.getLikeCnt())
                 .regDate(recipeInfo.getRegDate())
                 .modDate(recipeInfo.getModDate())
