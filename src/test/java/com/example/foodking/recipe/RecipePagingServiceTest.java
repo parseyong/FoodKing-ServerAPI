@@ -68,7 +68,7 @@ public class RecipePagingServiceTest {
                 .build();
 
         ReadRecipeInfoRes readRecipeInfoRes = ReadRecipeInfoRes
-                .toDTO(recipeInfo,1L,1L,"writerNickName");
+                .toDTO(recipeInfo,1L,"writerNickName");
 
         given(recipeInfoRepository.findRecipeInfoTotalCnt(any())).willReturn(10L);
         given(recipeInfoRepository.findRecipeInfoPagingByCondition(any(),any()))
@@ -118,7 +118,7 @@ public class RecipePagingServiceTest {
                 .build();
 
         ReadRecipeInfoRes readRecipeInfoRes = ReadRecipeInfoRes
-                .toDTO(recipeInfo,1L,1L,"writerNickName");
+                .toDTO(recipeInfo,1L,"writerNickName");
 
         given(recipeInfoRepository.findLikedRecipeInfoCnt(any())).willReturn(10L);
         given(recipeInfoRepository.findLikedRecipeInfoList(any(),any()))

@@ -1,6 +1,5 @@
 package com.example.foodking.recipe.service;
 
-import com.example.foodking.aop.distributedLock.DistributedLock;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.ingredient.dto.response.ReadIngredientRes;
@@ -80,7 +79,7 @@ public class RecipeService {
         recipeInfoRepository.delete(recipeInfo);
     }
 
-    @DistributedLock(key = "#LockRecipe")
+    //@DistributedLock(key = "#LockRecipe")
     public Object readRecipe(Long userId, Long recipeInfoId,
                                     ReplySortType replySortType,
                                     Long lastId, Object lastValue){

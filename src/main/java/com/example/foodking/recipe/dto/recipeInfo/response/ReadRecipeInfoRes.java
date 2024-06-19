@@ -33,6 +33,14 @@ public class ReadRecipeInfoRes {
     private RecipeInfo recipeInfo;
 
     public static ReadRecipeInfoRes toDTO(RecipeInfo recipeInfo, Long writerUserId, String writerNickName){
+
+        Long replyCnt;
+        if(recipeInfo.getReplyList() == null){
+            replyCnt = 0L;
+        }
+        else{
+            replyCnt = (long) recipeInfo.getReplyList().size();
+        }
         return ReadRecipeInfoRes.builder()
                 .recipeInfo(recipeInfo)
                 .calogy(recipeInfo.getCalogy())
@@ -42,7 +50,7 @@ public class ReadRecipeInfoRes {
                 .ingredentCost(recipeInfo.getIngredientCost())
                 .recipeInfoId(recipeInfo.getRecipeInfoId())
                 .recipeImageUrl(recipeInfo.getRecipeImage())
-                .replyCnt((long) recipeInfo.getReplyList().size())
+                .replyCnt(replyCnt)
                 .emotionCnt(recipeInfo.getLikeCnt())
                 .regDate(recipeInfo.getRegDate())
                 .modDate(recipeInfo.getModDate())

@@ -238,7 +238,7 @@ public class RecipeServiceTest {
     public void readRecipeSuccess(){
         //given
         ReadRecipeInfoRes readRecipeInfoRes = ReadRecipeInfoRes
-                .toDTO(recipeInfo,1L,1L,"writerNickName");
+                .toDTO(recipeInfo,1L,"writerNickName");
         given(recipeInfoRepository.findRecipeInfo(any(Long.class))).willReturn(readRecipeInfoRes);
 
         //when

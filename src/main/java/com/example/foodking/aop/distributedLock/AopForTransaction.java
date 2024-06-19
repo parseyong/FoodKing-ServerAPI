@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class AopForTransaction {
 
-    // 락 해제 전에 트랜잭션 커밋이 되어야 하기 떄문에 트랜잭션 전파범위를 REQUIRES_NEW로 명시해주어야한다.
+    // 부모 트랜잭션의 유무와 관계없이 별도의 트랜잭션을 생성하기 위해 전파범위를 REQUIRES_NEW로 설정
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Object proceed(final ProceedingJoinPoint joinPoint) throws Throwable {
 

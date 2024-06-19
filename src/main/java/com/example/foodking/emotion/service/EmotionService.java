@@ -16,7 +16,6 @@ import com.example.foodking.user.domain.User;
 import com.example.foodking.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -31,7 +30,6 @@ public class EmotionService {
     private final RecipeInfoRepository recipeInfoRepository;
 
 
-    @Transactional
     @DistributedLock(key = "#LockReplyEmotion")
     public void toggleReplyEmotion(Long userId, Long replyId, EmotionType emotionType){
         User user = userRepository.findById(userId)
@@ -65,7 +63,6 @@ public class EmotionService {
         replyRepository.save(reply);
     }
 
-    @Transactional
     @DistributedLock(key = "#LockRecipeEmotion")
     public void toggleRecipeInfoEmotion(Long userId, Long recipeInfoId, EmotionType emotionType){
         User user = userRepository.findById(userId)
