@@ -740,7 +740,6 @@ public class ControllerTest {
         //given
         makeAuthentication();
         UpdateUserInfoReq updateUserInfoReq = UpdateUserInfoReq.builder()
-                .phoneNum("01056962173")
                 .oldPassword("1234")
                 .newPassword("12345")
                 .nickName("new NickName")
@@ -764,7 +763,6 @@ public class ControllerTest {
     public void updateUserInfoFail1() throws Exception {
         //given
         UpdateUserInfoReq updateUserInfoReq = UpdateUserInfoReq.builder()
-                .phoneNum("01056962173")
                 .oldPassword("1234")
                 .newPassword("12345")
                 .nickName("new NickName")
@@ -789,7 +787,6 @@ public class ControllerTest {
         //given
         makeAuthentication();
         UpdateUserInfoReq updateUserInfoReq = UpdateUserInfoReq.builder()
-                .phoneNum("")
                 .oldPassword("")
                 .newPassword("")
                 .nickName("")
@@ -814,7 +811,6 @@ public class ControllerTest {
         //given
         makeAuthentication();
         UpdateUserInfoReq updateUserInfoReq = UpdateUserInfoReq.builder()
-                .phoneNum("01056962173")
                 .oldPassword("1234")
                 .newPassword("12345")
                 .nickName("new NickName")
@@ -842,7 +838,6 @@ public class ControllerTest {
         //given
         makeAuthentication();
         UpdateUserInfoReq updateUserInfoReq = UpdateUserInfoReq.builder()
-                .phoneNum("01056962173")
                 .oldPassword("1234")
                 .newPassword("12345")
                 .nickName("new NickName")

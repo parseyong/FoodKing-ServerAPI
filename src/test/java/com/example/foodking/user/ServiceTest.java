@@ -74,7 +74,6 @@ public class ServiceTest {
                 .nickName("newNickName")
                 .oldPassword("1234")
                 .newPassword("12345")
-                .phoneNum("01056962174")
                 .build();
         this.deleteUserReq = DeleteUserReq.builder()
                 .email("test@google.com")

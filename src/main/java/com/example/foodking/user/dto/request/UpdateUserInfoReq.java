@@ -19,6 +19,4 @@ public class UpdateUserInfoReq {
     @NotBlank(message = "닉네임을 입력해주세요")
     private String nickName;
 
-    @NotBlank(message = "전화번호를 입력해주세요")
-    private String phoneNum;
 }

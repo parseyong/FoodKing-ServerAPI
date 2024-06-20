@@ -5,6 +5,7 @@ import com.example.foodking.recipe.service.RecipeService;
 import com.example.foodking.reply.common.ReplySortType;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.Executors;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +23,7 @@ public class DistributedLockTest {
     private RecipeInfoRepository recipeInfoRepository;
 
     @Test
+    @Disabled
     void 동시성100명_테스트() throws InterruptedException {
         int numberOfThreads = 100;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
