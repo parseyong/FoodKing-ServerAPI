@@ -25,8 +25,11 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Set up application.properties
-      run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/DB.properties
+    - name: Set up application.properties for prod
+      run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application-prod.properties
+
+    - name: Set up application.properties for test
+      run: echo "${{ secrets.APPLICATION_TEST }}" > ./src/test/resources/application.properties
 
     - name: Run build with Gradle Wrapper
       run: ./gradlew build

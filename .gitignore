@@ -20,8 +20,9 @@ settings.gradle
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-**/CoolSMS.properties
-**/DB.properties
+**/application-local.properties
+**/application-prod.properties
+**/application.properties
 
 ### IntelliJ IDEA ###
 .idea

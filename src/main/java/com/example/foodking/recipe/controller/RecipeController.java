@@ -109,7 +109,7 @@ public class RecipeController {
                 recipePagingService.readRecipeInfoPagingByCondition(readRecipeInfoPagingReq)));
     }
 
-    @GetMapping("/recipes/like//list")
+    @GetMapping("/recipes/like/list")
     public ResponseEntity<CommonResDTO> readLikeRecipeInfoPaging(
             @AuthenticationPrincipal final Long userId,
             @RequestParam RecipeSortType recipeSortType,
