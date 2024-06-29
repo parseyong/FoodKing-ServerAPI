@@ -20,8 +20,8 @@ settings.gradle
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-**/application-local.properties
 **/application-prod.properties
+**/application-local.properties
 **/application.properties
 
 ### IntelliJ IDEA ###
