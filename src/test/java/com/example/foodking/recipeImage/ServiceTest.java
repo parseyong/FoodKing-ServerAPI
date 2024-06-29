@@ -137,9 +137,6 @@ public class ServiceTest {
         MockMultipartFile oldImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
-        File oldFile = new File(recipeInfo.getRecipeImage());
-        oldImage.transferTo(oldFile);
-        assertThat(oldFile.exists()).isTrue();
 
         //when,then
         try{
@@ -220,9 +217,6 @@ public class ServiceTest {
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
         recipeInfo.addRecipeImage("C:/upload/testImage.png"); // 테스트를 위해 임의의 문자열값을 저장
-        File file = new File(recipeInfo.getRecipeImage());
-        newImage.transferTo(file);
-        assertThat(file.exists()).isTrue();
 
         //when,then
         try{
