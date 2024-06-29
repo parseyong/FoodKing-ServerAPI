@@ -22,6 +22,7 @@ import javax.validation.Valid;
 @Validated
 @RequiredArgsConstructor
 @Api(value = "RecipeInfo")
+
 public class RecipeController {
 
     private final RecipeService recipeService;

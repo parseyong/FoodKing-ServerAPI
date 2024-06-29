@@ -24,7 +24,7 @@ public class Ingredient {
     @Column(nullable = false, name = "ingredient_amount")
     private String ingredientAmount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "recipe_Info_id",nullable = false)
     private RecipeInfo recipeInfo;
 

@@ -1,5 +1,6 @@
 package com.example.foodking.recipeImage;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.recipe.domain.RecipeInfo;
@@ -17,6 +18,8 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -31,6 +34,8 @@ public class ServiceTest {
     private RecipeImageService recipeImageService;
     @Mock
     private RecipeInfoRepository recipeInfoRepository;
+    @Mock
+    private AmazonS3 amazonS3;
 
     private RecipeInfo recipeInfo;
     private User user;
@@ -58,52 +63,23 @@ public class ServiceTest {
     */
     @Test
     @DisplayName("이미지 등록테스트 -> (성공)")
-    public void addImageSucess() {
+    public void addImageSucess() throws MalformedURLException {
         //given
         given(user.getUserId()).willReturn(1L);
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
+        given(amazonS3.putObject(any(),any(),any(),any())).willReturn(null);
+        given(amazonS3.getUrl(any(),any())).willReturn(new URL("https://example.com"));
+
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
 
         //when
-        String savedImagePath = recipeImageService.saveImage(newImage,1L,1L);
-        File newFile = new File(savedImagePath);
+        recipeImageService.saveImage(newImage,1L,1L);
 
         //then
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
         verify(recipeInfoRepository,times(1)).findById(any(Long.class));
-        assertThat(newFile.exists()).isTrue();
-    }
-
-    @Test
-    @DisplayName("이미지 수정테스트 -> (성공)")
-    public void updateImageSucess() throws IOException {
-        //given
-        given(user.getUserId()).willReturn(1L);
-        recipeInfo.addRecipeImage("C:/upload/testOldImage");
-        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
-
-        MockMultipartFile newImage = new MockMultipartFile(
-                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
-        );
-        MockMultipartFile oldImage = new MockMultipartFile(
-                "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
-        );
-
-        File oldFile = new File(recipeInfo.getRecipeImage());
-        oldImage.transferTo(oldFile);
-        assertThat(oldFile.exists()).isTrue();
-
-        //when
-        String savedImagePath = recipeImageService.saveImage(newImage,1L,1L);
-        File newFile = new File(savedImagePath);
-
-        //then
-        verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
-        verify(recipeInfoRepository,times(1)).findById(any(Long.class));
-        assertThat(newFile.exists()).isTrue();
-        assertThat(oldFile.exists()).isFalse();
     }
 
     @Test
@@ -186,10 +162,7 @@ public class ServiceTest {
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
-        recipeInfo.addRecipeImage("C:/upload/testImage.png"); // 테스트를 위해 임의의 문자열값을 저장
-        File file = new File(recipeInfo.getRecipeImage());
-        newImage.transferTo(file);
-        assertThat(file.exists()).isTrue();
+        recipeInfo.addRecipeImage("https://example.com/test"); // 테스트를 위해 임의의 문자열값을 저장
 
         //when
         recipeImageService.deleteImage(1L,1L);
@@ -197,7 +170,6 @@ public class ServiceTest {
         //then
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
         verify(recipeInfoRepository,times(1)).findById(any(Long.class));
-        assertThat(file.exists()).isFalse();
         assertThat(recipeInfo.getRecipeImage()).isEqualTo(null);
     }
 

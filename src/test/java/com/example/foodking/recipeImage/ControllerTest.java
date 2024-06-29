@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -148,7 +147,8 @@ public class ControllerTest {
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
-        given(recipeImageService.saveImage(any(MultipartFile.class),any(Long.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.FILE_IOEXCEPTION));
+        doThrow(new CommondException(ExceptionCode.FILE_IOEXCEPTION))
+                .when(recipeImageService).saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(multipart("/recipes/{recipeInfoId}/image", 1L)
@@ -169,10 +169,12 @@ public class ControllerTest {
     public void addImageFail5() throws Exception {
         //given
         makeAuthentication();
+        doThrow(new CommondException(ExceptionCode.INVALID_SAVE_FILE))
+                .when(recipeImageService).saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
-        given(recipeImageService.saveImage(any(MultipartFile.class),any(Long.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.INVALID_SAVE_FILE));
 
         //when, then
         this.mockMvc.perform(multipart("/recipes/{recipeInfoId}/image", 1L)
@@ -196,7 +198,8 @@ public class ControllerTest {
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
-        given(recipeImageService.saveImage(any(MultipartFile.class),any(Long.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+        doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO))
+                .when(recipeImageService).saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(multipart("/recipes/{recipeInfoId}/image", 1L)
@@ -220,7 +223,8 @@ public class ControllerTest {
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
-        given(recipeImageService.saveImage(any(MultipartFile.class),any(Long.class),any(Long.class))).willThrow(new CommondException(ExceptionCode.ACCESS_FAIL_FILE));
+        doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_FILE))
+                .when(recipeImageService).saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(multipart("/recipes/{recipeInfoId}/image", 1L)
