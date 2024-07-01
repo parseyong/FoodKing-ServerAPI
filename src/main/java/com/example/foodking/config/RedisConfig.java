@@ -23,8 +23,14 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 public class RedisConfig {
 
-    @Value("${spring.redis.host}")
-    private String host;
+    @Value("${spring.redis.auth.host}")
+    private String authHost;
+
+    @Value("${spring.redis.lock.host}")
+    private String lockHost;
+
+    @Value("${spring.redis.cache.host}")
+    private String cacheHost;
 
     @Value("${spring.redis.lock.port}")
     private int lockPort;
@@ -40,7 +46,7 @@ public class RedisConfig {
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
-        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host+":"+ lockPort);
+        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + lockHost+":"+ lockPort);
         config.setCodec(new JsonJacksonCodec());
         return Redisson.create(config);
     }
@@ -48,7 +54,7 @@ public class RedisConfig {
     @Bean({"redisConnectionFactory", "cacheRedisConnectionFactory"})
     public RedisConnectionFactory cacheRedisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(host);
+        redisStandaloneConfiguration.setHostName(cacheHost);
         redisStandaloneConfiguration.setPort(cachePort);
         LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(
                 redisStandaloneConfiguration);
@@ -59,7 +65,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory authRedisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(host);
+        redisStandaloneConfiguration.setHostName(authHost);
         redisStandaloneConfiguration.setPort(authPort);
         LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(
                 redisStandaloneConfiguration);
