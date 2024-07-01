@@ -60,9 +60,27 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Deploy to AWS EC2
+    - name: Deploy to AWS EC2 - server1
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} <<EOF
+          docker pull ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+          docker stop my-app || true
+          docker rm my-app || true
+          docker run -d --name my-app -p 80:8080 ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+        EOF
+
+    - name: Deploy to AWS EC2 - server2
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_2 }} <<EOF
+          docker pull ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+          docker stop my-app || true
+          docker rm my-app || true
+          docker run -d --name my-app -p 80:8080 ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+        EOF
+
+    - name: Deploy to AWS EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_3 }} <<EOF
           docker pull ${{ secrets.DOCKER_USERNAME }}/my-app:latest
           docker stop my-app || true
           docker rm my-app || true
