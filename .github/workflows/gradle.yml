@@ -46,7 +46,7 @@ jobs:
       run: mkdir -p ./src/main/resources
 
     - name: Create resources directory if it doesn't exist
-      run: mkdir -p ./src/main/resources
+      run: mkdir -p ./src/test/resources
 
     - name: Set up application.properties for prod
       run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
