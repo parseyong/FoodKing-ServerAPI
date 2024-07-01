@@ -50,7 +50,7 @@ jobs:
 
     - name: Set up application.properties for prod
       run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
-g
+
     - name: Set up application.properties for prod
       run: echo "${{ secrets.APPLICATION }}" > ./src/test/resources/application.properties
 
