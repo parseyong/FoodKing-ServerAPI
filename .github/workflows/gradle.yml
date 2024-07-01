@@ -24,18 +24,6 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Create SSH Tunnel to Redis 1
-      run: ssh -N -L 6805:${{ secrets.REDIS_TOKEN_HOST }}:6379 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} &
-
-    - name: Create SSH Tunnel to Redis 2
-      run: ssh -N -L 6805:${{ secrets.REDIS_LOCK_HOST }}:6379 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} &
-
-    - name: Create SSH Tunnel to Redis 3
-      run: ssh -N -L 6805:${{ secrets.REDIS_CACHE_HOST }}:6379 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} &
-
-    - name: Wait for SSH tunnel
-      run: sleep 10
-
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
 
@@ -50,9 +38,6 @@ jobs:
 
     - name: Set up application.properties for prod
       run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
-
-    - name: Set up application.properties for prod
-      run: echo "${{ secrets.APPLICATION }}" > ./src/test/resources/application.properties
 
     - name: Run build with Gradle Wrapper
       run: ./gradlew build

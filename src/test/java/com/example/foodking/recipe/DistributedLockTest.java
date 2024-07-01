@@ -7,6 +7,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.Executors;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -15,6 +16,10 @@ import java.util.concurrent.CountDownLatch;
 import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
+@EnabledIfEnvironmentVariable(
+        named = "SPRING_PROFILES_ACTIVE",
+        matches = "local"
+)
 public class DistributedLockTest {
 
     @Autowired
