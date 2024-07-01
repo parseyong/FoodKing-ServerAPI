@@ -51,14 +51,15 @@ public class ReplyService {
 
     public List<ReadReplyRes> readReply(Long recipeId, Long userId,
                                         ReplySortType replySortType,
-                                        Long lastId, Object lastValue){
+                                        Long lastId, Object lastValue,
+                                        boolean isFirstPage){
 
         List<ReadReplyRes> replyResList = replyRepository.findReplyList(
                 getBuilder(recipeId, replySortType, lastId, lastValue),
                 createOrderSpecifier(replySortType),
                 userId);
 
-        if(replyResList.size() == 0)
+        if(replyResList.size() == 0 && !isFirstPage)
             throw new CommondException(ExceptionCode.NOT_EXIST_PAGE);
 
         return replyResList;

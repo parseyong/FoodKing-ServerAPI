@@ -246,7 +246,7 @@ public class RecipeServiceTest {
 
         //then
         verify(replyService,times(1))
-                .readReply(any(Long.class),any(Long.class), any(ReplySortType.class),any(),any());
+                .readReply(any(Long.class),any(Long.class), any(ReplySortType.class),any(),any(),any(Boolean.class));
         verify(recipeInfoRepository,times(1)).findRecipeInfo(any(Long.class));
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
     }
@@ -261,7 +261,7 @@ public class RecipeServiceTest {
 
         //then
         verify(replyService,times(1))
-                .readReply(any(Long.class),any(Long.class), any(ReplySortType.class),any(Long.class),any());
+                .readReply(any(Long.class),any(Long.class), any(ReplySortType.class),any(Long.class),any(),any(Boolean.class));
         verify(recipeInfoRepository,times(0)).findRecipeInfo(any(Long.class));
         verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
     }

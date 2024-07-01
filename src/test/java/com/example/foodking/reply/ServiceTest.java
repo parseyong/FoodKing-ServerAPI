@@ -132,7 +132,7 @@ public class ServiceTest {
                 .willReturn(List.of(ReadReplyRes.toDTO(reply,"test",true)));
 
         //when
-        replyService.readReply(1L,1L, ReplySortType.LIKE,1L,12);
+        replyService.readReply(1L,1L, ReplySortType.LIKE,1L,12,false);
 
         //then
         verify(replyRepository,times(1)).findReplyList(any(),any(),any(Long.class));
@@ -145,7 +145,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            replyService.readReply(1L,1L, ReplySortType.LIKE,1L,12);
+            replyService.readReply(1L,1L, ReplySortType.LIKE,1L,12,false);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_PAGE);

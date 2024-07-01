@@ -88,7 +88,7 @@ public class RecipeService {
         // 만약 첫번째 페이지를 요청했다면 레시피정보를 가져와야하지만
         // 첫번째 페이지가 아니라면 레시피정보를 가져올 필요가 없이 댓글정보만 가져오면 된다.
         if(lastId != null && lastValue != null)
-            return replyService.readReply(recipeInfoId, userId, replySortType, lastId, lastValue);
+            return replyService.readReply(recipeInfoId, userId, replySortType, lastId, lastValue, false);
         
         // 레시피 정보 가져오기
         ReadRecipeInfoRes readRecipeInfoRes = recipeInfoRepository.findRecipeInfo(recipeInfoId);
@@ -105,7 +105,9 @@ public class RecipeService {
                 .collect(Collectors.toList());
         
         // 댓글 페이징 조회
-        List<ReadReplyRes> readReplyResList = replyService.readReply(recipeInfoId, userId, replySortType, lastId, lastValue);
+        List<ReadReplyRes> readReplyResList = replyService
+                .readReply(recipeInfoId, userId, replySortType, lastId, lastValue,true);
+
         recipeInfo.addVisitCnt();
         recipeInfoRepository.save(recipeInfo);
 
