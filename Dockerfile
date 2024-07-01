@@ -8,4 +8,4 @@ COPY ./build/libs/FoodKing-0.0.1-SNAPSHOT.jar app.jar
 COPY ./src/main/resources/application.properties /resources/application.properties
 
 EXPOSE 8080
-ENTRYPOINT ["java","-Dspring.config.location=file:/resources/application-prod.properties", "-jar", "app.jar"]
+ENTRYPOINT ["java","-Dspring.config.location=file:/resources/application.properties", "-jar", "app.jar"]
