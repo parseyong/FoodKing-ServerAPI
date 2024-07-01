@@ -25,13 +25,13 @@ jobs:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Create SSH Tunnel to Redis 1
-      run: ssh -N -L 6379:${{ secrets.REDIS_TOKEN_HOST }}:6379 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} &
+      run: ssh -N -L 6805:${{ secrets.REDIS_TOKEN_HOST }}:6379 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} &
 
     - name: Create SSH Tunnel to Redis 2
-      run: ssh -N -L 6379:${{ secrets.REDIS_LOCK_HOST }}:6379 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} &
+      run: ssh -N -L 6805:${{ secrets.REDIS_LOCK_HOST }}:6379 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} &
 
     - name: Create SSH Tunnel to Redis 3
-      run: ssh -N -L 6379:${{ secrets.REDIS_CACHE_HOST }}:6379 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} &
+      run: ssh -N -L 6805:${{ secrets.REDIS_CACHE_HOST }}:6379 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} &
 
     - name: Wait for SSH tunnel
       run: sleep 10
