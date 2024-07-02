@@ -5,7 +5,7 @@ FROM eclipse-temurin:17.0.11_9-jre-alpine
 COPY ./build/libs/FoodKing-0.0.1-SNAPSHOT.jar app.jar
 
 # copy application.properties to the correct location
-COPY ./src/main/resources/application.properties /resources/application.properties
+COPY ./src/main/resources/application-prod.properties /resources/application-prod.properties
 
 EXPOSE 8080
-ENTRYPOINT ["java","-Dspring.config.location=file:/resources/application.properties", "-jar", "app.jar"]
+ENTRYPOINT ["java","-Dspring.config.location=file:/resources/application-prod.properties", "-jar", "app.jar"]

@@ -21,7 +21,7 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 **/application-prod.properties
-**/application.properties
+**/application-local.properties
 
 
 ### IntelliJ IDEA ###
