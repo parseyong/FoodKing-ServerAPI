@@ -1,19 +1,21 @@
 package com.example.foodking.reply.dto.response;
 
 import com.example.foodking.reply.domain.Reply;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 캐싱의 역직렬화를 위한 기본생성자.
 @AllArgsConstructor
 public class ReadReplyRes {
 
     private Long replyId;
 
+    @JsonProperty("isMyReply")
+    @Getter(AccessLevel.NONE)
     private boolean isMyReply;
 
     private String content;

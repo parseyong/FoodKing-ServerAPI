@@ -3,15 +3,12 @@ package com.example.foodking.recipe.service;
 import com.example.foodking.aop.distributedLock.DistributedLock;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
-import com.example.foodking.ingredient.dto.response.ReadIngredientRes;
 import com.example.foodking.ingredient.service.IngredientService;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.dto.recipe.request.SaveRecipeReq;
 import com.example.foodking.recipe.dto.recipe.response.ReadRecipeRes;
 import com.example.foodking.recipe.dto.recipeInfo.request.SaveRecipeInfoReq;
-import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoRes;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
-import com.example.foodking.recipeWayInfo.dto.response.ReadRecipeWayInfoRes;
 import com.example.foodking.recipeWayInfo.service.RecipeWayInfoService;
 import com.example.foodking.reply.common.ReplySortType;
 import com.example.foodking.reply.dto.response.ReadReplyRes;
@@ -19,11 +16,11 @@ import com.example.foodking.reply.service.ReplyService;
 import com.example.foodking.user.domain.User;
 import com.example.foodking.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +31,7 @@ public class RecipeService {
     private final ReplyService replyService;
     private final IngredientService ingredientService;
     private final RecipeWayInfoService recipeWayInfoService;
+    private final CacheService cacheService;
 
     @Transactional
     public Long addRecipe(SaveRecipeReq saveRecipeReq, Long userId){
@@ -50,6 +48,7 @@ public class RecipeService {
     }
 
     @Transactional
+    @CacheEvict(value = "recipeInfoCache", key = "#recipeInfoId", cacheManager = "redisCacheManager")
     public void updateRecipe(SaveRecipeReq saveRecipeReq, Long userId, Long recipeInfoId){
 
         RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
@@ -72,6 +71,7 @@ public class RecipeService {
     }
 
     @Transactional
+    @CacheEvict(value = "recipeInfoCache", key = "#recipeInfoId", cacheManager = "redisCacheManager")
     public void deleteRecipe(Long userId, Long recipeInfoId){
         RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
@@ -90,33 +90,23 @@ public class RecipeService {
         if(lastId != null && lastValue != null)
             return replyService.readReply(recipeInfoId, userId, replySortType, lastId, lastValue, false);
 
-        // 레시피 정보 가져오기
-        ReadRecipeInfoRes readRecipeInfoRes = recipeInfoRepository.findRecipeInfo(recipeInfoId);
-        RecipeInfo recipeInfo = readRecipeInfoRes.getRecipeInfo();
-
-        // 조리법 리스트 가져오기
-        List<ReadRecipeWayInfoRes> readRecipeWayInfoResList = recipeInfo.getRecipeWayInfoList().stream()
-                .map(entity -> ReadRecipeWayInfoRes.toDTO(entity))
-                .collect(Collectors.toList());
-
-        // 재료 리스트 가져오기
-        List<ReadIngredientRes> readIngredientResList = recipeInfo.getIngredientList().stream()
-                .map(entity -> ReadIngredientRes.toDTO(entity))
-                .collect(Collectors.toList());
+        ReadRecipeRes readRecipeRes = (ReadRecipeRes) cacheService.readRecipeByCache(recipeInfoId,true);
 
         // 댓글 페이징 조회
         List<ReadReplyRes> readReplyResList = replyService
                 .readReply(recipeInfoId, userId, replySortType, lastId, lastValue,true);
 
+        RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
+                .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
+
         recipeInfo.addVisitCnt();
         recipeInfoRepository.save(recipeInfo);
 
         return ReadRecipeRes.builder()
-                .readRecipeInfoRes(readRecipeInfoRes)
+                .readRecipeInfoRes(readRecipeRes.getReadRecipeInfoRes())
                 .readReplyResList(readReplyResList)
-                .readRecipeWayInfoResList(readRecipeWayInfoResList)
-                .readIngredientResList(readIngredientResList)
-                .recipeTip(recipeInfo.getRecipeTip())
+                .readRecipeWayInfoResList(readRecipeRes.getReadRecipeWayInfoResList())
+                .readIngredientResList(readRecipeRes.getReadIngredientResList())
                 .isMyRecipe(recipeInfo.getUser().getUserId() == userId)
                 .build();
     }

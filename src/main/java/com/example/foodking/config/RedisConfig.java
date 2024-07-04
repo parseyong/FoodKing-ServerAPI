@@ -9,10 +9,12 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -63,7 +65,7 @@ public class RedisConfig {
         return Redisson.create(config);
     }
 
-    @Bean({"redisConnectionFactory", "cacheRedisConnectionFactory"})
+    @Bean("cacheRedisConnectionFactory")
     public RedisConnectionFactory cacheRedisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(cacheHost);
@@ -74,7 +76,18 @@ public class RedisConfig {
         return lettuceConnectionFactory;
     }
 
-    @Bean
+    @Bean("lockRedisConnectionFactory")
+    public RedisConnectionFactory lockRedisConnectionFactory() {
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+        redisStandaloneConfiguration.setHostName(lockHost);
+        redisStandaloneConfiguration.setPort(lockPort);
+        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(
+                redisStandaloneConfiguration);
+
+        return lettuceConnectionFactory;
+    }
+
+    @Bean("authRedisConnectionFactory")
     public RedisConnectionFactory authRedisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(authHost);
@@ -85,11 +98,43 @@ public class RedisConfig {
         return lettuceConnectionFactory;
     }
 
-    @Bean
-    public RedisTemplate<String, String> authRedis() {
+    @Bean("authRedis")
+    public RedisTemplate<String, String> authRedis
+            (@Qualifier("authRedisConnectionFactory") RedisConnectionFactory authRedisConnectionFactory) {
 
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(authRedisConnectionFactory());
+        redisTemplate.setConnectionFactory(authRedisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        redisTemplate.setEnableTransactionSupport(true);
+
+        return redisTemplate;
+    }
+
+    @Bean("cacheRedis")
+    public RedisTemplate<String,String> cacheRedisTemplate
+            (@Qualifier("cacheRedisConnectionFactory") RedisConnectionFactory cacheRedisConnectionFactory){
+
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(cacheRedisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        redisTemplate.setEnableTransactionSupport(true);
+
+        return redisTemplate;
+    }
+
+    @Bean("redisTemplate")
+    @Primary
+    public RedisTemplate<String,String> lockRedisTemplate
+            (@Qualifier("lockRedisConnectionFactory") RedisConnectionFactory lockRedisConnectionFactory){
+
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(lockRedisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
@@ -100,7 +145,8 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisCacheManager redisCacheManager() {
+    public RedisCacheManager redisCacheManager
+            (@Qualifier("cacheRedisConnectionFactory") RedisConnectionFactory cacheRedisConnectionFactory) {
 
         PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType(Object.class)
@@ -116,7 +162,7 @@ public class RedisConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer))
                 .entryTtl(Duration.ofMinutes(30L));
 
-        return RedisCacheManager.builder(cacheRedisConnectionFactory())
+        return RedisCacheManager.builder(cacheRedisConnectionFactory)
                 .cacheDefaults(redisCacheConfiguration)
                 .build();
     }

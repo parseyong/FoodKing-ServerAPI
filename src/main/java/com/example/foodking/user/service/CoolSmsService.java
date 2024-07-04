@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class CoolSmsService {
     private String caller; // 발신자 번호
     private Message coolSms;
 
+    @Qualifier("authRedis")
     private final RedisTemplate<String,String> authRedis;
     @PostConstruct
     protected void init() {

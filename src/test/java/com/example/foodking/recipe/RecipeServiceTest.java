@@ -6,9 +6,11 @@ import com.example.foodking.ingredient.service.IngredientService;
 import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.dto.recipe.request.SaveRecipeReq;
+import com.example.foodking.recipe.dto.recipe.response.ReadRecipeRes;
 import com.example.foodking.recipe.dto.recipeInfo.request.SaveRecipeInfoReq;
 import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoRes;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
+import com.example.foodking.recipe.service.CacheService;
 import com.example.foodking.recipe.service.RecipeService;
 import com.example.foodking.recipeWayInfo.service.RecipeWayInfoService;
 import com.example.foodking.reply.common.ReplySortType;
@@ -47,6 +49,8 @@ public class RecipeServiceTest {
     private UserRepository userRepository;
     @Mock
     private ReplyService replyService;
+    @Mock
+    private CacheService cacheService;
 
     private SaveRecipeReq saveRecipeReq;
     private RecipeInfo recipeInfo;
@@ -239,7 +243,13 @@ public class RecipeServiceTest {
         //given
         ReadRecipeInfoRes readRecipeInfoRes = ReadRecipeInfoRes
                 .toDTO(recipeInfo,1L,"writerNickName");
-        given(recipeInfoRepository.findRecipeInfo(any(Long.class))).willReturn(readRecipeInfoRes);
+        given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
+
+        given(cacheService.readRecipeByCache(any(Long.class),any(Boolean.class))).willReturn(ReadRecipeRes.builder()
+                        .readRecipeInfoRes(ReadRecipeInfoRes.builder().build())
+                        .readRecipeWayInfoResList(new ArrayList<>())
+                        .readIngredientResList(new ArrayList<>())
+                        .build());
 
         //when
         recipeService.readRecipe(1L,1L, ReplySortType.LIKE,null,null);
@@ -247,7 +257,7 @@ public class RecipeServiceTest {
         //then
         verify(replyService,times(1))
                 .readReply(any(Long.class),any(Long.class), any(ReplySortType.class),any(),any(),any(Boolean.class));
-        verify(recipeInfoRepository,times(1)).findRecipeInfo(any(Long.class));
+        verify(recipeInfoRepository,times(1)).findById(any(Long.class));
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
     }
 

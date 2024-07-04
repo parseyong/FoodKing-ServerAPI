@@ -2,15 +2,13 @@ package com.example.foodking.recipe.dto.recipeInfo.response;
 
 import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.domain.RecipeInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 캐싱의 역직렬화를 위한 기본생성자.
 @AllArgsConstructor
 public class ReadRecipeInfoRes {
 
@@ -19,6 +17,7 @@ public class ReadRecipeInfoRes {
     private Long ingredentCost;
     private Long cookingTime;
     private Long calogy;
+    private String recipeTip;
     private Long recipeInfoId;
     private String recipeImageUrl;
     private Long replyCnt;
@@ -28,9 +27,6 @@ public class ReadRecipeInfoRes {
     private Long visitCnt;
     private Long writerUserId;
     private String writerNickName;
-
-    @JsonIgnore
-    private RecipeInfo recipeInfo;
 
     public static ReadRecipeInfoRes toDTO(RecipeInfo recipeInfo, Long writerUserId, String writerNickName){
 
@@ -42,12 +38,12 @@ public class ReadRecipeInfoRes {
             replyCnt = (long) recipeInfo.getReplyList().size();
         }
         return ReadRecipeInfoRes.builder()
-                .recipeInfo(recipeInfo)
                 .calogy(recipeInfo.getCalogy())
                 .recipeInfoType(recipeInfo.getRecipeInfoType())
                 .recipeName(recipeInfo.getRecipeName())
                 .cookingTime(recipeInfo.getCookingTime())
                 .ingredentCost(recipeInfo.getIngredientCost())
+                .recipeTip(recipeInfo.getRecipeTip())
                 .recipeInfoId(recipeInfo.getRecipeInfoId())
                 .recipeImageUrl(recipeInfo.getRecipeImage())
                 .replyCnt(replyCnt)
