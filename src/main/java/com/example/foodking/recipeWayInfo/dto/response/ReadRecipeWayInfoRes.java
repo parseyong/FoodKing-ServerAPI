@@ -8,13 +8,13 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ReadRecipeWayInfoResDTO {
+public class ReadRecipeWayInfoRes {
 
     private String recipeWay;
     private Long recipeOrder;
 
-    public static ReadRecipeWayInfoResDTO toDTO(RecipeWayInfo recipeWayInfo){
-        return ReadRecipeWayInfoResDTO.builder()
+    public static ReadRecipeWayInfoRes toDTO(RecipeWayInfo recipeWayInfo){
+        return ReadRecipeWayInfoRes.builder()
                 .recipeWay(recipeWayInfo.getRecipeWay())
                 .recipeOrder(recipeWayInfo.getRecipeOrder())
                 .build();

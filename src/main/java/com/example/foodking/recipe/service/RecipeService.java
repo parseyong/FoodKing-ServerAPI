@@ -11,7 +11,7 @@ import com.example.foodking.recipe.dto.recipe.response.ReadRecipeRes;
 import com.example.foodking.recipe.dto.recipeInfo.request.SaveRecipeInfoReq;
 import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoRes;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
-import com.example.foodking.recipeWayInfo.dto.response.ReadRecipeWayInfoResDTO;
+import com.example.foodking.recipeWayInfo.dto.response.ReadRecipeWayInfoRes;
 import com.example.foodking.recipeWayInfo.service.RecipeWayInfoService;
 import com.example.foodking.reply.common.ReplySortType;
 import com.example.foodking.reply.dto.response.ReadReplyRes;
@@ -82,28 +82,28 @@ public class RecipeService {
 
     @DistributedLock(key = "#LockRecipe")
     public Object readRecipe(Long userId, Long recipeInfoId,
-                                    ReplySortType replySortType,
-                                    Long lastId, Object lastValue){
+                             ReplySortType replySortType,
+                             Long lastId, Object lastValue){
 
         // 만약 첫번째 페이지를 요청했다면 레시피정보를 가져와야하지만
         // 첫번째 페이지가 아니라면 레시피정보를 가져올 필요가 없이 댓글정보만 가져오면 된다.
         if(lastId != null && lastValue != null)
             return replyService.readReply(recipeInfoId, userId, replySortType, lastId, lastValue, false);
-        
+
         // 레시피 정보 가져오기
         ReadRecipeInfoRes readRecipeInfoRes = recipeInfoRepository.findRecipeInfo(recipeInfoId);
         RecipeInfo recipeInfo = readRecipeInfoRes.getRecipeInfo();
-        
+
         // 조리법 리스트 가져오기
-        List<ReadRecipeWayInfoResDTO> readRecipeWayInfoResDTOList = recipeInfo.getRecipeWayInfoList().stream()
-                .map(entity -> ReadRecipeWayInfoResDTO.toDTO(entity))
+        List<ReadRecipeWayInfoRes> readRecipeWayInfoResList = recipeInfo.getRecipeWayInfoList().stream()
+                .map(entity -> ReadRecipeWayInfoRes.toDTO(entity))
                 .collect(Collectors.toList());
-        
+
         // 재료 리스트 가져오기
         List<ReadIngredientRes> readIngredientResList = recipeInfo.getIngredientList().stream()
                 .map(entity -> ReadIngredientRes.toDTO(entity))
                 .collect(Collectors.toList());
-        
+
         // 댓글 페이징 조회
         List<ReadReplyRes> readReplyResList = replyService
                 .readReply(recipeInfoId, userId, replySortType, lastId, lastValue,true);
@@ -114,12 +114,11 @@ public class RecipeService {
         return ReadRecipeRes.builder()
                 .readRecipeInfoRes(readRecipeInfoRes)
                 .readReplyResList(readReplyResList)
-                .readRecipeWayInfoResDTOList(readRecipeWayInfoResDTOList)
+                .readRecipeWayInfoResList(readRecipeWayInfoResList)
                 .readIngredientResList(readIngredientResList)
                 .recipeTip(recipeInfo.getRecipeTip())
                 .isMyRecipe(recipeInfo.getUser().getUserId() == userId)
                 .build();
-
     }
 
     public static void isMyRecipe(Long userId, User user, ExceptionCode exceptionCode){
@@ -128,6 +127,7 @@ public class RecipeService {
     }
 
     private void updateRecipeInfo(RecipeInfo recipeInfo, SaveRecipeInfoReq saveRecipeInfoReq){
+
         recipeInfo.changeCalogy(saveRecipeInfoReq.getCalogy());
         recipeInfo.changeRecipeInfoType(saveRecipeInfoReq.getRecipeInfoType());
         recipeInfo.changeCookingTime(saveRecipeInfoReq.getCookingTime());

@@ -37,15 +37,15 @@ public class RecipePagingService {
         Long recipeCnt = recipeInfoRepository.findRecipeInfoTotalCnt(getBuilderForCount(readRecipeInfoPagingReq));
 
         // 쿼리 실행
-        List<ReadRecipeInfoRes> readRecipeInfoResDTOList = recipeInfoRepository.findRecipeInfoPagingByCondition(
+        List<ReadRecipeInfoRes> readRecipeInfoResList = recipeInfoRepository.findRecipeInfoPagingByCondition(
                 getBuilderForPaging(readRecipeInfoPagingReq),
                 createOrderSpecifier(readRecipeInfoPagingReq.getRecipeSortType()));
 
         // 존재하지 않는 페이지일 경우 예외를 던짐
-        if(readRecipeInfoResDTOList.size() == 0)
+        if(readRecipeInfoResList.size() == 0)
             throw new CommondException(ExceptionCode.NOT_EXIST_PAGE);
 
-        return ReadRecipeInfoPagingRes.toDTO(readRecipeInfoResDTOList,recipeCnt);
+        return ReadRecipeInfoPagingRes.toDTO(readRecipeInfoResList,recipeCnt);
     }
 
     public ReadRecipeInfoPagingRes readLikedRecipeInfoPaging(ReadRecipeInfoPagingReq readRecipeInfoPagingReq){
