@@ -20,7 +20,7 @@ public class EmotionController {
 
     private final EmotionService emotionService;
 
-    @PostMapping("/replies/emotions/{replyId}")
+    @PostMapping("/replies/{replyId}/emotions")
     public ResponseEntity<CommonResDTO> toggleReplyEmotion(
             @AuthenticationPrincipal final Long userId,
             @PathVariable final Long replyId,
@@ -30,7 +30,7 @@ public class EmotionController {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("댓글이모션 토글 완료",null));
     }
 
-    @PostMapping("/recipes/emotions/{recipeInfoId}")
+    @PostMapping("/recipes/{recipeInfoId}/emotions")
     public ResponseEntity<CommonResDTO> toggleRecipeEmotion(
             @AuthenticationPrincipal final Long userId,
             @PathVariable final Long recipeInfoId,

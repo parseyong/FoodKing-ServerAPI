@@ -470,7 +470,7 @@ public class ControllerTest {
         given(userService.findEmail(any(String.class))).willReturn("test");
 
         //when,then
-        this.mockMvc.perform(get("/email/find")
+        this.mockMvc.perform(get("/users/email/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("phoneNum","01056962173"))
                 .andExpect(status().isOk())
@@ -486,7 +486,7 @@ public class ControllerTest {
         //given
 
         //when,then
-        this.mockMvc.perform(get("/email/find")
+        this.mockMvc.perform(get("/users/email/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("phoneNum",""))
                 .andExpect(status().isBadRequest())
@@ -503,7 +503,7 @@ public class ControllerTest {
                 .when(userService).findEmail(any(String.class));
 
         //when,then
-        this.mockMvc.perform(get("/email/find")
+        this.mockMvc.perform(get("/users/email/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("phoneNum","01056962173"))
                 .andExpect(status().isBadRequest())
@@ -521,7 +521,7 @@ public class ControllerTest {
                 .willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         //when,then
-        this.mockMvc.perform(get("/email/find")
+        this.mockMvc.perform(get("/users/email/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("phoneNum","01056962173"))
                 .andExpect(status().isBadRequest())
@@ -543,7 +543,7 @@ public class ControllerTest {
         given(userService.findPassword(any(FindPwdReq.class))).willReturn("12345");
 
         //when,then
-        this.mockMvc.perform(patch("/password/find")
+        this.mockMvc.perform(patch("/users/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -566,7 +566,7 @@ public class ControllerTest {
         given(userService.findPassword(any(FindPwdReq.class))).willReturn("12345");
 
         //when,then
-        this.mockMvc.perform(patch("/password/find")
+        this.mockMvc.perform(patch("/users/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -588,7 +588,7 @@ public class ControllerTest {
         given(userService.findPassword(any(FindPwdReq.class))).willReturn("12345");
 
         //when,then
-        this.mockMvc.perform(patch("/password/find")
+        this.mockMvc.perform(patch("/users/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -612,7 +612,7 @@ public class ControllerTest {
                 .when(userService).findPassword(any(FindPwdReq.class));
 
         //when,then
-        this.mockMvc.perform(patch("/password/find")
+        this.mockMvc.perform(patch("/users/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -636,7 +636,7 @@ public class ControllerTest {
                 .willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         //when,then
-        this.mockMvc.perform(patch("/password/find")
+        this.mockMvc.perform(patch("/users/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -659,7 +659,7 @@ public class ControllerTest {
                 .willThrow(new CommondException(ExceptionCode.ACCESS_FAIL_USER));
 
         //when,then
-        this.mockMvc.perform(patch("/password/find")
+        this.mockMvc.perform(patch("/users/password/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isForbidden())

@@ -54,7 +54,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(post("/replies/{recipeInfoId}",1L)
+        this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글내용"))
                 .andExpect(status().isCreated())
@@ -70,7 +70,7 @@ public class ControllerTest {
         //given
 
         //when,then
-        this.mockMvc.perform(post("/replies/{recipeInfoId}",1L)
+        this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글내용"))
                 .andExpect(status().isUnauthorized())
@@ -87,7 +87,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(post("/replies/{recipeInfoId}",1L)
+        this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content",""))
                 .andExpect(status().isBadRequest())
@@ -104,7 +104,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(post("/replies/{recipeInfoId}"," ")
+        this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies"," ")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글내용"))
                 .andExpect(status().isBadRequest())
@@ -120,7 +120,7 @@ public class ControllerTest {
         makeAuthentication();
 
         //when,then
-        this.mockMvc.perform(post("/replies/{recipeInfoId}","ㅎㅇ")
+        this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies","ㅎㅇ")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글내용"))
                 .andExpect(status().isBadRequest())
@@ -138,7 +138,7 @@ public class ControllerTest {
                 .when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
-        this.mockMvc.perform(post("/replies/{recipeInfoId}",1L)
+        this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글내용"))
                 .andExpect(status().isBadRequest())
@@ -157,7 +157,7 @@ public class ControllerTest {
                 .when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
 
         //when,then
-        this.mockMvc.perform(post("/replies/{recipeInfoId}",1L)
+        this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies",1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("content","댓글내용"))
                 .andExpect(status().isBadRequest())

@@ -20,7 +20,7 @@ public class ReplyController {
 
     private final ReplyService replyService;
 
-    @PostMapping("/replies/{recipeInfoId}")
+    @PostMapping("/recipes/{recipeInfoId}/replies")
     public ResponseEntity<CommonResDTO> addReply(
             @AuthenticationPrincipal final Long userId,
             @PathVariable final Long recipeInfoId,

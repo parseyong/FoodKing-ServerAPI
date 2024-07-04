@@ -56,7 +56,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("닉네임 중복체크 완료",isDuplicated));
     }
 
-    @GetMapping("/email/find")
+    @GetMapping("/users/email/find")
     public ResponseEntity<CommonResDTO> findEmail(
             @RequestParam @NotBlank(message = "전화번호를 입력하세요") String phoneNum){
 
@@ -65,7 +65,7 @@ public class UserController {
     }
 
     // 새로운 비밀번호를 생성해 반환하므로 patch요청으로 받는다.
-    @PatchMapping("/password/find")
+    @PatchMapping("/users/password/find")
     public ResponseEntity<CommonResDTO> findPassword(@RequestBody @Valid FindPwdReq findPwdReq){
 
         String password = userService.findPassword(findPwdReq);
