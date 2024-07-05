@@ -70,8 +70,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(cacheHost);
         redisStandaloneConfiguration.setPort(cachePort);
-        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(
-                redisStandaloneConfiguration);
+        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(redisStandaloneConfiguration);
 
         return lettuceConnectionFactory;
     }
@@ -81,8 +80,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(lockHost);
         redisStandaloneConfiguration.setPort(lockPort);
-        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(
-                redisStandaloneConfiguration);
+        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(redisStandaloneConfiguration);
 
         return lettuceConnectionFactory;
     }
@@ -92,8 +90,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(authHost);
         redisStandaloneConfiguration.setPort(authPort);
-        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(
-                redisStandaloneConfiguration);
+        LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(redisStandaloneConfiguration);
 
         return lettuceConnectionFactory;
     }

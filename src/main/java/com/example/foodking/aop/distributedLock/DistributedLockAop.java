@@ -39,7 +39,7 @@ public class DistributedLockAop {
         // 메소드에 선언된 @DistributedLock 어노테이션 정보 가져오기
         DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
 
-        // SpringELParser를 통해 파라미터값에 따라 동적으로 키를 생성해 키의 중복을 방지한다.
+        // 키 생성
         String key = REDISSON_LOCK_PREFIX + distributedLock.key() + method.getName() + args[1];
 
         // lock 획득시도
@@ -56,14 +56,12 @@ public class DistributedLockAop {
             }
 
             // lock을 얻었다면 트랜잭션을 시작한다.
-            log.info(key);
             return aopForTransaction.proceed(joinPoint);
 
         } catch (InterruptedException e) {
-            // waitTime이나 leaseTime등의 이유로 interrupted 발생 시
-            log.info("Interrupted lock");
-            throw new CommondException(ExceptionCode.LOCK_CAPTURE_FAIL);
 
+            // waitTime이나 leaseTime등의 이유로 interrupted 발생 시
+            throw new CommondException(ExceptionCode.LOCK_CAPTURE_FAIL);
         } finally {
 
             // 트랜잭션 커밋 이후 락이 해제되도록 finally절에 락 해제 선언

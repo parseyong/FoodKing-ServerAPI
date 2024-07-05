@@ -77,7 +77,7 @@ public class JwtProvider {
         authRedis.delete(RedissonPrefix.TOKEN_REDIS + String.valueOf(userId));
     }
 
-    // 로그인 성공 시 엑세스토큰을 생성해서 반환하는 메소드
+    // 엑세스토큰을 생성해서 반환하는 메소드
     public String createAccessToken(Long userId, Collection<? extends GrantedAuthority> roleList) {
 
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
@@ -92,7 +92,7 @@ public class JwtProvider {
                 .compact();
     }
 
-    // 로그인 성공 시 리프레시토큰을 생성해서 반환하는 메소드
+    // 리프레시토큰을 생성해서 반환하는 메소드
     public String createRefreshToken(Long userId, Collection<? extends GrantedAuthority> roleList) {
 
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
@@ -148,17 +148,19 @@ public class JwtProvider {
 
         String token = request.getHeader("Authorization");
 
-        if(token == null || !token.substring(0,7).equals("Bearer "))
-            return null;
+        // Bear 제거 후 반환
+        if(token != null && token.length() > 7 )
+            return token.substring(7);
 
-        return token.substring(7);
+        return null;
     }
 
-    // Http헤더에서 AccessToken을 가져오는 메소드
+    // Http헤더에서 RefreshToken을 가져오는 메소드
     public String resolveRefreshToken(HttpServletRequest request) {
 
         String token = request.getHeader("RefreshToken");
-
+        
+        // Bear 제거 후 반환
         if(token != null && token.length() > 7 )
             return token.substring(7);
 
@@ -187,7 +189,7 @@ public class JwtProvider {
         }
     }
 
-    // RefreshToken의 유효성을 검증하는 메소드
+    // RefreshToken의 유효성을 검증하는 메소드, 레디스에 존재하는 지 여부는 userId를 key로 하기때문에 reIssue메소드에서 수행한다.
     private boolean validateRefreshToken(String token) {
         try {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(refreshSecretKey).build().parseClaimsJws(token);

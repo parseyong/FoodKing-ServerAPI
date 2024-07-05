@@ -35,6 +35,7 @@ public class ReplyEmotion {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "reply_id",nullable = false)
     private Reply reply;
+
     @Builder
     private ReplyEmotion(EmotionType emotionType, User user, Reply reply){
         this.emotionType=emotionType;

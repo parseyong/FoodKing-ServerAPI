@@ -65,10 +65,12 @@ public class RecipeInfo extends TimeEntity {
     @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
     private List<Reply> replyList;
 
-    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "recipeInfo", cascade = {CascadeType.REMOVE, CascadeType.PERSIST},
+            orphanRemoval = true,fetch = FetchType.LAZY)
     private List<RecipeWayInfo> recipeWayInfoList;
 
-    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "recipeInfo", cascade = {CascadeType.REMOVE, CascadeType.PERSIST},
+            orphanRemoval = true,fetch = FetchType.LAZY)
     private List<Ingredient> ingredientList;
 
     @Builder

@@ -22,6 +22,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String token = jwtProvider.resolveAccessToken(request);
+
         // 토큰의 유효성 검증
         if (token != null && jwtProvider.validateAccessToken(token)) {
 
