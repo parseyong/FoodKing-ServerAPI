@@ -5,8 +5,8 @@ import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.common.RecipeSortType;
 import com.example.foodking.recipe.domain.RecipeInfo;
-import com.example.foodking.recipe.dto.recipeInfo.request.ReadRecipeInfoPagingReq;
-import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoRes;
+import com.example.foodking.recipe.dto.recipeInfo.request.RecipeInfoPagingFindReq;
+import com.example.foodking.recipe.dto.recipeInfo.response.RecipeInfoFindRes;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.example.foodking.recipe.service.RecipePagingService;
 import com.example.foodking.user.domain.User;
@@ -36,7 +36,7 @@ public class RecipePagingServiceTest {
     private RecipeInfoRepository recipeInfoRepository;
     private User user;
     private RecipeInfo recipeInfo;
-    private ReadRecipeInfoPagingReq readRecipeInfoPagingReq;
+    private RecipeInfoPagingFindReq recipeInfoPagingFindReq;
 
     @BeforeEach
     void beforeEach(){
@@ -50,7 +50,7 @@ public class RecipePagingServiceTest {
         this.recipeInfo = RecipeInfo.builder()
                 .user(user)
                 .recipeName("testName")
-                .recipeWayInfoList(new ArrayList<>())
+                .recipeWayList(new ArrayList<>())
                 .ingredientList(new ArrayList<>())
                 .calogy(1L)
                 .build();
@@ -61,21 +61,21 @@ public class RecipePagingServiceTest {
     @DisplayName("레시피 조건 페이징 조회 테스트 -> (성공)")
     public void readRecipeInfoPagingByConditionSuccess(){
         //given
-        this.readRecipeInfoPagingReq = ReadRecipeInfoPagingReq.builder()
+        this.recipeInfoPagingFindReq = RecipeInfoPagingFindReq.builder()
                 .recipeSortType(RecipeSortType.LIKE)
                 .userId(1L)
                 .condition(RecipeInfoType.KOREAN)
                 .build();
 
-        ReadRecipeInfoRes readRecipeInfoRes = ReadRecipeInfoRes
+        RecipeInfoFindRes recipeInfoFindRes = RecipeInfoFindRes
                 .toDTO(recipeInfo,1L,"writerNickName");
 
         given(recipeInfoRepository.findRecipeInfoTotalCnt(any())).willReturn(10L);
         given(recipeInfoRepository.findRecipeInfoPagingByCondition(any(),any()))
-                .willReturn(List.of(readRecipeInfoRes));
+                .willReturn(List.of(recipeInfoFindRes));
 
         //when
-        recipePagingService.readRecipeInfoPagingByCondition(readRecipeInfoPagingReq);
+        recipePagingService.findRecipeInfoPagingByCondition(recipeInfoPagingFindReq);
 
         //then
         verify(recipeInfoRepository,times(1)).findRecipeInfoTotalCnt(any());
@@ -86,7 +86,7 @@ public class RecipePagingServiceTest {
     @DisplayName("레시피 조건 페이징 조회 테스트 -> (실패 : 존재하지 않는 페이지)")
     public void readRecipeInfoPagingByConditionFail(){
         //given
-        this.readRecipeInfoPagingReq = ReadRecipeInfoPagingReq.builder()
+        this.recipeInfoPagingFindReq = RecipeInfoPagingFindReq.builder()
                 .recipeSortType(RecipeSortType.LIKE)
                 .userId(1L)
                 .condition(RecipeInfoType.KOREAN)
@@ -98,7 +98,7 @@ public class RecipePagingServiceTest {
 
         //when, then
         try {
-            recipePagingService.readRecipeInfoPagingByCondition(readRecipeInfoPagingReq);
+            recipePagingService.findRecipeInfoPagingByCondition(recipeInfoPagingFindReq);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_PAGE);
@@ -111,21 +111,21 @@ public class RecipePagingServiceTest {
     @DisplayName("좋아요 누른 레시피 페이징 조회 테스트 -> (성공)")
     public void readLikedRecipeInfoPagingSuccess(){
         //given
-        this.readRecipeInfoPagingReq = ReadRecipeInfoPagingReq.builder()
+        this.recipeInfoPagingFindReq = RecipeInfoPagingFindReq.builder()
                 .recipeSortType(RecipeSortType.LIKE)
                 .userId(1L)
                 .condition("like")
                 .build();
 
-        ReadRecipeInfoRes readRecipeInfoRes = ReadRecipeInfoRes
+        RecipeInfoFindRes recipeInfoFindRes = RecipeInfoFindRes
                 .toDTO(recipeInfo,1L,"writerNickName");
 
         given(recipeInfoRepository.findLikedRecipeInfoCnt(any())).willReturn(10L);
         given(recipeInfoRepository.findLikedRecipeInfoList(any(),any()))
-                .willReturn(List.of(readRecipeInfoRes));
+                .willReturn(List.of(recipeInfoFindRes));
 
         //when
-        recipePagingService.readLikedRecipeInfoPaging(readRecipeInfoPagingReq);
+        recipePagingService.findLikedRecipeInfoPaging(recipeInfoPagingFindReq);
 
         //then
         verify(recipeInfoRepository,times(1)).findLikedRecipeInfoCnt(any());
@@ -136,7 +136,7 @@ public class RecipePagingServiceTest {
     @DisplayName("좋아요 누른 레시피 페이징 조회 테스트 -> (실패 : 존재하지 않는 페이지)")
     public void readLikedRecipeInfoPagingFail(){
         //given
-        this.readRecipeInfoPagingReq = ReadRecipeInfoPagingReq.builder()
+        this.recipeInfoPagingFindReq = RecipeInfoPagingFindReq.builder()
                 .recipeSortType(RecipeSortType.LIKE)
                 .userId(1L)
                 .condition("like")
@@ -148,7 +148,7 @@ public class RecipePagingServiceTest {
 
         //when, then
         try {
-            recipePagingService.readLikedRecipeInfoPaging(readRecipeInfoPagingReq);
+            recipePagingService.findLikedRecipeInfoPaging(recipeInfoPagingFindReq);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_PAGE);

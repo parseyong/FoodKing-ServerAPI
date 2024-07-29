@@ -37,10 +37,10 @@ public class EmotionService {
         Reply  reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_REPLY));
 
-        Optional<ReplyEmotion> result = replyEmotionRepository.findByReplyAndUser(reply,user);
+        Optional<ReplyEmotion> replyEmotionOptional = replyEmotionRepository.findByReplyAndUser(reply,user);
         
         // 만약 등록된 이모션이 없다면 이모션 등록
-        if(result.isEmpty()){
+        if(replyEmotionOptional.isEmpty()){
             ReplyEmotion replyEmotion = ReplyEmotion.builder()
                     .emotionType(emotionType)
                     .user(user)
@@ -51,13 +51,13 @@ public class EmotionService {
         }
         // 만약 등록된 이모션이 있다면 해당 이모션 삭제
         else{
-            ReplyEmotion replyEmotion = result.get();
+            ReplyEmotion replyEmotion = replyEmotionOptional.get();
             
             // 이모션 삭제권한이 없으면 예외반환
             if(!isMyEmotion(user.getUserId(),replyEmotion.getUser()))
                 throw new CommondException(ExceptionCode.ACCESS_FAIL_EMOTION);
 
-            replyEmotionRepository.delete(result.get());
+            replyEmotionRepository.delete(replyEmotionOptional.get());
             reply.unLiking();
         }
         replyRepository.save(reply);
@@ -70,10 +70,10 @@ public class EmotionService {
         RecipeInfo  recipeInfo = recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
 
-        Optional<RecipeEmotion> result = recipeEmotionRepository.findByRecipeInfoAndUser(recipeInfo,user);
+        Optional<RecipeEmotion> recipeEmotionOptional = recipeEmotionRepository.findByRecipeInfoAndUser(recipeInfo,user);
 
         // 만약 등록된 이모션이 없다면 이모션 등록
-        if(result.isEmpty()){
+        if(recipeEmotionOptional.isEmpty()){
             RecipeEmotion recipeEmotion = RecipeEmotion.builder()
                     .emotionType(emotionType)
                     .user(user)
@@ -84,7 +84,7 @@ public class EmotionService {
         }
         // 만약 등록된 이모션이 있다면 해당 이모션 삭제
         else{
-            RecipeEmotion recipeEmotion = result.get();
+            RecipeEmotion recipeEmotion = recipeEmotionOptional.get();
             // 이모션 삭제권한이 없으면 예외반환
             if(!isMyEmotion(user.getUserId(),recipeEmotion.getUser()))
                 throw new CommondException(ExceptionCode.ACCESS_FAIL_EMOTION);

@@ -3,7 +3,7 @@ package com.example.foodking.recipe.domain;
 import com.example.foodking.common.TimeEntity;
 import com.example.foodking.ingredient.domain.Ingredient;
 import com.example.foodking.recipe.common.RecipeInfoType;
-import com.example.foodking.recipeWayInfo.domain.RecipeWayInfo;
+import com.example.foodking.recipeWay.domain.RecipeWay;
 import com.example.foodking.reply.domain.Reply;
 import com.example.foodking.user.domain.User;
 import lombok.AccessLevel;
@@ -67,7 +67,7 @@ public class RecipeInfo extends TimeEntity {
 
     @OneToMany(mappedBy = "recipeInfo", cascade = {CascadeType.REMOVE, CascadeType.PERSIST},
             orphanRemoval = true,fetch = FetchType.LAZY)
-    private List<RecipeWayInfo> recipeWayInfoList;
+    private List<RecipeWay> recipeWayList;
 
     @OneToMany(mappedBy = "recipeInfo", cascade = {CascadeType.REMOVE, CascadeType.PERSIST},
             orphanRemoval = true,fetch = FetchType.LAZY)
@@ -75,7 +75,7 @@ public class RecipeInfo extends TimeEntity {
 
     @Builder
     private RecipeInfo(String recipeName, RecipeInfoType recipeInfoType, Long ingredientCost, Long cookingTime, Long calogy, String recipeTip,
-                      User user, List<RecipeWayInfo> recipeWayInfoList, List<Ingredient> ingredientList){
+                       User user, List<RecipeWay> recipeWayList, List<Ingredient> ingredientList){
         this.recipeName=recipeName;
         this.recipeInfoType=recipeInfoType;
         this.ingredientCost=ingredientCost;
@@ -83,24 +83,24 @@ public class RecipeInfo extends TimeEntity {
         this.calogy=calogy;
         this.recipeTip=recipeTip;
         this.user=user;
-        this.recipeWayInfoList=recipeWayInfoList;
+        this.recipeWayList = recipeWayList;
         this.ingredientList=ingredientList;
         this.visitCnt = 0L;
         this.likeCnt = 0L;
     }
-    public void changeRecipeName(String recipeName){
+    public void updateRecipeName(String recipeName){
         this.recipeName = recipeName;
     }
-    public void changeRecipeInfoType(RecipeInfoType recipeInfoType){
+    public void updateRecipeInfoType(RecipeInfoType recipeInfoType){
         this.recipeInfoType = recipeInfoType;
     }
-    public void changeIngredientCost(Long ingredientCost){
+    public void updateIngredientCost(Long ingredientCost){
         this.ingredientCost = ingredientCost;
     }
-    public void changeCookingTime(Long cookingTime){
+    public void updateCookingTime(Long cookingTime){
         this.cookingTime = cookingTime;
     }
-    public void changeCalogy(Long calogy){
+    public void updateCalogy(Long calogy){
         this.calogy = calogy;
     }
     public void addRecipeImage(String recipeImage){
@@ -109,7 +109,7 @@ public class RecipeInfo extends TimeEntity {
     public void deleteRecipeImage(){
         this.recipeImage=null;
     }
-    public void changeRecipeTip(String recipeTip){
+    public void updateRecipeTip(String recipeTip){
         this.recipeTip=recipeTip;
     }
     public void addVisitCnt(){

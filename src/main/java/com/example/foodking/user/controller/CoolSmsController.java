@@ -1,7 +1,7 @@
 package com.example.foodking.user.controller;
 
 import com.example.foodking.common.CommonResDTO;
-import com.example.foodking.user.dto.request.CheckAuthNumberReq;
+import com.example.foodking.user.dto.request.AuthNumberCheckReq;
 import com.example.foodking.user.service.CoolSmsService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +33,9 @@ public class CoolSmsController {
     }
 
     @PostMapping("/message/auth")
-    public ResponseEntity<CommonResDTO> authNumCheck(@RequestBody @Valid CheckAuthNumberReq checkAuthNumberReq){
+    public ResponseEntity<CommonResDTO> checkAuthNum(@RequestBody @Valid AuthNumberCheckReq authNumberCheckReq){
 
-        coolSmsService.authNumCheck(checkAuthNumberReq);
+        coolSmsService.checkAuthNum(authNumberCheckReq);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("인증 성공!",null));
     }
 }

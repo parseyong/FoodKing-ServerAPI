@@ -4,17 +4,17 @@ import com.example.foodking.auth.JwtProvider;
 import com.example.foodking.config.SecurityConfig;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
-import com.example.foodking.ingredient.dto.request.SaveIngredientReq;
+import com.example.foodking.ingredient.dto.request.IngredientAddReq;
 import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.common.RecipeSortType;
 import com.example.foodking.recipe.controller.RecipeController;
-import com.example.foodking.recipe.dto.recipe.request.SaveRecipeReq;
-import com.example.foodking.recipe.dto.recipe.response.ReadRecipeRes;
-import com.example.foodking.recipe.dto.recipeInfo.request.ReadRecipeInfoPagingReq;
-import com.example.foodking.recipe.dto.recipeInfo.request.SaveRecipeInfoReq;
+import com.example.foodking.recipe.dto.recipe.request.RecipeSaveReq;
+import com.example.foodking.recipe.dto.recipe.response.RecipeFindRes;
+import com.example.foodking.recipe.dto.recipeInfo.request.RecipeInfoPagingFindReq;
+import com.example.foodking.recipe.dto.recipeInfo.request.RecipeInfoSaveReq;
 import com.example.foodking.recipe.service.RecipePagingService;
 import com.example.foodking.recipe.service.RecipeService;
-import com.example.foodking.recipeWayInfo.dto.request.SaveRecipeWayInfoReqDTO;
+import com.example.foodking.recipeWay.dto.request.RecipeWayAddReq;
 import com.example.foodking.reply.common.ReplySortType;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,15 +62,15 @@ public class ControllerTest {
     private JwtProvider jwtProvider;
     @Autowired
     private MockMvc mockMvc;
-    private List<SaveIngredientReq> saveIngredientReqList;
-    private List<SaveRecipeWayInfoReqDTO> saveRecipeWayInfoReqDTOList;
-    private SaveRecipeReq saveRecipeReq;
-    private SaveRecipeInfoReq saveRecipeInfoReq;
+    private List<IngredientAddReq> ingredientAddReqList;
+    private List<RecipeWayAddReq> recipeWayAddReqList;
+    private RecipeSaveReq recipeSaveReq;
+    private RecipeInfoSaveReq recipeInfoSaveReq;
     private Gson gson = new Gson();
 
     @BeforeEach
     void beforeEach(){
-        this.saveRecipeInfoReq = SaveRecipeInfoReq.builder()
+        this.recipeInfoSaveReq = RecipeInfoSaveReq.builder()
                 .recipeInfoType(RecipeInfoType.KOREAN)
                 .recipeName("테스트레시피 이름")
                 .recipeTip("테스트레시피 팁")
@@ -79,31 +79,31 @@ public class ControllerTest {
                 .ingredentCost(30L)
                 .build();
 
-        SaveIngredientReq saveIngredientReq1 = SaveIngredientReq.builder()
+        IngredientAddReq ingredientAddReq1 = IngredientAddReq.builder()
                 .ingredientName("재료명1")
                 .ingredientAmount("재료 수량1")
                 .build();
-        SaveIngredientReq saveIngredientReq2 = SaveIngredientReq.builder()
+        IngredientAddReq ingredientAddReq2 = IngredientAddReq.builder()
                 .ingredientName("재료명2")
                 .ingredientAmount("재료 수량2")
                 .build();
 
-        this.saveIngredientReqList = new ArrayList<>(List.of(saveIngredientReq1, saveIngredientReq2));
+        this.ingredientAddReqList = new ArrayList<>(List.of(ingredientAddReq1, ingredientAddReq2));
 
-        SaveRecipeWayInfoReqDTO saveRecipeWayInfoReqDTO1 = SaveRecipeWayInfoReqDTO.builder()
+        RecipeWayAddReq recipeWayAddReq1 = RecipeWayAddReq.builder()
                 .recipeOrder(1L)
                 .recipeWay("조리법 1")
                 .build();
-        SaveRecipeWayInfoReqDTO saveRecipeWayInfoReqDTO2 = SaveRecipeWayInfoReqDTO.builder()
+        RecipeWayAddReq recipeWayAddReq2 = RecipeWayAddReq.builder()
                 .recipeOrder(2L)
                 .recipeWay("조리법 2")
                 .build();
-        this.saveRecipeWayInfoReqDTOList = new ArrayList<>(List.of(saveRecipeWayInfoReqDTO1, saveRecipeWayInfoReqDTO2));
+        this.recipeWayAddReqList = new ArrayList<>(List.of(recipeWayAddReq1, recipeWayAddReq2));
 
-        this.saveRecipeReq = SaveRecipeReq.builder()
-                .saveRecipeInfoReq(saveRecipeInfoReq)
-                .saveIngredientReqList(saveIngredientReqList)
-                .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
+        this.recipeSaveReq = RecipeSaveReq.builder()
+                .recipeInfoSaveReq(recipeInfoSaveReq)
+                .ingredientAddReqList(ingredientAddReqList)
+                .recipeWayAddReqList(recipeWayAddReqList)
                 .build();
     }
 
@@ -113,7 +113,7 @@ public class ControllerTest {
     public void addRecipeInfoSuccess() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = gson.toJson(saveRecipeReq);
+        String requestBody = gson.toJson(recipeSaveReq);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -123,7 +123,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("레시피 등록완료"))
                 .andDo(print());
 
-        verify(recipeService,times(1)).addRecipe(any(SaveRecipeReq.class),any(Long.class));
+        verify(recipeService,times(1)).addRecipe(any(RecipeSaveReq.class),any(Long.class));
     }
 
     @Test
@@ -131,7 +131,7 @@ public class ControllerTest {
     @DisplayName("레시피 등록테스트 -> (실패 : 인증실패)")
     public void addRecipeInfoFail() throws Exception {
         //given
-        String requestBody = gson.toJson(saveRecipeReq);
+        String requestBody = gson.toJson(recipeSaveReq);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -141,7 +141,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
 
-        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReq.class),any(Long.class));
+        verify(recipeService,times(0)).addRecipe(any(RecipeSaveReq.class),any(Long.class));
     }
 
     @Test
@@ -150,11 +150,11 @@ public class ControllerTest {
     public void addRecipeInfoFai2() throws Exception {
         //given
         makeAuthentication();
-        SaveRecipeReq saveRecipeReq = SaveRecipeReq.builder()
-                .saveIngredientReqList(saveIngredientReqList)
-                .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
+        RecipeSaveReq recipeSaveReq = RecipeSaveReq.builder()
+                .ingredientAddReqList(ingredientAddReqList)
+                .recipeWayAddReqList(recipeWayAddReqList)
                 .build();
-        String requestBody = gson.toJson(saveRecipeReq);
+        String requestBody = gson.toJson(recipeSaveReq);
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -164,7 +164,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
 
-        verify(recipeService,times(0)).addRecipe(any(SaveRecipeReq.class),any(Long.class));
+        verify(recipeService,times(0)).addRecipe(any(RecipeSaveReq.class),any(Long.class));
     }
 
     @Test
@@ -173,9 +173,9 @@ public class ControllerTest {
     public void addRecipeInfoFai3() throws Exception {
         //given
         makeAuthentication();
-        String requestBody = gson.toJson(saveRecipeReq);
+        String requestBody = gson.toJson(recipeSaveReq);
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER))
-                .when(recipeService).addRecipe(any(SaveRecipeReq.class),any(Long.class));
+                .when(recipeService).addRecipe(any(RecipeSaveReq.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(post("/recipes")
@@ -185,7 +185,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
 
-        verify(recipeService,times(1)).addRecipe(any(SaveRecipeReq.class),any(Long.class));
+        verify(recipeService,times(1)).addRecipe(any(RecipeSaveReq.class),any(Long.class));
     }
 
     @Test
@@ -193,7 +193,7 @@ public class ControllerTest {
     public void updateRecipeSuccess() throws Exception {
         //given
         makeAuthentication();
-        String requestbody = gson.toJson(saveRecipeReq);
+        String requestbody = gson.toJson(recipeSaveReq);
 
         //when, then
         this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
@@ -204,14 +204,14 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipeService,times(1))
-                .updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
+                .updateRecipe(any(RecipeSaveReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
     @DisplayName("레시피 수정 테스트 -> (실패 : 인증되지 않은 유저)")
     public void updateRecipeFail1() throws Exception {
         //given
-        String requestbody = gson.toJson(saveRecipeReq);
+        String requestbody = gson.toJson(recipeSaveReq);
 
         //when, then
         this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
@@ -222,14 +222,14 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipeService,times(0))
-                .updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
+                .updateRecipe(any(RecipeSaveReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
     @DisplayName("레시피 수정 테스트 -> (실패 : 입력값 공백)")
     public void updateRecipeFail2() throws Exception {
         //given
-        SaveRecipeInfoReq saveRecipeInfoReq = SaveRecipeInfoReq.builder()
+        RecipeInfoSaveReq recipeInfoSaveReq = RecipeInfoSaveReq.builder()
                 .recipeInfoType(RecipeInfoType.KOREAN)
                 .recipeName("")
                 .recipeTip("")
@@ -238,13 +238,13 @@ public class ControllerTest {
                 .ingredentCost(null)
                 .build();
 
-        SaveRecipeReq saveRecipeReq = SaveRecipeReq.builder()
-                .saveRecipeInfoReq(saveRecipeInfoReq)
-                .saveIngredientReqList(saveIngredientReqList)
-                .saveRecipeWayInfoReqDTOList(saveRecipeWayInfoReqDTOList)
+        RecipeSaveReq recipeSaveReq = RecipeSaveReq.builder()
+                .recipeInfoSaveReq(recipeInfoSaveReq)
+                .ingredientAddReqList(ingredientAddReqList)
+                .recipeWayAddReqList(recipeWayAddReqList)
                 .build();
 
-        String requestbody = gson.toJson(saveRecipeReq);
+        String requestbody = gson.toJson(recipeSaveReq);
         makeAuthentication();
 
         //when, then
@@ -256,14 +256,14 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipeService,times(0))
-                .updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
+                .updateRecipe(any(RecipeSaveReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
     @DisplayName("레시피 수정 테스트 -> (실패 : Pathvariable값 타입 예외)")
     public void updateRecipeFail3() throws Exception {
         //given
-        String requestbody = gson.toJson(saveRecipeReq);
+        String requestbody = gson.toJson(recipeSaveReq);
         makeAuthentication();
 
         //when, then
@@ -274,14 +274,14 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipeService,times(0))
-                .updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
+                .updateRecipe(any(RecipeSaveReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
     @DisplayName("레시피 수정 테스트 -> (실패 : Pathvariable값 공백)")
     public void updateRecipeFail4() throws Exception {
         //given
-        String requestbody = gson.toJson(saveRecipeReq);
+        String requestbody = gson.toJson(recipeSaveReq);
         makeAuthentication();
 
         //when, then
@@ -293,7 +293,7 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipeService,times(0))
-                .updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
+                .updateRecipe(any(RecipeSaveReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -301,9 +301,9 @@ public class ControllerTest {
     public void updateRecipeFail6() throws Exception {
         //given
         makeAuthentication();
-        String requestbody = gson.toJson(saveRecipeReq);
+        String requestbody = gson.toJson(recipeSaveReq);
         doThrow(new CommondException(NOT_EXIST_RECIPEINFO))
-                .when(recipeService).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
+                .when(recipeService).updateRecipe(any(RecipeSaveReq.class),any(Long.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
@@ -314,7 +314,7 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipeService,times(1))
-                .updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
+                .updateRecipe(any(RecipeSaveReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -322,9 +322,9 @@ public class ControllerTest {
     public void updateRecipeFail7() throws Exception {
         //given
         makeAuthentication();
-        String requestbody = gson.toJson(saveRecipeReq);
+        String requestbody = gson.toJson(recipeSaveReq);
         doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_RECIPE))
-                .when(recipeService).updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
+                .when(recipeService).updateRecipe(any(RecipeSaveReq.class),any(Long.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(patch("/recipes/{recipeInfoId}",1L)
@@ -335,7 +335,7 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipeService,times(1))
-                .updateRecipe(any(SaveRecipeReq.class),any(Long.class),any(Long.class));
+                .updateRecipe(any(RecipeSaveReq.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -438,11 +438,11 @@ public class ControllerTest {
 
     @Test
     @DisplayName("레시피 조회 테스트 -> 성공")
-    public void readRecipeSuccess() throws Exception {
+    public void findRecipeSuccess() throws Exception {
         // given
         makeAuthentication();
-        ReadRecipeRes readRecipeRes = ReadRecipeRes.builder().build();
-        given(recipeService.readRecipe(any(Long.class),any(Long.class),any(),any(),any())).willReturn(readRecipeRes);
+        RecipeFindRes recipeFindRes = RecipeFindRes.builder().build();
+        given(recipeService.findRecipe(any(Long.class),any(Long.class),any(),any(),any())).willReturn(recipeFindRes);
 
         //when, then
         this.mockMvc.perform(get("/recipes/{recipeInfoId}",1L)
@@ -455,12 +455,12 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data").isNotEmpty())
                 .andDo(print());
 
-        verify(recipeService,times(1)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
+        verify(recipeService,times(1)).findRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
     @DisplayName("레시피 조회 테스트 -> (실패 : 인증되지 않은 유저)")
-    public void readRecipeFail1() throws Exception {
+    public void findRecipeFail1() throws Exception {
         // given
 
         //when, then
@@ -471,12 +471,12 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
 
-        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
+        verify(recipeService,times(0)).findRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
     @DisplayName("레시피 조회 테스트 -> (실패 : PathVariable 타입예외)")
-    public void readRecipeFail2() throws Exception {
+    public void findRecipeFail2() throws Exception {
         // given
         makeAuthentication();
 
@@ -488,12 +488,12 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."))
                 .andDo(print());
 
-        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
+        verify(recipeService,times(0)).findRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
     @DisplayName("레시피 조회 테스트 -> (실패 : PathVariable 공백)")
-    public void readRecipeFail3() throws Exception {
+    public void findRecipeFail3() throws Exception {
         // given
         makeAuthentication();
 
@@ -505,12 +505,12 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."))
                 .andDo(print());
 
-        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
+        verify(recipeService,times(0)).findRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
     @DisplayName("레시피 조회 테스트 -> (실패 : 입력값enum타입 예외)")
-    public void readRecipeFail4() throws Exception {
+    public void findRecipeFail4() throws Exception {
         // given
         makeAuthentication();
 
@@ -522,12 +522,12 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("sort이 ReplySortType타입이여야 합니다."))
                 .andDo(print());
 
-        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
+        verify(recipeService,times(0)).findRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
     @DisplayName("레시피 조회 테스트 -> (실패 : 입력값없음)")
-    public void readRecipeFail5() throws Exception {
+    public void findRecipeFail5() throws Exception {
         // given
         makeAuthentication();
 
@@ -539,15 +539,15 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.sort")
                         .value("Required request parameter 'sort' for method parameter type ReplySortType is not present(관리자에게 문의하세요)"))
                 .andDo(print());
-        verify(recipeService,times(0)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
+        verify(recipeService,times(0)).findRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
     @DisplayName("레시피 조회 테스트 -> (실패 : 존재하지 않는 레시피)")
-    public void readRecipeFail6() throws Exception {
+    public void findRecipeFail6() throws Exception {
         // given
         makeAuthentication();
-        given(recipeService.readRecipe(any(Long.class),any(Long.class),any(),any(),any()))
+        given(recipeService.findRecipe(any(Long.class),any(Long.class),any(),any(),any()))
                 .willThrow(new CommondException(NOT_EXIST_RECIPEINFO));
 
         //when, then
@@ -560,12 +560,12 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
                 .andDo(print());
 
-        verify(recipeService,times(1)).readRecipe(any(Long.class),any(Long.class),any(),any(),any());
+        verify(recipeService,times(1)).findRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
 
     @Test
     @DisplayName("레시피타입조회 페이징 테스트 -> 성공")
-    public void readRecipeInfoPagingByTypeSuccess() throws Exception {
+    public void findRecipeInfoPagingByTypeSuccess() throws Exception {
         // given
         makeAuthentication();
 
@@ -578,12 +578,12 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipePagingService,times(1))
-                .readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class));
+                .findRecipeInfoPagingByCondition(any(RecipeInfoPagingFindReq.class));
     }
 
     @Test
     @DisplayName("레시피타입조회 페이징 테스트 -> (실패 : RecipeInfoType 타입 예외)")
-    public void readRecipeInfoPagingByTypeFail1() throws Exception {
+    public void findRecipeInfoPagingByTypeFail1() throws Exception {
         // given
         makeAuthentication();
 
@@ -596,12 +596,12 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipePagingService,times(0))
-                .readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class));
+                .findRecipeInfoPagingByCondition(any(RecipeInfoPagingFindReq.class));
     }
 
     @Test
     @DisplayName("레시피타입조회 페이징 테스트 -> (실패 : 인증되지 않음)")
-    public void readRecipeInfoPagingByTypeFail3() throws Exception {
+    public void findRecipeInfoPagingByTypeFail3() throws Exception {
         // given
 
         //when, then
@@ -613,15 +613,15 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipePagingService,times(0))
-                .readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class));
+                .findRecipeInfoPagingByCondition(any(RecipeInfoPagingFindReq.class));
     }
 
     @Test
     @DisplayName("레시피타입조회 페이징 테스트 -> (실패 : 존재하지 않는 페이지)")
-    public void readRecipeInfoPagingByTypeFail4() throws Exception {
+    public void findRecipeInfoPagingByTypeFail4() throws Exception {
         // given
         makeAuthentication();
-        given(recipePagingService.readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class)))
+        given(recipePagingService.findRecipeInfoPagingByCondition(any(RecipeInfoPagingFindReq.class)))
                 .willThrow(new CommondException(ExceptionCode.NOT_EXIST_PAGE));
 
         //when, then
@@ -633,12 +633,12 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipePagingService,times(1))
-                .readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class));
+                .findRecipeInfoPagingByCondition(any(RecipeInfoPagingFindReq.class));
     }
 
     @Test
     @DisplayName("내가 쓴 레시피 페이징조회 -> 성공")
-    public void readMyRecipeInfoPagingSuccess() throws Exception {
+    public void findMyRecipeInfoPagingSuccess() throws Exception {
         // given
         makeAuthentication();
 
@@ -651,12 +651,12 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipePagingService,times(1))
-                .readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class));
+                .findRecipeInfoPagingByCondition(any(RecipeInfoPagingFindReq.class));
     }
 
     @Test
     @DisplayName("내가 쓴 레시피 페이징조회 -> (실패 : RecipeSortType 타입예외)")
-    public void readMyRecipeInfoPagingFail1() throws Exception {
+    public void findMyRecipeInfoPagingFail1() throws Exception {
         // given
         makeAuthentication();
 
@@ -669,12 +669,12 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipePagingService,times(0))
-                .readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class));
+                .findRecipeInfoPagingByCondition(any(RecipeInfoPagingFindReq.class));
     }
 
     @Test
     @DisplayName("내가 쓴 레시피 페이징조회 -> (실패 : 인증실패)")
-    public void readMyRecipeInfoPagingFail2() throws Exception {
+    public void findMyRecipeInfoPagingFail2() throws Exception {
         // given
 
         //when, then
@@ -686,15 +686,15 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipePagingService,times(0))
-                .readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class));
+                .findRecipeInfoPagingByCondition(any(RecipeInfoPagingFindReq.class));
     }
 
     @Test
     @DisplayName("내가 쓴 레시피 페이징조회 -> (실패 : 존재하지않는 페이지)")
-    public void readMyRecipeInfoPagingFail3() throws Exception {
+    public void findMyRecipeInfoPagingFail3() throws Exception {
         // given
         makeAuthentication();
-        given(recipePagingService.readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class)))
+        given(recipePagingService.findRecipeInfoPagingByCondition(any(RecipeInfoPagingFindReq.class)))
                 .willThrow(new CommondException(ExceptionCode.NOT_EXIST_PAGE));
 
         //when, then
@@ -706,12 +706,12 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipePagingService,times(1))
-                .readRecipeInfoPagingByCondition(any(ReadRecipeInfoPagingReq.class));
+                .findRecipeInfoPagingByCondition(any(RecipeInfoPagingFindReq.class));
     }
 
     @Test
     @DisplayName("좋아요 누른 레시피 페이징조회 -> 성공")
-    public void readLikeRecipeInfoPagingSuccess() throws Exception {
+    public void findLikeRecipeInfoPagingSuccess() throws Exception {
         // given
         makeAuthentication();
 
@@ -724,12 +724,12 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipePagingService,times(1))
-                .readLikedRecipeInfoPaging(any(ReadRecipeInfoPagingReq.class));
+                .findLikedRecipeInfoPaging(any(RecipeInfoPagingFindReq.class));
     }
 
     @Test
     @DisplayName("좋아요 누른 레시피 페이징조회 -> (실패 : RecipeSortType 타입예외)")
-    public void readLikeRecipeInfoPagingFail1() throws Exception {
+    public void findLikeRecipeInfoPagingFail1() throws Exception {
         // given
         makeAuthentication();
 
@@ -742,12 +742,12 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipePagingService,times(0))
-                .readLikedRecipeInfoPaging(any(ReadRecipeInfoPagingReq.class));
+                .findLikedRecipeInfoPaging(any(RecipeInfoPagingFindReq.class));
     }
 
     @Test
     @DisplayName("좋아요 누른 레시피 페이징조회 -> (실패 : 인증실패)")
-    public void readLikeRecipeInfoPagingFail2() throws Exception {
+    public void findLikeRecipeInfoPagingFail2() throws Exception {
         // given
 
         //when, then
@@ -759,15 +759,15 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipePagingService,times(0))
-                .readLikedRecipeInfoPaging(any(ReadRecipeInfoPagingReq.class));
+                .findLikedRecipeInfoPaging(any(RecipeInfoPagingFindReq.class));
     }
 
     @Test
     @DisplayName("좋아요 누른 레시피 페이징조회 -> (실패 : 존재하지 않는 페이지)")
-    public void readLikeRecipeInfoPagingFail3() throws Exception {
+    public void findLikeRecipeInfoPagingFail3() throws Exception {
         // given
         makeAuthentication();
-        given(recipePagingService.readLikedRecipeInfoPaging(any(ReadRecipeInfoPagingReq.class)))
+        given(recipePagingService.findLikedRecipeInfoPaging(any(RecipeInfoPagingFindReq.class)))
                 .willThrow(new CommondException(ExceptionCode.NOT_EXIST_PAGE));
 
         //when, then
@@ -779,7 +779,7 @@ public class ControllerTest {
                 .andDo(print());
 
         verify(recipePagingService,times(1))
-                .readLikedRecipeInfoPaging(any(ReadRecipeInfoPagingReq.class));
+                .findLikedRecipeInfoPaging(any(RecipeInfoPagingFindReq.class));
     }
     
     private void makeAuthentication(){

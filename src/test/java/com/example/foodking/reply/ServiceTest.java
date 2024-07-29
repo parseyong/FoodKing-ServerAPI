@@ -7,7 +7,7 @@ import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.example.foodking.reply.common.ReplySortType;
 import com.example.foodking.reply.domain.Reply;
-import com.example.foodking.reply.dto.response.ReadReplyRes;
+import com.example.foodking.reply.dto.response.ReplyFindRes;
 import com.example.foodking.reply.repository.ReplyRepository;
 import com.example.foodking.reply.service.ReplyService;
 import com.example.foodking.user.domain.User;
@@ -129,10 +129,10 @@ public class ServiceTest {
     public void readReplySuccess(){
         //given
         given(replyRepository.findReplyList(any(),any(),any(Long.class)))
-                .willReturn(List.of(ReadReplyRes.toDTO(reply,"test",true)));
+                .willReturn(List.of(ReplyFindRes.toDTO(reply,"test",true)));
 
         //when
-        replyService.readReply(1L,1L, ReplySortType.LIKE,1L,12,false);
+        replyService.findReplyList(1L,1L, ReplySortType.LIKE,1L,12,false);
 
         //then
         verify(replyRepository,times(1)).findReplyList(any(),any(),any(Long.class));
@@ -145,7 +145,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            replyService.readReply(1L,1L, ReplySortType.LIKE,1L,12,false);
+            replyService.findReplyList(1L,1L, ReplySortType.LIKE,1L,12,false);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_PAGE);

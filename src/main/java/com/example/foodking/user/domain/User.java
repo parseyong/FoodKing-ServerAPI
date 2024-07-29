@@ -50,10 +50,10 @@ public class User implements UserDetails {
         this.phoneNum=phoneNum;
         this.roleName="ROLE_USER";
     }
-    public void changeNickName(String nickName){
+    public void updateNickName(String nickName){
         this.nickName=nickName;
     }
-    public void changePassword(String password){
+    public void updatePassword(String password){
         this.password=password;
     }
 

@@ -6,7 +6,7 @@ import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.example.foodking.reply.common.ReplySortType;
 import com.example.foodking.reply.domain.Reply;
-import com.example.foodking.reply.dto.response.ReadReplyRes;
+import com.example.foodking.reply.dto.response.ReplyFindRes;
 import com.example.foodking.reply.repository.ReplyRepository;
 import com.example.foodking.user.domain.User;
 import com.example.foodking.user.repository.UserRepository;
@@ -49,12 +49,12 @@ public class ReplyService {
         return replyRepository.save(reply).getReplyId();
     }
 
-    public List<ReadReplyRes> readReply(Long recipeId, Long userId,
-                                        ReplySortType replySortType,
-                                        Long lastId, Object lastValue,
-                                        boolean isFirstPage){
+    public List<ReplyFindRes> findReplyList(Long recipeId, Long userId,
+                                            ReplySortType replySortType,
+                                            Long lastId, Object lastValue,
+                                            boolean isFirstPage){
 
-        List<ReadReplyRes> replyResList = replyRepository.findReplyList(
+        List<ReplyFindRes> replyResList = replyRepository.findReplyList(
                 getBuilder(recipeId, replySortType, lastId, lastValue),
                 createOrderSpecifier(replySortType),
                 userId);
@@ -83,7 +83,7 @@ public class ReplyService {
         if(!isMyReply(userId,reply.getUser()))
             throw new CommondException(ExceptionCode.ACCESS_FAIL_REPLY);;
 
-        reply.changeContent(content);
+        reply.updateContent(content);
         replyRepository.save(reply);
     }
 

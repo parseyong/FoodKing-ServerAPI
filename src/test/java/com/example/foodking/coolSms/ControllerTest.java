@@ -5,7 +5,7 @@ import com.example.foodking.config.SecurityConfig;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.controller.CoolSmsController;
-import com.example.foodking.user.dto.request.CheckAuthNumberReq;
+import com.example.foodking.user.dto.request.AuthNumberCheckReq;
 import com.example.foodking.user.service.CoolSmsService;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
@@ -116,11 +116,11 @@ public class ControllerTest {
     @DisplayName("인증번호 확인 테스트 -> (성공)")
     public void authNumCheckSuccess() throws Exception {
         //given
-        CheckAuthNumberReq checkAuthNumberReq = CheckAuthNumberReq.builder()
+        AuthNumberCheckReq authNumberCheckReq = AuthNumberCheckReq.builder()
                 .phoneNum("01056962173")
-                .authenticationNumber("1234")
+                .authNumber("1234")
                 .build();
-        String requestBody = gson.toJson(checkAuthNumberReq);
+        String requestBody = gson.toJson(authNumberCheckReq);
 
         //when ,then
         this.mockMvc.perform(post("/message/auth")
@@ -129,18 +129,18 @@ public class ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("인증 성공!"))
                 .andDo(print());
-        verify(coolSmsService,times(1)).authNumCheck(any(CheckAuthNumberReq.class));
+        verify(coolSmsService,times(1)).checkAuthNum(any(AuthNumberCheckReq.class));
     }
 
     @Test
     @DisplayName("인증번호 확인 테스트 -> (실패 : 입력값 공백)")
     public void authNumCheckFail1() throws Exception {
         //given
-        CheckAuthNumberReq checkAuthNumberReq = CheckAuthNumberReq.builder()
+        AuthNumberCheckReq authNumberCheckReq = AuthNumberCheckReq.builder()
                 .phoneNum("")
-                .authenticationNumber("")
+                .authNumber("")
                 .build();
-        String requestBody = gson.toJson(checkAuthNumberReq);
+        String requestBody = gson.toJson(authNumberCheckReq);
 
         //when ,then
         this.mockMvc.perform(post("/message/auth")
@@ -150,20 +150,20 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.phoneNum").value("전화번호를 입력하세요"))
                 .andDo(print());
-        verify(coolSmsService,times(0)).authNumCheck(any(CheckAuthNumberReq.class));
+        verify(coolSmsService,times(0)).checkAuthNum(any(AuthNumberCheckReq.class));
     }
 
     @Test
     @DisplayName("인증번호 확인 테스트 -> (실패 : 인증번호 불일치)")
     public void authNumCheckFail2() throws Exception {
         //given
-        CheckAuthNumberReq checkAuthNumberReq = CheckAuthNumberReq.builder()
+        AuthNumberCheckReq authNumberCheckReq = AuthNumberCheckReq.builder()
                 .phoneNum("01056962173")
-                .authenticationNumber("1234")
+                .authNumber("1234")
                 .build();
-        String requestBody = gson.toJson(checkAuthNumberReq);
+        String requestBody = gson.toJson(authNumberCheckReq);
         doThrow(new CommondException(ExceptionCode.SMS_AUTHENTICATION_FAIL))
-                .when(coolSmsService).authNumCheck(any(CheckAuthNumberReq.class));
+                .when(coolSmsService).checkAuthNum(any(AuthNumberCheckReq.class));
 
 
         //when ,then
@@ -173,6 +173,6 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("인증번호가 올바르지 않습니다"))
                 .andDo(print());
-        verify(coolSmsService,times(1)).authNumCheck(any(CheckAuthNumberReq.class));
+        verify(coolSmsService,times(1)).checkAuthNum(any(AuthNumberCheckReq.class));
     }
 }

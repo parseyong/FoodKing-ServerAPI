@@ -34,10 +34,10 @@ public class Ingredient {
         this.ingredientAmount=ingredientAmount;
         this.recipeInfo=recipeInfo;
     }
-    public void changeIngredientName(String ingredientName){
+    public void updateIngredientName(String ingredientName){
         this.ingredientName=ingredientName;
     }
-    public void changeIngredientAmount(String ingredientAmount){
+    public void updateIngredientAmount(String ingredientAmount){
         this.ingredientAmount=ingredientAmount;
     }
 }

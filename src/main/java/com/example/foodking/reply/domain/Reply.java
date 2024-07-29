@@ -49,7 +49,7 @@ public class Reply extends TimeEntity {
         this.likeCnt = 0L;
     }
 
-    public void changeContent(String content){
+    public void updateContent(String content){
         this.content=content;
     }
     public void liking(){

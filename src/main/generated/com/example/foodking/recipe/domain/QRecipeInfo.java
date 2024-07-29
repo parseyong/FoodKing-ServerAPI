@@ -47,7 +47,7 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final StringPath recipeTip = createString("recipeTip");
 
-    public final ListPath<com.example.foodking.recipeWayInfo.domain.RecipeWayInfo, com.example.foodking.recipeWayInfo.domain.QRecipeWayInfo> recipeWayInfoList = this.<com.example.foodking.recipeWayInfo.domain.RecipeWayInfo, com.example.foodking.recipeWayInfo.domain.QRecipeWayInfo>createList("recipeWayInfoList", com.example.foodking.recipeWayInfo.domain.RecipeWayInfo.class, com.example.foodking.recipeWayInfo.domain.QRecipeWayInfo.class, PathInits.DIRECT2);
+    public final ListPath<com.example.foodking.recipeWay.domain.RecipeWay, com.example.foodking.recipeWay.domain.QRecipeWay> recipeWayList = this.<com.example.foodking.recipeWay.domain.RecipeWay, com.example.foodking.recipeWay.domain.QRecipeWay>createList("recipeWayList", com.example.foodking.recipeWay.domain.RecipeWay.class, com.example.foodking.recipeWay.domain.QRecipeWay.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> regDate = _super.regDate;

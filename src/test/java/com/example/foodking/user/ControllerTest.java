@@ -6,8 +6,8 @@ import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.controller.UserController;
 import com.example.foodking.user.dto.request.*;
-import com.example.foodking.user.dto.response.LoginTokenResDTO;
-import com.example.foodking.user.dto.response.ReadUserInfoResDTO;
+import com.example.foodking.user.dto.response.LoginTokenRes;
+import com.example.foodking.user.dto.response.UserReadRes;
 import com.example.foodking.user.service.UserService;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
@@ -63,12 +63,12 @@ public class ControllerTest {
                 .email("test@google.com")
                 .password("1234")
                 .build();
-        LoginTokenResDTO loginTokenResDTO = LoginTokenResDTO.builder()
+        LoginTokenRes loginTokenRes = LoginTokenRes.builder()
                 .accessToken("access")
                 .refreshToken("refresh")
                 .build();
 
-        given(userService.login(any(LoginReq.class))).willReturn(loginTokenResDTO);
+        given(userService.login(any(LoginReq.class))).willReturn(loginTokenRes);
         String requestBody = gson.toJson(loginReq);
 
         //when,then
@@ -158,7 +158,7 @@ public class ControllerTest {
     @DisplayName("회원가입 테스트 -> (회원가입 성공)")
     public void addUserSuccess() throws Exception {
         //given
-        AddUserReq addUserReq = AddUserReq.builder()
+        UserAddReq userAddReq = UserAddReq.builder()
                 .email("test@google.com")
                 .nickName("testNickName")
                 .phoneNum("01056962173")
@@ -166,7 +166,7 @@ public class ControllerTest {
                 .passwordRepeat("1234")
                 .build();
 
-        String requestBody = gson.toJson(addUserReq);
+        String requestBody = gson.toJson(userAddReq);
 
         //when,then
         this.mockMvc.perform(post("/users")
@@ -176,14 +176,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("회원가입 완료"))
                 .andDo(print());
 
-        verify(userService,times(1)).addUser(any(AddUserReq.class));
+        verify(userService,times(1)).addUser(any(UserAddReq.class));
     }
 
     @Test
     @DisplayName("회원가입 테스트 -> (회원가입 실패 : 입력값 공백)")
     public void addUserFail1() throws Exception {
         //given
-        AddUserReq addUserReq = AddUserReq.builder()
+        UserAddReq userAddReq = UserAddReq.builder()
                 .email("")
                 .nickName("")
                 .phoneNum("")
@@ -191,7 +191,7 @@ public class ControllerTest {
                 .passwordRepeat("")
                 .build();
 
-        String requestBody = gson.toJson(addUserReq);
+        String requestBody = gson.toJson(userAddReq);
 
         //when,then
         this.mockMvc.perform(post("/users")
@@ -205,14 +205,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.phoneNum").value("전화번호를 입력해주세요"))
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
-        verify(userService,times(0)).addUser(any(AddUserReq.class));
+        verify(userService,times(0)).addUser(any(UserAddReq.class));
     }
 
     @Test
     @DisplayName("회원가입 테스트 -> (회원가입 실패 : 이메일형식 예외)")
     public void addUserFail2() throws Exception {
         //given
-        AddUserReq addUserReq = AddUserReq.builder()
+        UserAddReq userAddReq = UserAddReq.builder()
                 .email("testgoogle.com")
                 .nickName("testNickName")
                 .phoneNum("01056962173")
@@ -220,7 +220,7 @@ public class ControllerTest {
                 .passwordRepeat("1234")
                 .build();
 
-        String requestBody = gson.toJson(addUserReq);
+        String requestBody = gson.toJson(userAddReq);
 
         //when,then
         this.mockMvc.perform(post("/users")
@@ -230,14 +230,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.email").value("이메일 형식이 올바르지 않습니다"))
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
-        verify(userService,times(0)).addUser(any(AddUserReq.class));
+        verify(userService,times(0)).addUser(any(UserAddReq.class));
     }
 
     @Test
     @DisplayName("회원가입 테스트 -> (회원가입 실패 : 이메일 중복예외)")
     public void addUserFail3() throws Exception {
         //given
-        AddUserReq addUserReq = AddUserReq.builder()
+        UserAddReq userAddReq = UserAddReq.builder()
                 .email("test@google.com")
                 .nickName("testNickName")
                 .phoneNum("01056962173")
@@ -246,9 +246,9 @@ public class ControllerTest {
                 .build();
 
         doThrow(new CommondException(ExceptionCode.EMAIL_DUPLICATED))
-                .when(userService).addUser(any(AddUserReq.class));
+                .when(userService).addUser(any(UserAddReq.class));
 
-        String requestBody = gson.toJson(addUserReq);
+        String requestBody = gson.toJson(userAddReq);
 
         //when,then
         this.mockMvc.perform(post("/users")
@@ -258,14 +258,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.email").value("중복된 이메일입니다"))
                 .andExpect(jsonPath("$.message").value("중복된 이메일입니다"))
                 .andDo(print());
-        verify(userService,times(1)).addUser(any(AddUserReq.class));
+        verify(userService,times(1)).addUser(any(UserAddReq.class));
     }
 
     @Test
     @DisplayName("회원가입 테스트 -> (회원가입 실패 : 닉네임 중복예외)")
     public void addUserFail4() throws Exception {
         //given
-        AddUserReq addUserReq = AddUserReq.builder()
+        UserAddReq userAddReq = UserAddReq.builder()
                 .email("test@google.com")
                 .nickName("testNickName")
                 .phoneNum("01056962173")
@@ -274,9 +274,9 @@ public class ControllerTest {
                 .build();
 
         doThrow(new CommondException(ExceptionCode.NICKNAME_DUPLICATED))
-                .when(userService).addUser(any(AddUserReq.class));
+                .when(userService).addUser(any(UserAddReq.class));
 
-        String requestBody = gson.toJson(addUserReq);
+        String requestBody = gson.toJson(userAddReq);
 
         //when,then
         this.mockMvc.perform(post("/users")
@@ -286,14 +286,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.nickName").value("중복된 닉네임입니다"))
                 .andExpect(jsonPath("$.message").value("중복된 닉네임입니다"))
                 .andDo(print());
-        verify(userService,times(1)).addUser(any(AddUserReq.class));
+        verify(userService,times(1)).addUser(any(UserAddReq.class));
     }
 
     @Test
     @DisplayName("회원가입 테스트 -> (회원가입 실패 : 비밀번호 불일치)")
     public void addUserFail5() throws Exception {
         //given
-        AddUserReq addUserReq = AddUserReq.builder()
+        UserAddReq userAddReq = UserAddReq.builder()
                 .email("test@google.com")
                 .nickName("testNickName")
                 .phoneNum("01056962173")
@@ -302,9 +302,9 @@ public class ControllerTest {
                 .build();
 
         doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT))
-                .when(userService).addUser(any(AddUserReq.class));
+                .when(userService).addUser(any(UserAddReq.class));
 
-        String requestBody = gson.toJson(addUserReq);
+        String requestBody = gson.toJson(userAddReq);
 
         //when,then
         this.mockMvc.perform(post("/users")
@@ -314,14 +314,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.password").value("비밀번호가 일치하지 않습니다."))
                 .andExpect(jsonPath("$.message").value("비밀번호가 일치하지 않습니다."))
                 .andDo(print());
-        verify(userService,times(1)).addUser(any(AddUserReq.class));
+        verify(userService,times(1)).addUser(any(UserAddReq.class));
     }
 
     @Test
     @DisplayName("회원가입 테스트 -> (회원가입 실패 : 인증되지 않은 번호)")
     public void addUserFail6() throws Exception {
         //given
-        AddUserReq addUserReq = AddUserReq.builder()
+        UserAddReq userAddReq = UserAddReq.builder()
                 .email("test@google.com")
                 .nickName("testNickName")
                 .phoneNum("01056962173")
@@ -329,9 +329,9 @@ public class ControllerTest {
                 .passwordRepeat("1234")
                 .build();
 
-        doThrow(new CommondException(SMS_NOT_AUTHENTICATION)).when(userService).addUser(any(AddUserReq.class));
+        doThrow(new CommondException(SMS_NOT_AUTHENTICATION)).when(userService).addUser(any(UserAddReq.class));
 
-        String requestBody = gson.toJson(addUserReq);
+        String requestBody = gson.toJson(userAddReq);
 
         //when,then
         this.mockMvc.perform(post("/users")
@@ -341,14 +341,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.phoneNum").value("인증이 되지않은 번호입니다."))
                 .andExpect(jsonPath("$.message").value("인증이 되지않은 번호입니다."))
                 .andDo(print());
-        verify(userService,times(1)).addUser(any(AddUserReq.class));
+        verify(userService,times(1)).addUser(any(UserAddReq.class));
     }
 
     @Test
     @DisplayName("이메일 중복 테스트 -> (중복체크 성공)")
     public void emailDupCheckSuccess() throws Exception {
         //given
-        given(userService.emailDuplicatedChecking(any(String.class))).willReturn(false);
+        given(userService.checkEmailDuplication(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/email/check")
@@ -358,14 +358,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data").value("false"))
                 .andExpect(jsonPath("$.message").value("이메일 중복체크 완료"))
                 .andDo(print());
-        verify(userService,times(1)).emailDuplicatedChecking(any(String.class));
+        verify(userService,times(1)).checkEmailDuplication(any(String.class));
     }
 
     @Test
     @DisplayName("이메일 중복 테스트 -> (중복체크 실패 : 이메일 형식예외)")
     public void emailDupCheckFail1() throws Exception {
         //given
-        given(userService.emailDuplicatedChecking(any(String.class))).willReturn(false);
+        given(userService.checkEmailDuplication(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/email/check")
@@ -374,7 +374,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("이메일 형식이 올바르지 않습니다"))
                 .andDo(print());
-        verify(userService,times(0)).emailDuplicatedChecking(any(String.class));
+        verify(userService,times(0)).checkEmailDuplication(any(String.class));
 
     }
 
@@ -382,7 +382,7 @@ public class ControllerTest {
     @DisplayName("이메일 중복 테스트 -> (중복체크 실패 : 이메일값 공백)")
     public void emailDupCheckFail2() throws Exception {
         //given
-        given(userService.emailDuplicatedChecking(any(String.class))).willReturn(false);
+        given(userService.checkEmailDuplication(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/email/check")
@@ -391,7 +391,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("이메일 정보를 입력해주세요"))
                 .andDo(print());
-        verify(userService,times(0)).emailDuplicatedChecking(any(String.class));
+        verify(userService,times(0)).checkEmailDuplication(any(String.class));
 
     }
 
@@ -399,7 +399,7 @@ public class ControllerTest {
     @DisplayName("이메일 중복 테스트 -> (중복체크 실패 : 이메일값 파라미터 없음)")
     public void emailDupCheckFail3() throws Exception {
         //given
-        given(userService.emailDuplicatedChecking(any(String.class))).willReturn(false);
+        given(userService.checkEmailDuplication(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/email/check")
@@ -408,7 +408,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.email").value("Required request parameter 'email' for method parameter type String is not present(관리자에게 문의하세요)"))
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
-        verify(userService,times(0)).emailDuplicatedChecking(any(String.class));
+        verify(userService,times(0)).checkEmailDuplication(any(String.class));
 
     }
 
@@ -416,7 +416,7 @@ public class ControllerTest {
     @DisplayName("닉네임 중복 테스트 -> (중복체크 성공)")
     public void nickNameDupCheckSuccess() throws Exception {
         //given
-        given(userService.nickNameDuplicatedChecking(any(String.class))).willReturn(false);
+        given(userService.checkNickNameDuplication(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/nickname/check")
@@ -426,14 +426,14 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data").value("false"))
                 .andExpect(jsonPath("$.message").value("닉네임 중복체크 완료"))
                 .andDo(print());
-        verify(userService,times(1)).nickNameDuplicatedChecking(any(String.class));
+        verify(userService,times(1)).checkNickNameDuplication(any(String.class));
     }
 
     @Test
     @DisplayName("닉네임 중복 테스트 -> (중복체크 실패 : 닉네임 공백)")
     public void nickNameDupCheckFail1() throws Exception {
         //given
-        given(userService.nickNameDuplicatedChecking(any(String.class))).willReturn(false);
+        given(userService.checkNickNameDuplication(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/nickname/check")
@@ -442,7 +442,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("닉네임 정보를 입력해주세요"))
                 .andDo(print());
-        verify(userService,times(0)).nickNameDuplicatedChecking(any(String.class));
+        verify(userService,times(0)).checkNickNameDuplication(any(String.class));
 
     }
 
@@ -450,7 +450,7 @@ public class ControllerTest {
     @DisplayName("닉네임 중복 테스트 -> (중복체크 실패 : 닉네임파라미터 없음)")
     public void nickNameDupCheckFail2() throws Exception {
         //given
-        given(userService.nickNameDuplicatedChecking(any(String.class))).willReturn(false);
+        given(userService.checkNickNameDuplication(any(String.class))).willReturn(false);
 
         //when,then
         this.mockMvc.perform(get("/nickname/check")
@@ -459,7 +459,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.nickName").value("Required request parameter 'nickName' for method parameter type String is not present(관리자에게 문의하세요)"))
                 .andDo(print());
-        verify(userService,times(0)).nickNameDuplicatedChecking(any(String.class));
+        verify(userService,times(0)).checkNickNameDuplication(any(String.class));
 
     }
 
@@ -534,13 +534,13 @@ public class ControllerTest {
     @DisplayName("비밀번호 찾기 테스트 -> (비밀번호 찾기 성공)")
     public void findPasswordSuccess() throws Exception {
         //given
-        FindPwdReq findPwdReq = FindPwdReq.builder()
+        PasswordFindReq passwordFindReq = PasswordFindReq.builder()
                 .email("test@google.com")
                 .phoneNum("01056962173")
                 .build();
 
-        String requestBody = gson.toJson(findPwdReq);
-        given(userService.findPassword(any(FindPwdReq.class))).willReturn("12345");
+        String requestBody = gson.toJson(passwordFindReq);
+        given(userService.findPassword(any(PasswordFindReq.class))).willReturn("12345");
 
         //when,then
         this.mockMvc.perform(patch("/users/password/find")
@@ -550,20 +550,20 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("비밀번호 찾기성공"))
                 .andExpect(jsonPath("$.data").value("12345"))
                 .andDo(print());
-        verify(userService,times(1)).findPassword(any(FindPwdReq.class));
+        verify(userService,times(1)).findPassword(any(PasswordFindReq.class));
     }
 
     @Test
     @DisplayName("비밀번호 찾기 테스트 -> (비밀번호 찾기 실패 : 입력값 공백)")
     public void findPasswordFail1() throws Exception {
         //given
-        FindPwdReq findPwdReq = FindPwdReq.builder()
+        PasswordFindReq passwordFindReq = PasswordFindReq.builder()
                 .email("")
                 .phoneNum("")
                 .build();
 
-        String requestBody = gson.toJson(findPwdReq);
-        given(userService.findPassword(any(FindPwdReq.class))).willReturn("12345");
+        String requestBody = gson.toJson(passwordFindReq);
+        given(userService.findPassword(any(PasswordFindReq.class))).willReturn("12345");
 
         //when,then
         this.mockMvc.perform(patch("/users/password/find")
@@ -572,20 +572,20 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
-        verify(userService,times(0)).findPassword(any(FindPwdReq.class));
+        verify(userService,times(0)).findPassword(any(PasswordFindReq.class));
     }
 
     @Test
     @DisplayName("비밀번호 찾기 테스트 -> (비밀번호 찾기 실패 : 이메일 형식예외)")
     public void findPasswordFail2() throws Exception {
         //given
-        FindPwdReq findPwdReq = FindPwdReq.builder()
+        PasswordFindReq passwordFindReq = PasswordFindReq.builder()
                 .email("test")
                 .phoneNum("01056962173")
                 .build();
 
-        String requestBody = gson.toJson(findPwdReq);
-        given(userService.findPassword(any(FindPwdReq.class))).willReturn("12345");
+        String requestBody = gson.toJson(passwordFindReq);
+        given(userService.findPassword(any(PasswordFindReq.class))).willReturn("12345");
 
         //when,then
         this.mockMvc.perform(patch("/users/password/find")
@@ -595,21 +595,21 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andExpect(jsonPath("$.data.email").value("이메일 형식이 올바르지 않습니다"))
                 .andDo(print());
-        verify(userService,times(0)).findPassword(any(FindPwdReq.class));
+        verify(userService,times(0)).findPassword(any(PasswordFindReq.class));
     }
 
     @Test
     @DisplayName("비밀번호 찾기 테스트 -> (비밀번호 찾기 실패 : 인증되지 않은 번호)")
     public void findPasswordFail3() throws Exception {
         //given
-        FindPwdReq findPwdReq = FindPwdReq.builder()
+        PasswordFindReq passwordFindReq = PasswordFindReq.builder()
                 .email("test@google.com")
                 .phoneNum("01056962173")
                 .build();
 
-        String requestBody = gson.toJson(findPwdReq);
+        String requestBody = gson.toJson(passwordFindReq);
         doThrow(new CommondException(ExceptionCode.SMS_NOT_AUTHENTICATION))
-                .when(userService).findPassword(any(FindPwdReq.class));
+                .when(userService).findPassword(any(PasswordFindReq.class));
 
         //when,then
         this.mockMvc.perform(patch("/users/password/find")
@@ -619,20 +619,20 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증이 되지않은 번호입니다."))
                 .andExpect(jsonPath("$.data.phoneNum").value("인증이 되지않은 번호입니다."))
                 .andDo(print());
-        verify(userService,times(1)).findPassword(any(FindPwdReq.class));
+        verify(userService,times(1)).findPassword(any(PasswordFindReq.class));
     }
 
     @Test
     @DisplayName("비밀번호 찾기 테스트 -> (비밀번호 찾기 실패 : 존재하지 않는 유저)")
     public void findPasswordFail4() throws Exception {
         //given
-        FindPwdReq findPwdReq = FindPwdReq.builder()
+        PasswordFindReq passwordFindReq = PasswordFindReq.builder()
                 .email("test@google.com")
                 .phoneNum("01056962173")
                 .build();
 
-        String requestBody = gson.toJson(findPwdReq);
-        given(userService.findPassword(any(FindPwdReq.class)))
+        String requestBody = gson.toJson(passwordFindReq);
+        given(userService.findPassword(any(PasswordFindReq.class)))
                 .willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         //when,then
@@ -642,20 +642,20 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
-        verify(userService,times(1)).findPassword(any(FindPwdReq.class));
+        verify(userService,times(1)).findPassword(any(PasswordFindReq.class));
     }
 
     @Test
     @DisplayName("비밀번호 찾기 테스트 -> (비밀번호 찾기 실패 : 유저 권한없음)")
     public void findPasswordFail5() throws Exception {
         //given
-        FindPwdReq findPwdReq = FindPwdReq.builder()
+        PasswordFindReq passwordFindReq = PasswordFindReq.builder()
                 .email("test@google.com")
                 .phoneNum("01056962173")
                 .build();
 
-        String requestBody = gson.toJson(findPwdReq);
-        given(userService.findPassword(any(FindPwdReq.class)))
+        String requestBody = gson.toJson(passwordFindReq);
+        given(userService.findPassword(any(PasswordFindReq.class)))
                 .willThrow(new CommondException(ExceptionCode.ACCESS_FAIL_USER));
 
         //when,then
@@ -665,7 +665,7 @@ public class ControllerTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 유저에 대한 권한이 없습니다"))
                 .andDo(print());
-        verify(userService,times(1)).findPassword(any(FindPwdReq.class));
+        verify(userService,times(1)).findPassword(any(PasswordFindReq.class));
     }
 
     @Test
@@ -674,13 +674,13 @@ public class ControllerTest {
     public void readUserInfoSuccess() throws Exception {
         //given
         makeAuthentication();
-        ReadUserInfoResDTO readUserInfoResDTO = ReadUserInfoResDTO.builder()
+        UserReadRes userReadRes = UserReadRes.builder()
                 .nickName("nickName")
                 .phoneNum("01056962173")
                 .email("test@google.com")
                 .build();
 
-        given(userService.readUser(any(Long.class))).willReturn(readUserInfoResDTO);
+        given(userService.findUser(any(Long.class))).willReturn(userReadRes);
 
         //when,then
         this.mockMvc.perform(get("/users")
@@ -691,7 +691,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.nickName").value("nickName"))
                 .andExpect(jsonPath("$.data.phoneNum").value("01056962173"))
                 .andDo(print());
-        verify(userService,times(1)).readUser(any(Long.class));
+        verify(userService,times(1)).findUser(any(Long.class));
     }
 
     @Test
@@ -699,13 +699,13 @@ public class ControllerTest {
     @DisplayName("유저정보 조회 테스트 -> (조회 실패 : 인증 실패)")
     public void readUserInfoFail1() throws Exception {
         //given
-        ReadUserInfoResDTO readUserInfoResDTO = ReadUserInfoResDTO.builder()
+        UserReadRes userReadRes = UserReadRes.builder()
                 .nickName("nickName")
                 .phoneNum("01056962173")
                 .email("test@google.com")
                 .build();
 
-        given(userService.readUser(any(Long.class))).willReturn(readUserInfoResDTO);
+        given(userService.findUser(any(Long.class))).willReturn(userReadRes);
 
         //when,then
         this.mockMvc.perform(get("/users")
@@ -713,7 +713,7 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
-        verify(userService,times(0)).readUser(any(Long.class));
+        verify(userService,times(0)).findUser(any(Long.class));
     }
 
     @Test
@@ -722,7 +722,7 @@ public class ControllerTest {
     public void readUserInfoFail2() throws Exception {
         //given
         makeAuthentication();
-        given(userService.readUser(any(Long.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
+        given(userService.findUser(any(Long.class))).willThrow(new CommondException(ExceptionCode.NOT_EXIST_USER));
 
         //when,then
         this.mockMvc.perform(get("/users")
@@ -730,7 +730,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
-        verify(userService,times(1)).readUser(any(Long.class));
+        verify(userService,times(1)).findUser(any(Long.class));
     }
 
     @Test
@@ -739,13 +739,13 @@ public class ControllerTest {
     public void updateUserInfoSuccess() throws Exception {
         //given
         makeAuthentication();
-        UpdateUserInfoReq updateUserInfoReq = UpdateUserInfoReq.builder()
+        UserUpdateReq userUpdateReq = UserUpdateReq.builder()
                 .oldPassword("1234")
                 .newPassword("12345")
                 .nickName("new NickName")
                 .build();
 
-        String requestBody = gson.toJson(updateUserInfoReq);
+        String requestBody = gson.toJson(userUpdateReq);
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -754,7 +754,7 @@ public class ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("유저정보 변경 성공"))
                 .andDo(print());
-        verify(userService,times(1)).updateUser(any(UpdateUserInfoReq.class),any(Long.class));
+        verify(userService,times(1)).updateUser(any(UserUpdateReq.class),any(Long.class));
     }
 
     @Test
@@ -762,13 +762,13 @@ public class ControllerTest {
     @DisplayName("유저정보 수정테스트 -> (수정 실패 : 인증 실패)")
     public void updateUserInfoFail1() throws Exception {
         //given
-        UpdateUserInfoReq updateUserInfoReq = UpdateUserInfoReq.builder()
+        UserUpdateReq userUpdateReq = UserUpdateReq.builder()
                 .oldPassword("1234")
                 .newPassword("12345")
                 .nickName("new NickName")
                 .build();
 
-        String requestBody = gson.toJson(updateUserInfoReq);
+        String requestBody = gson.toJson(userUpdateReq);
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -777,7 +777,7 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
-        verify(userService,times(0)).updateUser(any(UpdateUserInfoReq.class),any(Long.class));
+        verify(userService,times(0)).updateUser(any(UserUpdateReq.class),any(Long.class));
     }
 
     @Test
@@ -786,13 +786,13 @@ public class ControllerTest {
     public void updateUserInfoFail2() throws Exception {
         //given
         makeAuthentication();
-        UpdateUserInfoReq updateUserInfoReq = UpdateUserInfoReq.builder()
+        UserUpdateReq userUpdateReq = UserUpdateReq.builder()
                 .oldPassword("")
                 .newPassword("")
                 .nickName("")
                 .build();
 
-        String requestBody = gson.toJson(updateUserInfoReq);
+        String requestBody = gson.toJson(userUpdateReq);
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -801,7 +801,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
-        verify(userService,times(0)).updateUser(any(UpdateUserInfoReq.class),any(Long.class));
+        verify(userService,times(0)).updateUser(any(UserUpdateReq.class),any(Long.class));
     }
 
     @Test
@@ -810,15 +810,15 @@ public class ControllerTest {
     public void updateUserInfoFail3() throws Exception {
         //given
         makeAuthentication();
-        UpdateUserInfoReq updateUserInfoReq = UpdateUserInfoReq.builder()
+        UserUpdateReq userUpdateReq = UserUpdateReq.builder()
                 .oldPassword("1234")
                 .newPassword("12345")
                 .nickName("new NickName")
                 .build();
 
-        String requestBody = gson.toJson(updateUserInfoReq);
+        String requestBody = gson.toJson(userUpdateReq);
         doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT))
-                .when(userService).updateUser(any(UpdateUserInfoReq.class),any(Long.class));
+                .when(userService).updateUser(any(UserUpdateReq.class),any(Long.class));
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -828,7 +828,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("비밀번호가 일치하지 않습니다."))
                 .andExpect(jsonPath("$.data.password").value("비밀번호가 일치하지 않습니다."))
                 .andDo(print());
-        verify(userService,times(1)).updateUser(any(UpdateUserInfoReq.class),any(Long.class));
+        verify(userService,times(1)).updateUser(any(UserUpdateReq.class),any(Long.class));
     }
 
     @Test
@@ -837,15 +837,15 @@ public class ControllerTest {
     public void updateUserInfoFail4() throws Exception {
         //given
         makeAuthentication();
-        UpdateUserInfoReq updateUserInfoReq = UpdateUserInfoReq.builder()
+        UserUpdateReq userUpdateReq = UserUpdateReq.builder()
                 .oldPassword("1234")
                 .newPassword("12345")
                 .nickName("new NickName")
                 .build();
 
-        String requestBody = gson.toJson(updateUserInfoReq);
+        String requestBody = gson.toJson(userUpdateReq);
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER))
-                .when(userService).updateUser(any(UpdateUserInfoReq.class),any(Long.class));
+                .when(userService).updateUser(any(UserUpdateReq.class),any(Long.class));
 
         //when,then
         this.mockMvc.perform(patch("/users")
@@ -854,7 +854,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
-        verify(userService,times(1)).updateUser(any(UpdateUserInfoReq.class),any(Long.class));
+        verify(userService,times(1)).updateUser(any(UserUpdateReq.class),any(Long.class));
     }
 
     @Test
@@ -863,12 +863,12 @@ public class ControllerTest {
     public void deleteUserInfoSuccess() throws Exception {
         //given
         makeAuthentication();
-        DeleteUserReq deleteUserReq = DeleteUserReq.builder()
+        UserDeleteReq userDeleteReq = UserDeleteReq.builder()
                 .email("test@google.com")
                 .password("1234")
                 .build();
 
-        String requestBody = gson.toJson(deleteUserReq);
+        String requestBody = gson.toJson(userDeleteReq);
 
         //when,then
         this.mockMvc.perform(delete("/users")
@@ -877,7 +877,7 @@ public class ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("유저 삭제완료"))
                 .andDo(print());
-        verify(userService,times(1)).deleteUser(any(DeleteUserReq.class),any());
+        verify(userService,times(1)).deleteUser(any(UserDeleteReq.class),any());
     }
 
     @Test
@@ -885,12 +885,12 @@ public class ControllerTest {
     @DisplayName("유저 삭제테스트 -> (유저삭제 실패 : 인증실패)")
     public void deleteUserInfoFail1() throws Exception {
         //given
-        DeleteUserReq deleteUserReq = DeleteUserReq.builder()
+        UserDeleteReq userDeleteReq = UserDeleteReq.builder()
                 .email("test@google.com")
                 .password("1234")
                 .build();
 
-        String requestBody = gson.toJson(deleteUserReq);
+        String requestBody = gson.toJson(userDeleteReq);
 
         //when,then
         this.mockMvc.perform(delete("/users")
@@ -899,7 +899,7 @@ public class ControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
-        verify(userService,times(0)).deleteUser(any(DeleteUserReq.class),any());
+        verify(userService,times(0)).deleteUser(any(UserDeleteReq.class),any());
     }
 
     @Test
@@ -908,14 +908,14 @@ public class ControllerTest {
     public void deleteUserInfoFail2() throws Exception {
         //given
         makeAuthentication();
-        DeleteUserReq deleteUserReq = DeleteUserReq.builder()
+        UserDeleteReq userDeleteReq = UserDeleteReq.builder()
                 .email("test@google.com")
                 .password("1234")
                 .build();
 
-        String requestBody = gson.toJson(deleteUserReq);
+        String requestBody = gson.toJson(userDeleteReq);
         doThrow(new CommondException(ExceptionCode.PASSWORD_NOT_COLLECT))
-                .when(userService).deleteUser(any(DeleteUserReq.class),any());
+                .when(userService).deleteUser(any(UserDeleteReq.class),any());
 
         //when,then
         this.mockMvc.perform(delete("/users")
@@ -925,7 +925,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("비밀번호가 일치하지 않습니다."))
                 .andExpect(jsonPath("$.data.password").value("비밀번호가 일치하지 않습니다."))
                 .andDo(print());
-        verify(userService,times(1)).deleteUser(any(DeleteUserReq.class),any());
+        verify(userService,times(1)).deleteUser(any(UserDeleteReq.class),any());
     }
 
     @Test
@@ -934,14 +934,14 @@ public class ControllerTest {
     public void deleteUserInfoFail3() throws Exception {
         //given
         makeAuthentication();
-        DeleteUserReq deleteUserReq = DeleteUserReq.builder()
+        UserDeleteReq userDeleteReq = UserDeleteReq.builder()
                 .email("test@google.com")
                 .password("1234")
                 .build();
 
-        String requestBody = gson.toJson(deleteUserReq);
+        String requestBody = gson.toJson(userDeleteReq);
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER))
-                .when(userService).deleteUser(any(DeleteUserReq.class),any());
+                .when(userService).deleteUser(any(UserDeleteReq.class),any());
 
         //when,then
         this.mockMvc.perform(delete("/users")
@@ -950,7 +950,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
-        verify(userService,times(1)).deleteUser(any(DeleteUserReq.class),any());
+        verify(userService,times(1)).deleteUser(any(UserDeleteReq.class),any());
     }
 
     @Test
@@ -959,12 +959,12 @@ public class ControllerTest {
     public void deleteUserInfoFail4() throws Exception {
         //given
         makeAuthentication();
-        DeleteUserReq deleteUserReq = DeleteUserReq.builder()
+        UserDeleteReq userDeleteReq = UserDeleteReq.builder()
                 .email("")
                 .password("")
                 .build();
 
-        String requestBody = gson.toJson(deleteUserReq);
+        String requestBody = gson.toJson(userDeleteReq);
 
         //when,then
         this.mockMvc.perform(delete("/users")
@@ -973,7 +973,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
-        verify(userService,times(0)).deleteUser(any(DeleteUserReq.class),any());
+        verify(userService,times(0)).deleteUser(any(UserDeleteReq.class),any());
     }
 
     @Test
@@ -982,12 +982,12 @@ public class ControllerTest {
     public void deleteUserInfoFail5() throws Exception {
         //given
         makeAuthentication();
-        DeleteUserReq deleteUserReq = DeleteUserReq.builder()
+        UserDeleteReq userDeleteReq = UserDeleteReq.builder()
                 .email("testgoogle.com")
                 .password("1234")
                 .build();
 
-        String requestBody = gson.toJson(deleteUserReq);
+        String requestBody = gson.toJson(userDeleteReq);
 
         //when,then
         this.mockMvc.perform(delete("/users")
@@ -996,7 +996,7 @@ public class ControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
                 .andDo(print());
-        verify(userService,times(0)).deleteUser(any(DeleteUserReq.class),any());
+        verify(userService,times(0)).deleteUser(any(UserDeleteReq.class),any());
     }
 
     private void makeAuthentication(){

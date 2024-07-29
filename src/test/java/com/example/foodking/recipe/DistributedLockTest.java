@@ -38,7 +38,7 @@ public class DistributedLockTest {
             executorService.submit(() -> {
                 try {
                     // 분산락 적용 메서드 호출
-                    recipeService.readRecipe(1L,1L, ReplySortType.LATEST,any(),any());
+                    recipeService.findRecipe(1L,1L, ReplySortType.LATEST,any(),any());
                 } finally {
                     latch.countDown();
                 }

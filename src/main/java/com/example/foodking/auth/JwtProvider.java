@@ -4,7 +4,7 @@ import com.example.foodking.common.RedissonPrefix;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.domain.User;
-import com.example.foodking.user.dto.response.LoginTokenResDTO;
+import com.example.foodking.user.dto.response.LoginTokenRes;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -118,7 +118,7 @@ public class JwtProvider {
     
     // 토큰 재발급, 탈취에 대한 위험성을 최소화하기 위해 accessToken외에 refreshToken도 재발급을 한다.
     @Transactional
-    public LoginTokenResDTO reissueToken(HttpServletRequest request){
+    public LoginTokenRes reissueToken(HttpServletRequest request){
 
         String refreshToken = resolveRefreshToken(request);
 
@@ -137,7 +137,7 @@ public class JwtProvider {
 
         User user = (User) customUserDetailsService.loadUserByUsername(userId);
 
-        return LoginTokenResDTO.builder()
+        return LoginTokenRes.builder()
                 .accessToken(createAccessToken(Long.valueOf(userId), user.getAuthorities()))
                 .refreshToken(createRefreshToken(Long.valueOf(userId),user.getAuthorities()))
                 .build();

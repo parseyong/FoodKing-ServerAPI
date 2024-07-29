@@ -1,7 +1,7 @@
 package com.example.foodking.ingredient;
 
 import com.example.foodking.ingredient.domain.Ingredient;
-import com.example.foodking.ingredient.dto.request.SaveIngredientReq;
+import com.example.foodking.ingredient.dto.request.IngredientAddReq;
 import com.example.foodking.ingredient.repository.IngredientRepository;
 import com.example.foodking.ingredient.service.IngredientService;
 import com.example.foodking.recipe.domain.RecipeInfo;
@@ -28,20 +28,20 @@ public class ServiceTest {
     private IngredientService ingredientService;
     @Mock
     private IngredientRepository ingredientRepository;
-    private List<SaveIngredientReq> saveIngredientReqList;
+    private List<IngredientAddReq> ingredientAddReqList;
 
     @BeforeEach
     void beforeEach(){
-        SaveIngredientReq saveIngredientReq1 = SaveIngredientReq.builder()
+        IngredientAddReq ingredientAddReq1 = IngredientAddReq.builder()
                 .ingredientName("재료명1")
                 .ingredientAmount("재료수량1")
                 .build();
-        SaveIngredientReq saveIngredientReq2 = SaveIngredientReq.builder()
+        IngredientAddReq ingredientAddReq2 = IngredientAddReq.builder()
                 .ingredientName("재료명2")
                 .ingredientAmount("재료수량2")
                 .build();
 
-        this.saveIngredientReqList = new ArrayList<>(List.of(saveIngredientReq1, saveIngredientReq2));
+        this.ingredientAddReqList = new ArrayList<>(List.of(ingredientAddReq1, ingredientAddReq2));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class ServiceTest {
                 .build();
 
         //when
-        ingredientService.addIngredient(saveIngredientReqList,recipeInfo);
+        ingredientService.addIngredient(ingredientAddReqList,recipeInfo);
 
         //then
         verify(ingredientRepository,times(1)).saveAll(any(List.class));
@@ -72,7 +72,7 @@ public class ServiceTest {
 
         //when
         assertThat(recipeInfo.getIngredientList().size()).isEqualTo(0L);
-        ingredientService.updateIngredientList(saveIngredientReqList, recipeInfo);
+        ingredientService.updateIngredientList(ingredientAddReqList, recipeInfo);
 
         //then
         assertThat(recipeInfo.getIngredientList().size()).isEqualTo(2L);
@@ -126,7 +126,7 @@ public class ServiceTest {
 
         //when
         assertThat(recipeInfo.getIngredientList().size()).isEqualTo(2L);
-        ingredientService.updateIngredientList(saveIngredientReqList , recipeInfo);
+        ingredientService.updateIngredientList(ingredientAddReqList, recipeInfo);
 
         //then
         assertThat(recipeInfo.getIngredientList().size()).isEqualTo(2L);

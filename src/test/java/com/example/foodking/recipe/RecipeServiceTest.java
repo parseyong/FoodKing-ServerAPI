@@ -5,14 +5,14 @@ import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.ingredient.service.IngredientService;
 import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.domain.RecipeInfo;
-import com.example.foodking.recipe.dto.recipe.request.SaveRecipeReq;
-import com.example.foodking.recipe.dto.recipe.response.ReadRecipeRes;
-import com.example.foodking.recipe.dto.recipeInfo.request.SaveRecipeInfoReq;
-import com.example.foodking.recipe.dto.recipeInfo.response.ReadRecipeInfoRes;
+import com.example.foodking.recipe.dto.recipe.request.RecipeSaveReq;
+import com.example.foodking.recipe.dto.recipe.response.RecipeFindRes;
+import com.example.foodking.recipe.dto.recipeInfo.request.RecipeInfoSaveReq;
+import com.example.foodking.recipe.dto.recipeInfo.response.RecipeInfoFindRes;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
-import com.example.foodking.recipe.service.CacheService;
+import com.example.foodking.recipe.service.RecipeCachingService;
 import com.example.foodking.recipe.service.RecipeService;
-import com.example.foodking.recipeWayInfo.service.RecipeWayInfoService;
+import com.example.foodking.recipeWay.service.RecipeWayService;
 import com.example.foodking.reply.common.ReplySortType;
 import com.example.foodking.reply.service.ReplyService;
 import com.example.foodking.user.domain.User;
@@ -44,17 +44,17 @@ public class RecipeServiceTest {
     @Mock
     private IngredientService ingredientService;
     @Mock
-    private RecipeWayInfoService recipeWayInfoService;
+    private RecipeWayService recipeWayService;
     @Mock
     private UserRepository userRepository;
     @Mock
     private ReplyService replyService;
     @Mock
-    private CacheService cacheService;
+    private RecipeCachingService recipeCachingService;
 
-    private SaveRecipeReq saveRecipeReq;
+    private RecipeSaveReq recipeSaveReq;
     private RecipeInfo recipeInfo;
-    private SaveRecipeInfoReq saveRecipeInfoReq;
+    private RecipeInfoSaveReq recipeInfoSaveReq;
     private User user;
 
     @BeforeEach
@@ -66,7 +66,7 @@ public class RecipeServiceTest {
                 .nickName("nickName")
                 .build());
 
-        this.saveRecipeInfoReq = SaveRecipeInfoReq.builder()
+        this.recipeInfoSaveReq = RecipeInfoSaveReq.builder()
                 .recipeInfoType(RecipeInfoType.KOREAN)
                 .recipeName("테스트레시피 이름")
                 .recipeTip("테스트레시피 팁")
@@ -75,14 +75,14 @@ public class RecipeServiceTest {
                 .ingredentCost(30L)
                 .build();
 
-        this.saveRecipeReq = SaveRecipeReq.builder()
-                .saveRecipeInfoReq(saveRecipeInfoReq)
+        this.recipeSaveReq = RecipeSaveReq.builder()
+                .recipeInfoSaveReq(recipeInfoSaveReq)
                 .build();
 
         this.recipeInfo = RecipeInfo.builder()
                 .user(user)
                 .recipeName("testName")
-                .recipeWayInfoList(new ArrayList<>())
+                .recipeWayList(new ArrayList<>())
                 .ingredientList(new ArrayList<>())
                 .calogy(1L)
                 .build();
@@ -95,13 +95,13 @@ public class RecipeServiceTest {
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
 
         //when
-        recipeService.addRecipe(saveRecipeReq,1L);
+        recipeService.addRecipe(recipeSaveReq,1L);
 
         //then
         verify(userRepository,times(1)).findById(any(Long.class));
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
         verify(ingredientService,times(1)).addIngredient(any(),any(RecipeInfo.class));
-        verify(recipeWayInfoService,times(1)).addRecipeWay(any(),any(RecipeInfo.class));
+        verify(recipeWayService,times(1)).addRecipeWay(any(),any(RecipeInfo.class));
     }
 
     @Test
@@ -112,13 +112,13 @@ public class RecipeServiceTest {
 
         //when,then
         try {
-            recipeService.addRecipe(saveRecipeReq,1L);
+            recipeService.addRecipe(recipeSaveReq,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(userRepository,times(1)).findById(any(Long.class));
             verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
             verify(ingredientService,times(0)).addIngredient(any(),any(RecipeInfo.class));
-            verify(recipeWayInfoService,times(0)).addRecipeWay(any(),any(RecipeInfo.class));
+            verify(recipeWayService,times(0)).addRecipeWay(any(),any(RecipeInfo.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
         }
     }
@@ -128,19 +128,19 @@ public class RecipeServiceTest {
     public void updateRecipeSuccess(){
         //given
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
-        SaveRecipeReq saveRecipeReq = SaveRecipeReq.builder()
-                .saveRecipeInfoReq(saveRecipeInfoReq)
+        RecipeSaveReq recipeSaveReq = RecipeSaveReq.builder()
+                .recipeInfoSaveReq(recipeInfoSaveReq)
                 .build();
         given(user.getUserId()).willReturn(1L);
 
         //when
-        recipeService.updateRecipe(saveRecipeReq,1L,1L);
+        recipeService.updateRecipe(recipeSaveReq,1L,1L);
 
         //then
         verify(recipeInfoRepository,times(1)).findById(any(Long.class));
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
         verify(ingredientService,times(1)).updateIngredientList(any(),any(RecipeInfo.class));
-        verify(recipeWayInfoService,times(1)).updateRecipeWayInfoList(any(),any(RecipeInfo.class));
+        verify(recipeWayService,times(1)).updateRecipeWayList(any(),any(RecipeInfo.class));
         assertThat(recipeInfo.getRecipeName()).isEqualTo("테스트레시피 이름");
         assertThat(recipeInfo.getRecipeTip()).isEqualTo("테스트레시피 팁");
         assertThat(recipeInfo.getCalogy()).isEqualTo(10L);
@@ -156,13 +156,13 @@ public class RecipeServiceTest {
 
         //when, then
         try {
-            recipeService.updateRecipe(saveRecipeReq,1L,1L);
+            recipeService.updateRecipe(recipeSaveReq,1L,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(recipeInfoRepository,times(1)).findById(any(Long.class));
             verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
             verify(ingredientService,times(0)).updateIngredientList(any(),any(RecipeInfo.class));
-            verify(recipeWayInfoService,times(0)).updateRecipeWayInfoList(any(),any(RecipeInfo.class));
+            verify(recipeWayService,times(0)).updateRecipeWayList(any(),any(RecipeInfo.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.ACCESS_FAIL_RECIPE);
         }
     }
@@ -175,13 +175,13 @@ public class RecipeServiceTest {
 
         //when, then
         try {
-            recipeService.updateRecipe(saveRecipeReq,1L,1L);
+            recipeService.updateRecipe(recipeSaveReq,1L,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             verify(recipeInfoRepository,times(1)).findById(any(Long.class));
             verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
             verify(ingredientService,times(0)).updateIngredientList(any(),any(RecipeInfo.class));
-            verify(recipeWayInfoService,times(0)).updateRecipeWayInfoList(any(),any(RecipeInfo.class));
+            verify(recipeWayService,times(0)).updateRecipeWayList(any(),any(RecipeInfo.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_RECIPEINFO);
         }
     }
@@ -241,22 +241,22 @@ public class RecipeServiceTest {
     @DisplayName("레시피 조회 테스트 -> (성공: 첫번째 페이지인 경우)")
     public void readRecipeSuccess(){
         //given
-        ReadRecipeInfoRes readRecipeInfoRes = ReadRecipeInfoRes
+        RecipeInfoFindRes recipeInfoFindRes = RecipeInfoFindRes
                 .toDTO(recipeInfo,1L,"writerNickName");
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
-        given(cacheService.readRecipeByCache(any(Long.class),any(Boolean.class))).willReturn(ReadRecipeRes.builder()
-                        .readRecipeInfoRes(ReadRecipeInfoRes.builder().build())
-                        .readRecipeWayInfoResList(new ArrayList<>())
-                        .readIngredientResList(new ArrayList<>())
+        given(recipeCachingService.findRecipeByCache(any(Long.class),any(Boolean.class))).willReturn(RecipeFindRes.builder()
+                        .recipeInfoFindRes(RecipeInfoFindRes.builder().build())
+                        .recipeWayFindResList(new ArrayList<>())
+                        .ingredientFindResList(new ArrayList<>())
                         .build());
 
         //when
-        recipeService.readRecipe(1L,1L, ReplySortType.LIKE,null,null);
+        recipeService.findRecipe(1L,1L, ReplySortType.LIKE,null,null);
 
         //then
         verify(replyService,times(1))
-                .readReply(any(Long.class),any(Long.class), any(ReplySortType.class),any(),any(),any(Boolean.class));
+                .findReplyList(any(Long.class),any(Long.class), any(ReplySortType.class),any(),any(),any(Boolean.class));
         verify(recipeInfoRepository,times(1)).findById(any(Long.class));
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
     }
@@ -267,11 +267,11 @@ public class RecipeServiceTest {
         //given
 
         //when
-        recipeService.readRecipe(1L,1L, ReplySortType.LIKE,1L,12);
+        recipeService.findRecipe(1L,1L, ReplySortType.LIKE,1L,12);
 
         //then
         verify(replyService,times(1))
-                .readReply(any(Long.class),any(Long.class), any(ReplySortType.class),any(Long.class),any(),any(Boolean.class));
+                .findReplyList(any(Long.class),any(Long.class), any(ReplySortType.class),any(Long.class),any(),any(Boolean.class));
         verify(recipeInfoRepository,times(0)).findRecipeInfo(any(Long.class));
         verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
     }
