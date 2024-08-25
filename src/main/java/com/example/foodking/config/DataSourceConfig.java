@@ -29,7 +29,7 @@ public class DataSourceConfig {
     private String masterUrl;
 
     @Value("${spring.datasource.username}")
-    private String username;
+    private String userName;
 
     @Value("${spring.datasource.password}")
     private String password;
@@ -43,7 +43,7 @@ public class DataSourceConfig {
         return DataSourceBuilder.create()
                 .driverClassName(driverClassName)
                 .url(masterUrl)
-                .username(username)
+                .username(userName)
                 .password(password)
                 .build();
     }
@@ -54,7 +54,7 @@ public class DataSourceConfig {
         return DataSourceBuilder.create()
                 .driverClassName(driverClassName)
                 .url(slaveUrl)
-                .username(username)
+                .username(userName)
                 .password(password)
                 .build();
     }

@@ -75,16 +75,16 @@ public class ServiceTest {
 
         RecipeInfo recipeInfo = RecipeInfo.builder()
                 .recipeName("testName")
-                .recipeWayList(new ArrayList<>(List.of(recipeWay1, recipeWay2)))
+                .recipeWays(new ArrayList<>(List.of(recipeWay1, recipeWay2)))
                 .calogy(1L)
                 .build();
 
         //when
-        assertThat(recipeInfo.getRecipeWayList().size()).isEqualTo(2L);
+        assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(2L);
         recipeWayService.updateRecipeWayList(new ArrayList<>(),recipeInfo);
 
         //then
-        assertThat(recipeInfo.getRecipeWayList().size()).isEqualTo(0L);
+        assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(0L);
     }
 
     @Test
@@ -102,18 +102,18 @@ public class ServiceTest {
 
         RecipeInfo recipeInfo = RecipeInfo.builder()
                 .recipeName("testName")
-                .recipeWayList(new ArrayList<>(List.of(recipeWay1, recipeWay2)))
+                .recipeWays(new ArrayList<>(List.of(recipeWay1, recipeWay2)))
                 .calogy(1L)
                 .build();
 
         //when
-        assertThat(recipeInfo.getRecipeWayList().size()).isEqualTo(2L);
+        assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(2L);
         recipeWayService.updateRecipeWayList(recipeWayAddReqList, recipeInfo);
 
         //then
-        assertThat(recipeInfo.getRecipeWayList().size()).isEqualTo(2L);
-        assertThat(recipeInfo.getRecipeWayList().get(0).getRecipeWay()).isEqualTo("조리법1 수정후");
-        assertThat(recipeInfo.getRecipeWayList().get(1).getRecipeWay()).isEqualTo("조리법2 수정후");
+        assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(2L);
+        assertThat(recipeInfo.getRecipeWays().get(0).getRecipeWay()).isEqualTo("조리법1 수정후");
+        assertThat(recipeInfo.getRecipeWays().get(1).getRecipeWay()).isEqualTo("조리법2 수정후");
     }
 
     @Test
@@ -122,16 +122,16 @@ public class ServiceTest {
         //given
         RecipeInfo recipeInfo = RecipeInfo.builder()
                 .recipeName("testName")
-                .recipeWayList(new ArrayList<>())
+                .recipeWays(new ArrayList<>())
                 .calogy(1L)
                 .build();
 
         //when
-        assertThat(recipeInfo.getRecipeWayList().size()).isEqualTo(0L);
+        assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(0L);
         recipeWayService.updateRecipeWayList(recipeWayAddReqList,recipeInfo);
 
         //then
-        assertThat(recipeInfo.getRecipeWayList().size()).isEqualTo(2L);
+        assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(2L);
     }
 
 }

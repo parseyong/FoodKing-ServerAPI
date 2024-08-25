@@ -82,8 +82,8 @@ public class RecipeServiceTest {
         this.recipeInfo = RecipeInfo.builder()
                 .user(user)
                 .recipeName("testName")
-                .recipeWayList(new ArrayList<>())
-                .ingredientList(new ArrayList<>())
+                .recipeWays(new ArrayList<>())
+                .ingredients(new ArrayList<>())
                 .calogy(1L)
                 .build();
     }
@@ -100,7 +100,7 @@ public class RecipeServiceTest {
         //then
         verify(userRepository,times(1)).findById(any(Long.class));
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
-        verify(ingredientService,times(1)).addIngredient(any(),any(RecipeInfo.class));
+        verify(ingredientService,times(1)).addIngredients(any(),any(RecipeInfo.class));
         verify(recipeWayService,times(1)).addRecipeWay(any(),any(RecipeInfo.class));
     }
 
@@ -117,7 +117,7 @@ public class RecipeServiceTest {
         }catch (CommondException ex){
             verify(userRepository,times(1)).findById(any(Long.class));
             verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
-            verify(ingredientService,times(0)).addIngredient(any(),any(RecipeInfo.class));
+            verify(ingredientService,times(0)).addIngredients(any(),any(RecipeInfo.class));
             verify(recipeWayService,times(0)).addRecipeWay(any(),any(RecipeInfo.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
         }
@@ -139,7 +139,7 @@ public class RecipeServiceTest {
         //then
         verify(recipeInfoRepository,times(1)).findById(any(Long.class));
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
-        verify(ingredientService,times(1)).updateIngredientList(any(),any(RecipeInfo.class));
+        verify(ingredientService,times(1)).updateIngredients(any(),any(RecipeInfo.class));
         verify(recipeWayService,times(1)).updateRecipeWayList(any(),any(RecipeInfo.class));
         assertThat(recipeInfo.getRecipeName()).isEqualTo("테스트레시피 이름");
         assertThat(recipeInfo.getRecipeTip()).isEqualTo("테스트레시피 팁");
@@ -161,7 +161,7 @@ public class RecipeServiceTest {
         }catch (CommondException ex){
             verify(recipeInfoRepository,times(1)).findById(any(Long.class));
             verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
-            verify(ingredientService,times(0)).updateIngredientList(any(),any(RecipeInfo.class));
+            verify(ingredientService,times(0)).updateIngredients(any(),any(RecipeInfo.class));
             verify(recipeWayService,times(0)).updateRecipeWayList(any(),any(RecipeInfo.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.ACCESS_FAIL_RECIPE);
         }
@@ -180,7 +180,7 @@ public class RecipeServiceTest {
         }catch (CommondException ex){
             verify(recipeInfoRepository,times(1)).findById(any(Long.class));
             verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
-            verify(ingredientService,times(0)).updateIngredientList(any(),any(RecipeInfo.class));
+            verify(ingredientService,times(0)).updateIngredients(any(),any(RecipeInfo.class));
             verify(recipeWayService,times(0)).updateRecipeWayList(any(),any(RecipeInfo.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_RECIPEINFO);
         }

@@ -31,7 +31,7 @@ public class RecipeWayService {
     @Transactional
     public void updateRecipeWayList(List<RecipeWayAddReq> recipeWayAddReqList, RecipeInfo recipeInfo){
 
-        List<RecipeWay> recipeWayList = recipeInfo.getRecipeWayList();
+        List<RecipeWay> recipeWayList = recipeInfo.getRecipeWays();
         int minSize = Math.min(recipeWayAddReqList.size(), recipeWayList.size());
 
         // 기존 조리순서 업데이트

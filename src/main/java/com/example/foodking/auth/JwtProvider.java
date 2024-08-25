@@ -78,10 +78,10 @@ public class JwtProvider {
     }
 
     // 엑세스토큰을 생성해서 반환하는 메소드
-    public String createAccessToken(Long userId, Collection<? extends GrantedAuthority> roleList) {
+    public String createAccessToken(Long userId, Collection<? extends GrantedAuthority> roles) {
 
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
-        claims.put("roleList", roleList);
+        claims.put("roleList", roles);
         Date now = new Date();
 
         return Jwts.builder()
@@ -93,10 +93,10 @@ public class JwtProvider {
     }
 
     // 리프레시토큰을 생성해서 반환하는 메소드
-    public String createRefreshToken(Long userId, Collection<? extends GrantedAuthority> roleList) {
+    public String createRefreshToken(Long userId, Collection<? extends GrantedAuthority> roles) {
 
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
-        claims.put("roleList", roleList);
+        claims.put("roleList", roles);
         Date now = new Date();
 
         String refreshToken = Jwts.builder()
@@ -127,7 +127,7 @@ public class JwtProvider {
             throw new CommondException(ExceptionCode.LOGIN_FAIL);
 
         // refreshToken에서 userId값 추출
-        String userId = getUserIdByRefreshToken(refreshToken);
+        String userId = findUserIdByRefreshToken(refreshToken);
 
         // 레디스에 존재하는 토큰인지 확인
         String tokenInRedis = authRedis.opsForValue().get(RedissonPrefix.TOKEN_REDIS + userId);
@@ -169,20 +169,20 @@ public class JwtProvider {
 
     // 토큰에서 추출한 userId값을 통해 인증객체를 생성하는 메소드
     @Transactional(readOnly = true)
-    public Authentication getAuthenticationByAccessToken(String token) {
+    public Authentication findAuthenticationByAccessToken(String accessToken) {
 
-        User user = (User) customUserDetailsService.loadUserByUsername(this.getUserIdByAccessToken(token));
+        User user = (User) customUserDetailsService.loadUserByUsername(this.findUserIdByAccessToken(accessToken));
         return new UsernamePasswordAuthenticationToken(user.getUserId(),user.getPassword(),user.getAuthorities());
     }
 
     // AccessToken의 유효성을 검증하는 메소드
-    public boolean validateAccessToken(String token) {
+    public boolean validateAccessToken(String accessToken) {
         try {
-            String blackList = authRedis.opsForValue().get(RedissonPrefix.BLACK_LIST_REDIS + token);
+            String blackList = authRedis.opsForValue().get(RedissonPrefix.BLACK_LIST_REDIS + accessToken);
             if(blackList != null)
                 return false;
 
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(accessSecretKey).build().parseClaimsJws(token);
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(accessSecretKey).build().parseClaimsJws(accessToken);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
@@ -190,9 +190,9 @@ public class JwtProvider {
     }
 
     // RefreshToken의 유효성을 검증하는 메소드, 레디스에 존재하는 지 여부는 userId를 key로 하기때문에 reIssue메소드에서 수행한다.
-    private boolean validateRefreshToken(String token) {
+    private boolean validateRefreshToken(String refreshToken) {
         try {
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(refreshSecretKey).build().parseClaimsJws(token);
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(refreshSecretKey).build().parseClaimsJws(refreshToken);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
@@ -200,12 +200,12 @@ public class JwtProvider {
     }
 
     // AccessToken에서 userId값을 추출하는 메소드
-    private String getUserIdByAccessToken(String token) {
-        return Jwts.parser().setSigningKey(accessSecretKey).parseClaimsJws(token).getBody().getSubject();
+    private String findUserIdByAccessToken(String accessToken) {
+        return Jwts.parser().setSigningKey(accessSecretKey).parseClaimsJws(accessToken).getBody().getSubject();
     }
 
     // RefreshToken에서 userId값을 추출하는 메소드
-    private String getUserIdByRefreshToken(String token) {
-        return Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(token).getBody().getSubject();
+    private String findUserIdByRefreshToken(String refreshToken) {
+        return Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(refreshToken).getBody().getSubject();
     }
 }

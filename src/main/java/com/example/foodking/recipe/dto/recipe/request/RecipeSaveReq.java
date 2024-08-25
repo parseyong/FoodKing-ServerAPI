@@ -22,9 +22,9 @@ public class RecipeSaveReq {
     private RecipeInfoSaveReq recipeInfoSaveReq;
 
     @NotEmpty(message = "재료를 추가해주세요")
-    private List<@Valid IngredientAddReq> ingredientAddReqList;
+    private List<@Valid IngredientAddReq> ingredientAddReqs;
 
     @NotEmpty(message = "조리법을 추가해주세요")
-    private List<@Valid RecipeWayAddReq> recipeWayAddReqList;
+    private List<@Valid RecipeWayAddReq> recipeWayAddReqs;
 
 }

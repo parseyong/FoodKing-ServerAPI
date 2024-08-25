@@ -54,7 +54,7 @@ public class RecipePagingService {
         Long recipeCnt = recipeInfoRepository.findLikedRecipeInfoCnt(getBuilderForCount(recipeInfoPagingFindReq));
 
         // 쿼리 실행
-        List<RecipeInfoFindRes> recipeInfoFindResDTOList = recipeInfoRepository.findLikedRecipeInfoList(
+        List<RecipeInfoFindRes> recipeInfoFindResDTOList = recipeInfoRepository.findLikedRecipeInfoPaging(
                 getBuilderForPaging(recipeInfoPagingFindReq),
                 createOrderSpecifier(recipeInfoPagingFindReq.getRecipeSortType()));
 

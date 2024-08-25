@@ -50,8 +50,8 @@ public class RecipePagingServiceTest {
         this.recipeInfo = RecipeInfo.builder()
                 .user(user)
                 .recipeName("testName")
-                .recipeWayList(new ArrayList<>())
-                .ingredientList(new ArrayList<>())
+                .recipeWays(new ArrayList<>())
+                .ingredients(new ArrayList<>())
                 .calogy(1L)
                 .build();
 
@@ -121,7 +121,7 @@ public class RecipePagingServiceTest {
                 .toDTO(recipeInfo,1L,"writerNickName");
 
         given(recipeInfoRepository.findLikedRecipeInfoCnt(any())).willReturn(10L);
-        given(recipeInfoRepository.findLikedRecipeInfoList(any(),any()))
+        given(recipeInfoRepository.findLikedRecipeInfoPaging(any(),any()))
                 .willReturn(List.of(recipeInfoFindRes));
 
         //when
@@ -129,7 +129,7 @@ public class RecipePagingServiceTest {
 
         //then
         verify(recipeInfoRepository,times(1)).findLikedRecipeInfoCnt(any());
-        verify(recipeInfoRepository,times(1)).findLikedRecipeInfoList(any(),any());
+        verify(recipeInfoRepository,times(1)).findLikedRecipeInfoPaging(any(),any());
     }
 
     @Test
@@ -143,7 +143,7 @@ public class RecipePagingServiceTest {
                 .build();
 
         given(recipeInfoRepository.findLikedRecipeInfoCnt(any())).willReturn(10L);
-        given(recipeInfoRepository.findLikedRecipeInfoList(any(),any()))
+        given(recipeInfoRepository.findLikedRecipeInfoPaging(any(),any()))
                 .willReturn(List.of());
 
         //when, then
@@ -153,7 +153,7 @@ public class RecipePagingServiceTest {
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_PAGE);
             verify(recipeInfoRepository,times(1)).findLikedRecipeInfoCnt(any());
-            verify(recipeInfoRepository,times(1)).findLikedRecipeInfoList(any(),any());
+            verify(recipeInfoRepository,times(1)).findLikedRecipeInfoPaging(any(),any());
         }
     }
 }

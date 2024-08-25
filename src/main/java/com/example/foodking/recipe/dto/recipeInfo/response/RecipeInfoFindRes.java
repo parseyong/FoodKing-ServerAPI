@@ -31,11 +31,11 @@ public class RecipeInfoFindRes {
     public static RecipeInfoFindRes toDTO(RecipeInfo recipeInfo, Long writerUserId, String writerNickName){
 
         Long replyCnt;
-        if(recipeInfo.getReplyList() == null){
+        if(recipeInfo.getReplies() == null){
             replyCnt = 0L;
         }
         else{
-            replyCnt = (long) recipeInfo.getReplyList().size();
+            replyCnt = (long) recipeInfo.getReplies().size();
         }
         return RecipeInfoFindRes.builder()
                 .calogy(recipeInfo.getCalogy())

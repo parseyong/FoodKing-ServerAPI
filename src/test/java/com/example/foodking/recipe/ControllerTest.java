@@ -102,8 +102,8 @@ public class ControllerTest {
 
         this.recipeSaveReq = RecipeSaveReq.builder()
                 .recipeInfoSaveReq(recipeInfoSaveReq)
-                .ingredientAddReqList(ingredientAddReqList)
-                .recipeWayAddReqList(recipeWayAddReqList)
+                .ingredientAddReqs(ingredientAddReqList)
+                .recipeWayAddReqs(recipeWayAddReqList)
                 .build();
     }
 
@@ -151,8 +151,8 @@ public class ControllerTest {
         //given
         makeAuthentication();
         RecipeSaveReq recipeSaveReq = RecipeSaveReq.builder()
-                .ingredientAddReqList(ingredientAddReqList)
-                .recipeWayAddReqList(recipeWayAddReqList)
+                .ingredientAddReqs(ingredientAddReqList)
+                .recipeWayAddReqs(recipeWayAddReqList)
                 .build();
         String requestBody = gson.toJson(recipeSaveReq);
 
@@ -240,8 +240,8 @@ public class ControllerTest {
 
         RecipeSaveReq recipeSaveReq = RecipeSaveReq.builder()
                 .recipeInfoSaveReq(recipeInfoSaveReq)
-                .ingredientAddReqList(ingredientAddReqList)
-                .recipeWayAddReqList(recipeWayAddReqList)
+                .ingredientAddReqs(ingredientAddReqList)
+                .recipeWayAddReqs(recipeWayAddReqList)
                 .build();
 
         String requestbody = gson.toJson(recipeSaveReq);

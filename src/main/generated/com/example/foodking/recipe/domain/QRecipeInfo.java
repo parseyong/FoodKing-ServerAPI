@@ -30,7 +30,7 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final NumberPath<Long> ingredientCost = createNumber("ingredientCost", Long.class);
 
-    public final ListPath<com.example.foodking.ingredient.domain.Ingredient, com.example.foodking.ingredient.domain.QIngredient> ingredientList = this.<com.example.foodking.ingredient.domain.Ingredient, com.example.foodking.ingredient.domain.QIngredient>createList("ingredientList", com.example.foodking.ingredient.domain.Ingredient.class, com.example.foodking.ingredient.domain.QIngredient.class, PathInits.DIRECT2);
+    public final ListPath<com.example.foodking.ingredient.domain.Ingredient, com.example.foodking.ingredient.domain.QIngredient> ingredients = this.<com.example.foodking.ingredient.domain.Ingredient, com.example.foodking.ingredient.domain.QIngredient>createList("ingredients", com.example.foodking.ingredient.domain.Ingredient.class, com.example.foodking.ingredient.domain.QIngredient.class, PathInits.DIRECT2);
 
     public final NumberPath<Long> likeCnt = createNumber("likeCnt", Long.class);
 
@@ -47,12 +47,12 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final StringPath recipeTip = createString("recipeTip");
 
-    public final ListPath<com.example.foodking.recipeWay.domain.RecipeWay, com.example.foodking.recipeWay.domain.QRecipeWay> recipeWayList = this.<com.example.foodking.recipeWay.domain.RecipeWay, com.example.foodking.recipeWay.domain.QRecipeWay>createList("recipeWayList", com.example.foodking.recipeWay.domain.RecipeWay.class, com.example.foodking.recipeWay.domain.QRecipeWay.class, PathInits.DIRECT2);
+    public final ListPath<com.example.foodking.recipeWay.domain.RecipeWay, com.example.foodking.recipeWay.domain.QRecipeWay> recipeWays = this.<com.example.foodking.recipeWay.domain.RecipeWay, com.example.foodking.recipeWay.domain.QRecipeWay>createList("recipeWays", com.example.foodking.recipeWay.domain.RecipeWay.class, com.example.foodking.recipeWay.domain.QRecipeWay.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> regDate = _super.regDate;
 
-    public final ListPath<com.example.foodking.reply.domain.Reply, com.example.foodking.reply.domain.QReply> replyList = this.<com.example.foodking.reply.domain.Reply, com.example.foodking.reply.domain.QReply>createList("replyList", com.example.foodking.reply.domain.Reply.class, com.example.foodking.reply.domain.QReply.class, PathInits.DIRECT2);
+    public final ListPath<com.example.foodking.reply.domain.Reply, com.example.foodking.reply.domain.QReply> replies = this.<com.example.foodking.reply.domain.Reply, com.example.foodking.reply.domain.QReply>createList("replies", com.example.foodking.reply.domain.Reply.class, com.example.foodking.reply.domain.QReply.class, PathInits.DIRECT2);
 
     public final com.example.foodking.user.domain.QUser user;
 

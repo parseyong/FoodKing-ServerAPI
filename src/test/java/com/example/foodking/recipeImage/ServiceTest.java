@@ -74,7 +74,7 @@ public class ServiceTest {
         );
 
         //when
-        recipeImageService.saveImage(newImage,1L,1L);
+        recipeImageService.addImage(newImage,1L,1L);
 
         //then
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
@@ -92,7 +92,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            recipeImageService.saveImage(newImage,1L,1L);
+            recipeImageService.addImage(newImage,1L,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             //then
@@ -113,7 +113,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            recipeImageService.saveImage(newImage,1L,1L);
+            recipeImageService.addImage(newImage,1L,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             //then
@@ -139,7 +139,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            recipeImageService.saveImage(newImage,1L,1L);
+            recipeImageService.addImage(newImage,1L,1L);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             //then

@@ -16,7 +16,7 @@ public enum ExceptionCode {
     LOGIN_FAIL(HttpStatus.BAD_REQUEST,"로그인에 실패하였습니다.",null),
     SMS_AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST,"인증번호가 올바르지 않습니다","authenticationNumber"),
     SMS_NOT_AUTHENTICATION(HttpStatus.BAD_REQUEST,"인증이 되지않은 번호입니다.","phoneNum"),
-    NOT_PHONENUM(HttpStatus.BAD_REQUEST,"올바른 전화번호 형식이 아닙니다","phoneNum"),
+    NOT_PHONENUM_TYPE(HttpStatus.BAD_REQUEST,"올바른 전화번호 형식이 아닙니다","phoneNum"),
     COOLSMS_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"인증시스템에 문제가 발생했습니다",null),
 
     // RECIPE EXCEPTION

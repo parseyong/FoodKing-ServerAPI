@@ -46,7 +46,7 @@ public class CoolSmsService {
     public String sendMessage(String phoneNum){
 
         if(phoneNum.length() > 12 || phoneNum.length() < 8 || !Pattern.matches("\\d+", phoneNum))
-            throw new CommondException(NOT_PHONENUM);
+            throw new CommondException(NOT_PHONENUM_TYPE);
 
         Random randomNum = new Random();
         int authenticationNumber = randomNum.nextInt(0,9999); // 인증번호 생성

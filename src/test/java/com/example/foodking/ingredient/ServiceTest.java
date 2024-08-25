@@ -54,7 +54,7 @@ public class ServiceTest {
                 .build();
 
         //when
-        ingredientService.addIngredient(ingredientAddReqList,recipeInfo);
+        ingredientService.addIngredients(ingredientAddReqList,recipeInfo);
 
         //then
         verify(ingredientRepository,times(1)).saveAll(any(List.class));
@@ -66,16 +66,16 @@ public class ServiceTest {
         //given
         RecipeInfo recipeInfo = RecipeInfo.builder()
                 .recipeName("testName")
-                .ingredientList(new ArrayList<>())
+                .ingredients(new ArrayList<>())
                 .calogy(1L)
                 .build();
 
         //when
-        assertThat(recipeInfo.getIngredientList().size()).isEqualTo(0L);
-        ingredientService.updateIngredientList(ingredientAddReqList, recipeInfo);
+        assertThat(recipeInfo.getIngredients().size()).isEqualTo(0L);
+        ingredientService.updateIngredients(ingredientAddReqList, recipeInfo);
 
         //then
-        assertThat(recipeInfo.getIngredientList().size()).isEqualTo(2L);
+        assertThat(recipeInfo.getIngredients().size()).isEqualTo(2L);
     }
 
     @Test
@@ -93,16 +93,16 @@ public class ServiceTest {
 
         RecipeInfo recipeInfo = RecipeInfo.builder()
                 .recipeName("testName")
-                .ingredientList(new ArrayList<>(List.of(ingredient1,ingredient2)))
+                .ingredients(new ArrayList<>(List.of(ingredient1,ingredient2)))
                 .calogy(1L)
                 .build();
 
         //when
-        assertThat(recipeInfo.getIngredientList().size()).isEqualTo(2L);
-        ingredientService.updateIngredientList(new ArrayList<>(), recipeInfo);
+        assertThat(recipeInfo.getIngredients().size()).isEqualTo(2L);
+        ingredientService.updateIngredients(new ArrayList<>(), recipeInfo);
 
         //then
-        assertThat(recipeInfo.getIngredientList().size()).isEqualTo(0L);
+        assertThat(recipeInfo.getIngredients().size()).isEqualTo(0L);
     }
 
     @Test
@@ -120,19 +120,19 @@ public class ServiceTest {
         
         RecipeInfo recipeInfo = RecipeInfo.builder()
                 .recipeName("testName")
-                .ingredientList( new ArrayList<>(List.of(ingredient1,ingredient2)))
+                .ingredients( new ArrayList<>(List.of(ingredient1,ingredient2)))
                 .calogy(1L)
                 .build();
 
         //when
-        assertThat(recipeInfo.getIngredientList().size()).isEqualTo(2L);
-        ingredientService.updateIngredientList(ingredientAddReqList, recipeInfo);
+        assertThat(recipeInfo.getIngredients().size()).isEqualTo(2L);
+        ingredientService.updateIngredients(ingredientAddReqList, recipeInfo);
 
         //then
-        assertThat(recipeInfo.getIngredientList().size()).isEqualTo(2L);
-        assertThat(recipeInfo.getIngredientList().get(0).getIngredientName()).isEqualTo("재료명1");
-        assertThat(recipeInfo.getIngredientList().get(1).getIngredientName()).isEqualTo("재료명2");
-        assertThat(recipeInfo.getIngredientList().get(0).getIngredientAmount()).isEqualTo("재료수량1");
-        assertThat(recipeInfo.getIngredientList().get(1).getIngredientAmount()).isEqualTo("재료수량2");
+        assertThat(recipeInfo.getIngredients().size()).isEqualTo(2L);
+        assertThat(recipeInfo.getIngredients().get(0).getIngredientName()).isEqualTo("재료명1");
+        assertThat(recipeInfo.getIngredients().get(1).getIngredientName()).isEqualTo("재료명2");
+        assertThat(recipeInfo.getIngredients().get(0).getIngredientAmount()).isEqualTo("재료수량1");
+        assertThat(recipeInfo.getIngredients().get(1).getIngredientAmount()).isEqualTo("재료수량2");
     }
 }

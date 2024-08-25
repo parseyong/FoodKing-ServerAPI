@@ -27,17 +27,17 @@ public class RecipeInfoPaingRepositoryImpl implements RecipeInfoPaingRepository 
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<RecipeInfoFindRes> findRecipeInfoPagingByCondition(BooleanBuilder builder, OrderSpecifier[] orderSpecifier) {
+    public List<RecipeInfoFindRes> findRecipeInfoPagingByCondition(BooleanBuilder builder, OrderSpecifier[] orderSpecifiers) {
 
-        List<Tuple> tupleList = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId)
+        List<Tuple> tuples = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId)
                 .from(recipeInfo)
                 .join(user).on(recipeInfo.user.userId.eq(user.userId))
                 .where(builder)
-                .orderBy(orderSpecifier)
+                .orderBy(orderSpecifiers)
                 .limit(10) //페이지의 크기
                 .fetch();
 
-        return tupleList.stream()
+        return tuples.stream()
                 .map(tuple -> {
                     RecipeInfo recipeInfo = tuple.get(QRecipeInfo.recipeInfo);
                     Long writerUserId = tuple.get(user.userId);
@@ -56,7 +56,7 @@ public class RecipeInfoPaingRepositoryImpl implements RecipeInfoPaingRepository 
     }
 
     @Override
-    public List<RecipeInfoFindRes> findLikedRecipeInfoList(BooleanBuilder builder, OrderSpecifier[] orderSpecifier) {
+    public List<RecipeInfoFindRes> findLikedRecipeInfoPaging(BooleanBuilder builder, OrderSpecifier[] orderSpecifiers) {
 
         /*
             좋아요를 누른 레시피를 가져오는 쿼리에서는 두개의 쿼리로 분리하여 진행했습니다.
@@ -69,23 +69,23 @@ public class RecipeInfoPaingRepositoryImpl implements RecipeInfoPaingRepository 
             성능이 오히려 저하되는 모습이 확인되어 두 개의 쿼리로 분리하여 로직을 수행하도록 했습니다.
         */
 
-        List<Long> likedRecipeInfoIdList = jpaQueryFactory.select(recipeInfo.recipeInfoId).distinct()
+        List<Long> likedRecipeInfoIds = jpaQueryFactory.select(recipeInfo.recipeInfoId).distinct()
                 .from(recipeEmotion)
                 .join(recipeInfo).on(recipeEmotion.recipeInfo.recipeInfoId.eq(recipeInfo.recipeInfoId))
                 .where(builder)
-                .orderBy(orderSpecifier)
+                .orderBy(orderSpecifiers)
                 .limit(10) //페이지의 크기
                 .fetch();
 
-        List<Tuple> tupleList = jpaQueryFactory.select(recipeInfo,user.userId,user.nickName)
+        List<Tuple> tuples = jpaQueryFactory.select(recipeInfo,user.userId,user.nickName)
                 .from(recipeInfo)
                 .join(user).on(recipeInfo.user.userId.eq(user.userId))
-                .where(recipeInfo.recipeInfoId.in(likedRecipeInfoIdList))
-                .orderBy(orderSpecifier)
+                .where(recipeInfo.recipeInfoId.in(likedRecipeInfoIds))
+                .orderBy(orderSpecifiers)
                 .limit(10) //페이지의 크기
                 .fetch();
 
-        return tupleList.stream()
+        return tuples.stream()
                 .map(tuple -> {
                     RecipeInfo recipeInfo = tuple.get(QRecipeInfo.recipeInfo);
                     Long writerUserId = tuple.get(user.userId);

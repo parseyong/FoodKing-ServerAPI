@@ -32,7 +32,7 @@ public class RecipeImageService {
     private final RecipeInfoRepository recipeInfoRepository;
 
     @Transactional
-    public void saveImage(MultipartFile newImage, Long recipeInfoId, Long userId) {
+    public void addImage(MultipartFile newImage, Long recipeInfoId, Long userId) {
         RecipeInfo recipeInfo = findRecipeInfoById(recipeInfoId);
 
         isMyRecipe(userId,recipeInfo.getUser(),ExceptionCode.ACCESS_FAIL_FILE);

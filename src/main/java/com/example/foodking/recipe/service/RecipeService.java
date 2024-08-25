@@ -40,8 +40,8 @@ public class RecipeService {
 
         RecipeInfo recipeInfo = RecipeInfoSaveReq.toEntity(recipeSaveReq.getRecipeInfoSaveReq(),user);
 
-        ingredientService.addIngredient(recipeSaveReq.getIngredientAddReqList(),recipeInfo);
-        recipeWayService.addRecipeWay(recipeSaveReq.getRecipeWayAddReqList(),recipeInfo);
+        ingredientService.addIngredients(recipeSaveReq.getIngredientAddReqs(),recipeInfo);
+        recipeWayService.addRecipeWay(recipeSaveReq.getRecipeWayAddReqs(),recipeInfo);
 
         recipeInfoRepository.save(recipeInfo);
         return recipeInfo.getRecipeInfoId();
@@ -60,10 +60,10 @@ public class RecipeService {
         updateRecipeInfo(recipeInfo, recipeSaveReq.getRecipeInfoSaveReq());
 
         // 조리법 수정
-        recipeWayService.updateRecipeWayList( recipeSaveReq.getRecipeWayAddReqList(), recipeInfo );
+        recipeWayService.updateRecipeWayList( recipeSaveReq.getRecipeWayAddReqs(), recipeInfo );
 
         // 재료 수정
-        ingredientService.updateIngredientList( recipeSaveReq.getIngredientAddReqList(), recipeInfo );
+        ingredientService.updateIngredients( recipeSaveReq.getIngredientAddReqs(), recipeInfo );
 
         recipeInfoRepository.save(recipeInfo);
     }

@@ -19,41 +19,41 @@ public class IngredientService {
     private final IngredientRepository ingredientRepository;
 
     @Transactional
-    public void addIngredient(List<IngredientAddReq> ingredientAddReqList, RecipeInfo recipeInfo){
+    public void addIngredients(List<IngredientAddReq> ingredientAddReqs, RecipeInfo recipeInfo){
 
-        List<Ingredient> ingredientList = ingredientAddReqList.stream()
+        List<Ingredient> ingredients = ingredientAddReqs.stream()
                 .map(dto -> IngredientAddReq.toEntity(dto, recipeInfo))
                 .collect(Collectors.toList());
 
-        ingredientRepository.saveAll(ingredientList);
+        ingredientRepository.saveAll(ingredients);
     }
 
     @Transactional
-    public void updateIngredientList(List<IngredientAddReq> ingredientAddReqList, RecipeInfo recipeInfo){
+    public void updateIngredients(List<IngredientAddReq> ingredientAddReqs, RecipeInfo recipeInfo){
 
-        List<Ingredient> ingredientList = recipeInfo.getIngredientList();
-        int minSize = Math.min(ingredientAddReqList.size(), ingredientList.size());
+        List<Ingredient> ingredients = recipeInfo.getIngredients();
+        int minSize = Math.min(ingredientAddReqs.size(), ingredients.size());
 
         // 기존 재료 업데이트
         IntStream.range(0,minSize)
                 .forEach(i ->{
-                    Ingredient ingredient = ingredientList.get(i);
-                    IngredientAddReq newInfo = ingredientAddReqList.get(i);
+                    Ingredient ingredient = ingredients.get(i);
+                    IngredientAddReq newInfo = ingredientAddReqs.get(i);
                     ingredient.updateIngredientName(newInfo.getIngredientName());
                     ingredient.updateIngredientAmount(newInfo.getIngredientAmount());
                 });
 
         // 재료가 추가된 경우
-        IntStream.range(minSize, ingredientAddReqList.size())
+        IntStream.range(minSize, ingredientAddReqs.size())
                 .forEach(i -> {
-                    Ingredient ingredient = IngredientAddReq.toEntity(ingredientAddReqList.get(i),recipeInfo);
-                    ingredientList.add(ingredient);
+                    Ingredient ingredient = IngredientAddReq.toEntity(ingredientAddReqs.get(i),recipeInfo);
+                    ingredients.add(ingredient);
                 });
 
         // 재료가 줄어든 경우
-        IntStream.range(ingredientAddReqList.size(),ingredientList.size())
+        IntStream.range(ingredientAddReqs.size(),ingredients.size())
                 .forEach(i -> {
-                    ingredientList.remove(minSize);
+                    ingredients.remove(minSize);
                 });
     }
 }

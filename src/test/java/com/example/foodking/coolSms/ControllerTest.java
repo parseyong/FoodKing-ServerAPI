@@ -64,7 +64,7 @@ public class ControllerTest {
     public void sendMessageFail1() throws Exception {
         //given
         given(coolSmsService.sendMessage(any(String.class)))
-                .willThrow(new CommondException(ExceptionCode.NOT_PHONENUM));
+                .willThrow(new CommondException(ExceptionCode.NOT_PHONENUM_TYPE));
 
         //when,then
         this.mockMvc.perform(post("/message/send")

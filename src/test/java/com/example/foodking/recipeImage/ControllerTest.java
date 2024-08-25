@@ -70,7 +70,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("이미지 등록완료"));
 
         verify(recipeImageService,times(1))
-                .saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+                .addImage(any(MultipartFile.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"));
 
         verify(recipeImageService,times(0))
-                .saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+                .addImage(any(MultipartFile.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."));
 
         verify(recipeImageService,times(0))
-                .saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+                .addImage(any(MultipartFile.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -135,7 +135,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
 
         verify(recipeImageService,times(0))
-                .saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+                .addImage(any(MultipartFile.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -148,7 +148,7 @@ public class ControllerTest {
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
         doThrow(new CommondException(ExceptionCode.FILE_IOEXCEPTION))
-                .when(recipeImageService).saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+                .when(recipeImageService).addImage(any(MultipartFile.class),any(Long.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(multipart("/recipes/{recipeInfoId}/image", 1L)
@@ -160,7 +160,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.recipeImage").value("파일 저장중 문제가 발생했습니다."));
 
         verify(recipeImageService,times(1))
-                .saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+                .addImage(any(MultipartFile.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -170,7 +170,7 @@ public class ControllerTest {
         //given
         makeAuthentication();
         doThrow(new CommondException(ExceptionCode.INVALID_SAVE_FILE))
-                .when(recipeImageService).saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+                .when(recipeImageService).addImage(any(MultipartFile.class),any(Long.class),any(Long.class));
 
         MockMultipartFile newImage = new MockMultipartFile(
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
@@ -186,7 +186,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data.recipeImage").value("등록할 파일이 존재하지 않습니다. 파일을 추가해주세요."));
 
         verify(recipeImageService,times(1))
-                .saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+                .addImage(any(MultipartFile.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -199,7 +199,7 @@ public class ControllerTest {
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO))
-                .when(recipeImageService).saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+                .when(recipeImageService).addImage(any(MultipartFile.class),any(Long.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(multipart("/recipes/{recipeInfoId}/image", 1L)
@@ -211,7 +211,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data").isEmpty());
 
         verify(recipeImageService,times(1))
-                .saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+                .addImage(any(MultipartFile.class),any(Long.class),any(Long.class));
     }
 
     @Test
@@ -224,7 +224,7 @@ public class ControllerTest {
                 "recipeImage", "testImage.png", "image/png", "test image content".getBytes()
         );
         doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_FILE))
-                .when(recipeImageService).saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+                .when(recipeImageService).addImage(any(MultipartFile.class),any(Long.class),any(Long.class));
 
         //when, then
         this.mockMvc.perform(multipart("/recipes/{recipeInfoId}/image", 1L)
@@ -236,7 +236,7 @@ public class ControllerTest {
                 .andExpect(jsonPath("$.data").isEmpty());
 
         verify(recipeImageService,times(1))
-                .saveImage(any(MultipartFile.class),any(Long.class),any(Long.class));
+                .addImage(any(MultipartFile.class),any(Long.class),any(Long.class));
     }
 
     @Test

@@ -46,12 +46,12 @@ public class RecipeCachingService {
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
 
         // 조리법 리스트 가져오기
-        List<RecipeWayFindRes> recipeWayFindResList = recipeInfo.getRecipeWayList().stream()
+        List<RecipeWayFindRes> recipeWayFindResList = recipeInfo.getRecipeWays().stream()
                 .map(entity -> RecipeWayFindRes.toDTO(entity))
                 .collect(Collectors.toList());
 
         // 재료 리스트 가져오기
-        List<IngredientFindRes> ingredientFindResList = recipeInfo.getIngredientList().stream()
+        List<IngredientFindRes> ingredientFindResList = recipeInfo.getIngredients().stream()
                 .map(entity -> IngredientFindRes.toDTO(entity))
                 .collect(Collectors.toList());
 
