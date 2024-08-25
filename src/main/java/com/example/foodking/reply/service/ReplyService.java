@@ -49,14 +49,14 @@ public class ReplyService {
         return replyRepository.save(reply).getReplyId();
     }
 
-    public List<ReplyFindRes> findReplyList(Long recipeId, Long userId,
-                                            ReplySortType replySortType,
-                                            Long lastId, Object lastValue,
-                                            boolean isFirstPage){
+    public List<ReplyFindRes> findReplyPaging(Long recipeId, Long userId,
+                                              ReplySortType replySortType,
+                                              Long lastId, Object lastValue,
+                                              boolean isFirstPage){
 
-        List<ReplyFindRes> replyResList = replyRepository.findReplyList(
+        List<ReplyFindRes> replyResList = replyRepository.findReplyPaging(
                 getBuilder(recipeId, replySortType, lastId, lastValue),
-                createOrderSpecifier(replySortType),
+                createOrderSpecifiers(replySortType),
                 userId);
 
         if(replyResList.size() == 0 && !isFirstPage)
@@ -70,7 +70,7 @@ public class ReplyService {
 
         Reply reply = findReplyById(replyId);
 
-        if(!isMyReply(userId,reply.getUser()))
+        if(!isMyReply(userId, reply.getUser()))
             throw new CommondException(ExceptionCode.ACCESS_FAIL_REPLY);;
         replyRepository.delete(reply);
     }
@@ -118,7 +118,7 @@ public class ReplyService {
     }
 
     // 정렬 조건을 동적으로 생성하는 메소드
-    private OrderSpecifier[] createOrderSpecifier(ReplySortType replySortType) {
+    private OrderSpecifier[] createOrderSpecifiers(ReplySortType replySortType) {
 
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
 

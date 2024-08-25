@@ -7,7 +7,7 @@ import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.controller.UserController;
 import com.example.foodking.user.dto.request.*;
 import com.example.foodking.user.dto.response.LoginTokenRes;
-import com.example.foodking.user.dto.response.UserReadRes;
+import com.example.foodking.user.dto.response.UserFindRes;
 import com.example.foodking.user.service.UserService;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
@@ -674,13 +674,13 @@ public class ControllerTest {
     public void readUserInfoSuccess() throws Exception {
         //given
         makeAuthentication();
-        UserReadRes userReadRes = UserReadRes.builder()
+        UserFindRes userFindRes = UserFindRes.builder()
                 .nickName("nickName")
                 .phoneNum("01056962173")
                 .email("test@google.com")
                 .build();
 
-        given(userService.findUser(any(Long.class))).willReturn(userReadRes);
+        given(userService.findUser(any(Long.class))).willReturn(userFindRes);
 
         //when,then
         this.mockMvc.perform(get("/users")
@@ -699,13 +699,13 @@ public class ControllerTest {
     @DisplayName("유저정보 조회 테스트 -> (조회 실패 : 인증 실패)")
     public void readUserInfoFail1() throws Exception {
         //given
-        UserReadRes userReadRes = UserReadRes.builder()
+        UserFindRes userFindRes = UserFindRes.builder()
                 .nickName("nickName")
                 .phoneNum("01056962173")
                 .email("test@google.com")
                 .build();
 
-        given(userService.findUser(any(Long.class))).willReturn(userReadRes);
+        given(userService.findUser(any(Long.class))).willReturn(userFindRes);
 
         //when,then
         this.mockMvc.perform(get("/users")

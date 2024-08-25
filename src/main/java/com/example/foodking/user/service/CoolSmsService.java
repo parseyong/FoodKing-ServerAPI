@@ -3,6 +3,7 @@ package com.example.foodking.user.service;
 import com.example.foodking.common.RedissonPrefix;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.user.dto.request.AuthNumberCheckReq;
+import com.example.foodking.util.AuthNumberGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.java_sdk.api.Message;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -48,8 +48,7 @@ public class CoolSmsService {
         if(phoneNum.length() > 12 || phoneNum.length() < 8 || !Pattern.matches("\\d+", phoneNum))
             throw new CommondException(NOT_PHONENUM_TYPE);
 
-        Random randomNum = new Random();
-        int authenticationNumber = randomNum.nextInt(0,9999); // 인증번호 생성
+        int authenticationNumber = AuthNumberGenerator.createAuthNumber();
 
         HashMap<String, String> params = new HashMap<>();
         params.put("to", phoneNum);    // 수신전화번호

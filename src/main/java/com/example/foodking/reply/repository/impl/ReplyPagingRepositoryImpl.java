@@ -24,19 +24,19 @@ public class ReplyPagingRepositoryImpl implements ReplyPagingRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<ReplyFindRes> findReplyList(BooleanBuilder builder, OrderSpecifier[] orderSpecifier, Long userId) {
-        List<Tuple> tupleList = jpaQueryFactory.select(reply, user.userId, user.nickName)
+    public List<ReplyFindRes> findReplyPaging(BooleanBuilder builder, OrderSpecifier[] orderSpecifiers, Long userId) {
+        List<Tuple> tuples = jpaQueryFactory.select(reply, user.userId, user.nickName)
                 .from(reply)
                 .join(user).on(reply.user.userId.eq(user.userId))
                 .where(builder)
-                .orderBy(orderSpecifier)
+                .orderBy(orderSpecifiers)
                 .limit(10)
                 .fetch();
 
-        return tupleList.stream()
+        return tuples.stream()
                 .map(tuple -> {
                     boolean isMyReply = userId == tuple.get(user.userId);
-                    return ReplyFindRes.toDTO(tuple.get(reply),tuple.get(user.nickName),isMyReply);
+                    return ReplyFindRes.toDTO(tuple.get(reply), tuple.get(user.nickName), isMyReply);
                 })
                 .collect(Collectors.toList());
     }

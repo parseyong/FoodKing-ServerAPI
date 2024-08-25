@@ -19,32 +19,32 @@ public class RecipeWayService {
     private final RecipeWayRepository recipeWayRepository;
 
     @Transactional
-    public void addRecipeWay(List<RecipeWayAddReq> recipeWayAddReqList, RecipeInfo recipeInfo){
+    public void addRecipeWays(List<RecipeWayAddReq> recipeWayAddReqs, RecipeInfo recipeInfo){
 
-        List<RecipeWay> recipeWayList = recipeWayAddReqList.stream()
+        List<RecipeWay> recipeWays = recipeWayAddReqs.stream()
                 .map(dto -> RecipeWayAddReq.toEntity(dto,recipeInfo))
                 .collect(Collectors.toList());
 
-        recipeWayRepository.saveAll(recipeWayList);
+        recipeWayRepository.saveAll(recipeWays);
     }
 
     @Transactional
-    public void updateRecipeWayList(List<RecipeWayAddReq> recipeWayAddReqList, RecipeInfo recipeInfo){
+    public void updateRecipeWays(List<RecipeWayAddReq> recipeWayAddReqs, RecipeInfo recipeInfo){
 
-        List<RecipeWay> recipeWayList = recipeInfo.getRecipeWays();
-        int minSize = Math.min(recipeWayAddReqList.size(), recipeWayList.size());
+        List<RecipeWay> recipeWays = recipeInfo.getRecipeWays();
+        int minSize = Math.min(recipeWayAddReqs.size(), recipeWays.size());
 
         // 기존 조리순서 업데이트
         IntStream.range(0, minSize)
-                .forEach(i -> recipeWayList.get(i).updateRecipeWay(recipeWayAddReqList.get(i).getRecipeWay()));
+                .forEach(i -> recipeWays.get(i).updateRecipeWay(recipeWayAddReqs.get(i).getRecipeWay()));
 
         // 조리순서가 추가된 경우
-        IntStream.range(minSize, recipeWayAddReqList.size())
-                .forEach(i -> recipeWayList.add(RecipeWayAddReq.toEntity(recipeWayAddReqList.get(i), recipeInfo)));
+        IntStream.range(minSize, recipeWayAddReqs.size())
+                .forEach(i -> recipeWays.add(RecipeWayAddReq.toEntity(recipeWayAddReqs.get(i), recipeInfo)));
 
         // 조리순서가 줄어든 경우
-        IntStream.range(recipeWayAddReqList.size(), recipeWayList.size())
-                .forEach(i -> recipeWayList.remove(minSize));
+        IntStream.range(recipeWayAddReqs.size(), recipeWays.size())
+                .forEach(i -> recipeWays.remove(minSize));
 
     }
 }

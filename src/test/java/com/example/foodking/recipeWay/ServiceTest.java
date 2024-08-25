@@ -28,7 +28,7 @@ public class ServiceTest {
     private RecipeWayService recipeWayService;
     @Mock
     private RecipeWayRepository recipeWayRepository;
-    private List<RecipeWayAddReq> recipeWayAddReqList;
+    private List<RecipeWayAddReq> recipeWayAddReqs;
 
     @BeforeEach
     void beforeEach(){
@@ -41,7 +41,7 @@ public class ServiceTest {
                 .recipeWay("조리법2 수정후")
                 .build();
 
-        this.recipeWayAddReqList = new ArrayList<>(List.of(recipeWayAddReq1, recipeWayAddReq2));
+        this.recipeWayAddReqs = new ArrayList<>(List.of(recipeWayAddReq1, recipeWayAddReq2));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class ServiceTest {
                 .build();
 
         //when
-        recipeWayService.addRecipeWay(recipeWayAddReqList,recipeInfo);
+        recipeWayService.addRecipeWays(recipeWayAddReqs,recipeInfo);
 
         //then
         verify(recipeWayRepository,times(1)).saveAll(any(List.class));
@@ -81,7 +81,7 @@ public class ServiceTest {
 
         //when
         assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(2L);
-        recipeWayService.updateRecipeWayList(new ArrayList<>(),recipeInfo);
+        recipeWayService.updateRecipeWays(new ArrayList<>(),recipeInfo);
 
         //then
         assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(0L);
@@ -108,7 +108,7 @@ public class ServiceTest {
 
         //when
         assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(2L);
-        recipeWayService.updateRecipeWayList(recipeWayAddReqList, recipeInfo);
+        recipeWayService.updateRecipeWays(recipeWayAddReqs, recipeInfo);
 
         //then
         assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(2L);
@@ -128,7 +128,7 @@ public class ServiceTest {
 
         //when
         assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(0L);
-        recipeWayService.updateRecipeWayList(recipeWayAddReqList,recipeInfo);
+        recipeWayService.updateRecipeWays(recipeWayAddReqs,recipeInfo);
 
         //then
         assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(2L);

@@ -29,7 +29,7 @@ public class RecipeInfoPaingRepositoryImpl implements RecipeInfoPaingRepository 
     @Override
     public List<RecipeInfoFindRes> findRecipeInfoPagingByCondition(BooleanBuilder builder, OrderSpecifier[] orderSpecifiers) {
 
-        List<Tuple> tuples = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId)
+        List<Tuple> tuples = jpaQueryFactory.select(recipeInfo, user.nickName, user.userId)
                 .from(recipeInfo)
                 .join(user).on(recipeInfo.user.userId.eq(user.userId))
                 .where(builder)
@@ -42,7 +42,7 @@ public class RecipeInfoPaingRepositoryImpl implements RecipeInfoPaingRepository 
                     RecipeInfo recipeInfo = tuple.get(QRecipeInfo.recipeInfo);
                     Long writerUserId = tuple.get(user.userId);
                     String writerNickName = tuple.get(user.nickName);
-                    return RecipeInfoFindRes.toDTO(recipeInfo,writerUserId,writerNickName);
+                    return RecipeInfoFindRes.toDTO(recipeInfo, writerUserId, writerNickName);
                 })
                 .collect(Collectors.toList());
     }
@@ -77,7 +77,7 @@ public class RecipeInfoPaingRepositoryImpl implements RecipeInfoPaingRepository 
                 .limit(10) //페이지의 크기
                 .fetch();
 
-        List<Tuple> tuples = jpaQueryFactory.select(recipeInfo,user.userId,user.nickName)
+        List<Tuple> tuples = jpaQueryFactory.select(recipeInfo, user.userId, user.nickName)
                 .from(recipeInfo)
                 .join(user).on(recipeInfo.user.userId.eq(user.userId))
                 .where(recipeInfo.recipeInfoId.in(likedRecipeInfoIds))
@@ -90,7 +90,7 @@ public class RecipeInfoPaingRepositoryImpl implements RecipeInfoPaingRepository 
                     RecipeInfo recipeInfo = tuple.get(QRecipeInfo.recipeInfo);
                     Long writerUserId = tuple.get(user.userId);
                     String writerNickName = tuple.get(user.nickName);
-                    return RecipeInfoFindRes.toDTO(recipeInfo,writerUserId,writerNickName);
+                    return RecipeInfoFindRes.toDTO(recipeInfo, writerUserId, writerNickName);
                 })
                 .collect(Collectors.toList());
     }
@@ -108,14 +108,13 @@ public class RecipeInfoPaingRepositoryImpl implements RecipeInfoPaingRepository 
 
     @Override
     public RecipeInfoFindRes findRecipeInfo(Long recipeinfoId) {
-        Tuple tuple = jpaQueryFactory.select(recipeInfo,user.nickName,user.userId)
+        Tuple tuple = jpaQueryFactory.select(recipeInfo, user.nickName, user.userId)
                 .from(recipeInfo)
                 .join(user).on(recipeInfo.user.userId.eq(user.userId))
                 .where(recipeInfo.recipeInfoId.eq(recipeinfoId))
                 .fetchOne();
 
-        return RecipeInfoFindRes.toDTO
-                (tuple.get(recipeInfo),tuple.get(user.userId),tuple.get(user.nickName));
+        return RecipeInfoFindRes.toDTO(tuple.get(recipeInfo), tuple.get(user.userId), tuple.get(user.nickName));
     }
 
 }

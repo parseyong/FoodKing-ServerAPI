@@ -2,7 +2,7 @@ package com.example.foodking.user.controller;
 
 import com.example.foodking.common.CommonResDTO;
 import com.example.foodking.user.dto.request.*;
-import com.example.foodking.user.dto.response.UserReadRes;
+import com.example.foodking.user.dto.response.UserFindRes;
 import com.example.foodking.user.service.UserService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -75,8 +75,8 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<CommonResDTO> findUser(@AuthenticationPrincipal final Long userId){
 
-        UserReadRes userReadRes = userService.findUser(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 조회 성공", userReadRes));
+        UserFindRes userFindRes = userService.findUser(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 조회 성공", userFindRes));
     }
 
     @PatchMapping("/users")

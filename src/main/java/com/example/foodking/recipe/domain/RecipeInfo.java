@@ -74,8 +74,9 @@ public class RecipeInfo extends TimeEntity {
     private List<Ingredient> ingredients;
 
     @Builder
-    private RecipeInfo(String recipeName, RecipeInfoType recipeInfoType, Long ingredientCost, Long cookingTime, Long calogy, String recipeTip,
-                       User user, List<RecipeWay> recipeWays, List<Ingredient> ingredients){
+    private RecipeInfo(String recipeName, RecipeInfoType recipeInfoType, Long ingredientCost,
+                       Long cookingTime, Long calogy, String recipeTip, User user,
+                       List<RecipeWay> recipeWays, List<Ingredient> ingredients){
         this.recipeName=recipeName;
         this.recipeInfoType=recipeInfoType;
         this.ingredientCost=ingredientCost;

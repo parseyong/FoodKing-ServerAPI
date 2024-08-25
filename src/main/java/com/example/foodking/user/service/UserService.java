@@ -6,7 +6,7 @@ import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.domain.User;
 import com.example.foodking.user.dto.request.*;
 import com.example.foodking.user.dto.response.LoginTokenRes;
-import com.example.foodking.user.dto.response.UserReadRes;
+import com.example.foodking.user.dto.response.UserFindRes;
 import com.example.foodking.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.RandomStringUtils;
@@ -128,9 +128,9 @@ public class UserService {
         return tempPassword;
     }
 
-    public UserReadRes findUser(Long userId){
+    public UserFindRes findUser(Long userId){
         User user = findUserById(userId);
-        return UserReadRes.toDTO(user);
+        return UserFindRes.toDTO(user);
     }
 
     @Transactional

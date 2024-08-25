@@ -29,6 +29,7 @@ public class DistributedLockTest {
 
     @Test
     @Disabled
+    // 비용이 높은 테스트이기 떄문에 CI-CD중에 테스트를 하지 않기위해 비활성화했습니다. 필요 시 수동으로 테스트하세요.
     void 동시성100명_테스트() throws InterruptedException {
         int numberOfThreads = 100;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);

@@ -101,7 +101,7 @@ public class RecipeServiceTest {
         verify(userRepository,times(1)).findById(any(Long.class));
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
         verify(ingredientService,times(1)).addIngredients(any(),any(RecipeInfo.class));
-        verify(recipeWayService,times(1)).addRecipeWay(any(),any(RecipeInfo.class));
+        verify(recipeWayService,times(1)).addRecipeWays(any(),any(RecipeInfo.class));
     }
 
     @Test
@@ -118,7 +118,7 @@ public class RecipeServiceTest {
             verify(userRepository,times(1)).findById(any(Long.class));
             verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
             verify(ingredientService,times(0)).addIngredients(any(),any(RecipeInfo.class));
-            verify(recipeWayService,times(0)).addRecipeWay(any(),any(RecipeInfo.class));
+            verify(recipeWayService,times(0)).addRecipeWays(any(),any(RecipeInfo.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
         }
     }
@@ -140,7 +140,7 @@ public class RecipeServiceTest {
         verify(recipeInfoRepository,times(1)).findById(any(Long.class));
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
         verify(ingredientService,times(1)).updateIngredients(any(),any(RecipeInfo.class));
-        verify(recipeWayService,times(1)).updateRecipeWayList(any(),any(RecipeInfo.class));
+        verify(recipeWayService,times(1)).updateRecipeWays(any(),any(RecipeInfo.class));
         assertThat(recipeInfo.getRecipeName()).isEqualTo("테스트레시피 이름");
         assertThat(recipeInfo.getRecipeTip()).isEqualTo("테스트레시피 팁");
         assertThat(recipeInfo.getCalogy()).isEqualTo(10L);
@@ -162,7 +162,7 @@ public class RecipeServiceTest {
             verify(recipeInfoRepository,times(1)).findById(any(Long.class));
             verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
             verify(ingredientService,times(0)).updateIngredients(any(),any(RecipeInfo.class));
-            verify(recipeWayService,times(0)).updateRecipeWayList(any(),any(RecipeInfo.class));
+            verify(recipeWayService,times(0)).updateRecipeWays(any(),any(RecipeInfo.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.ACCESS_FAIL_RECIPE);
         }
     }
@@ -181,7 +181,7 @@ public class RecipeServiceTest {
             verify(recipeInfoRepository,times(1)).findById(any(Long.class));
             verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
             verify(ingredientService,times(0)).updateIngredients(any(),any(RecipeInfo.class));
-            verify(recipeWayService,times(0)).updateRecipeWayList(any(),any(RecipeInfo.class));
+            verify(recipeWayService,times(0)).updateRecipeWays(any(),any(RecipeInfo.class));
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_RECIPEINFO);
         }
     }
@@ -246,19 +246,21 @@ public class RecipeServiceTest {
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         given(recipeCachingService.findRecipeByCache(any(Long.class),any(Boolean.class))).willReturn(RecipeFindRes.builder()
-                        .recipeInfoFindRes(RecipeInfoFindRes.builder().build())
+                        .recipeInfoFindRes(recipeInfoFindRes)
                         .recipeWayFindResList(new ArrayList<>())
                         .ingredientFindResList(new ArrayList<>())
                         .build());
 
         //when
-        recipeService.findRecipe(1L,1L, ReplySortType.LIKE,null,null);
+        RecipeFindRes recipeFindRes = (RecipeFindRes) recipeService.findRecipe
+                (1L,1L, ReplySortType.LIKE,null,null);
 
         //then
         verify(replyService,times(1))
-                .findReplyList(any(Long.class),any(Long.class), any(ReplySortType.class),any(),any(),any(Boolean.class));
+                .findReplyPaging(any(Long.class),any(Long.class), any(ReplySortType.class),any(),any(),any(Boolean.class));
         verify(recipeInfoRepository,times(1)).findById(any(Long.class));
         verify(recipeInfoRepository,times(1)).save(any(RecipeInfo.class));
+        assertThat(recipeFindRes.getRecipeInfoFindRes().getWriterNickName()).isEqualTo("writerNickName");
     }
 
     @Test
@@ -271,7 +273,7 @@ public class RecipeServiceTest {
 
         //then
         verify(replyService,times(1))
-                .findReplyList(any(Long.class),any(Long.class), any(ReplySortType.class),any(Long.class),any(),any(Boolean.class));
+                .findReplyPaging(any(Long.class),any(Long.class), any(ReplySortType.class),any(Long.class),any(),any(Boolean.class));
         verify(recipeInfoRepository,times(0)).findRecipeInfo(any(Long.class));
         verify(recipeInfoRepository,times(0)).save(any(RecipeInfo.class));
     }

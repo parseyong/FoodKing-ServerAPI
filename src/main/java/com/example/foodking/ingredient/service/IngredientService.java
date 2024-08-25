@@ -46,7 +46,7 @@ public class IngredientService {
         // 재료가 추가된 경우
         IntStream.range(minSize, ingredientAddReqs.size())
                 .forEach(i -> {
-                    Ingredient ingredient = IngredientAddReq.toEntity(ingredientAddReqs.get(i),recipeInfo);
+                    Ingredient ingredient = IngredientAddReq.toEntity(ingredientAddReqs.get(i), recipeInfo);
                     ingredients.add(ingredient);
                 });
 

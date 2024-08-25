@@ -40,7 +40,7 @@ public class User implements UserDetails {
     private String roleName;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
-    private List<RecipeInfo> recipeInfoList;
+    private List<RecipeInfo> recipeInfos;
 
     @Builder
     private User(String email, String password, String nickName, String phoneNum){

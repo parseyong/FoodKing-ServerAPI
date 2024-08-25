@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface ReplyPagingRepository {
 
-    List<ReplyFindRes> findReplyList(BooleanBuilder builder, OrderSpecifier[] orderSpecifier, Long userId);
+    List<ReplyFindRes> findReplyPaging(BooleanBuilder builder, OrderSpecifier[] orderSpecifiers, Long userId);
 }

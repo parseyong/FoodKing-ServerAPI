@@ -38,10 +38,10 @@ public class RecipeService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
 
-        RecipeInfo recipeInfo = RecipeInfoSaveReq.toEntity(recipeSaveReq.getRecipeInfoSaveReq(),user);
+        RecipeInfo recipeInfo = RecipeInfoSaveReq.toEntity(recipeSaveReq.getRecipeInfoSaveReq(), user);
 
-        ingredientService.addIngredients(recipeSaveReq.getIngredientAddReqs(),recipeInfo);
-        recipeWayService.addRecipeWay(recipeSaveReq.getRecipeWayAddReqs(),recipeInfo);
+        ingredientService.addIngredients(recipeSaveReq.getIngredientAddReqs(), recipeInfo);
+        recipeWayService.addRecipeWays(recipeSaveReq.getRecipeWayAddReqs(), recipeInfo);
 
         recipeInfoRepository.save(recipeInfo);
         return recipeInfo.getRecipeInfoId();
@@ -54,13 +54,13 @@ public class RecipeService {
         RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
 
-        isMyRecipe(userId,recipeInfo.getUser(),ExceptionCode.ACCESS_FAIL_RECIPE);
+        isMyRecipe(userId, recipeInfo.getUser(), ExceptionCode.ACCESS_FAIL_RECIPE);
 
         // 레시피 정보수정
         updateRecipeInfo(recipeInfo, recipeSaveReq.getRecipeInfoSaveReq());
 
         // 조리법 수정
-        recipeWayService.updateRecipeWayList( recipeSaveReq.getRecipeWayAddReqs(), recipeInfo );
+        recipeWayService.updateRecipeWays( recipeSaveReq.getRecipeWayAddReqs(), recipeInfo );
 
         // 재료 수정
         ingredientService.updateIngredients( recipeSaveReq.getIngredientAddReqs(), recipeInfo );
@@ -74,7 +74,7 @@ public class RecipeService {
         RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
 
-        isMyRecipe(userId,recipeInfo.getUser(),ExceptionCode.ACCESS_FAIL_RECIPE);
+        isMyRecipe(userId, recipeInfo.getUser(), ExceptionCode.ACCESS_FAIL_RECIPE);
         recipeInfoRepository.delete(recipeInfo);
     }
 
@@ -86,13 +86,13 @@ public class RecipeService {
         // 만약 첫번째 페이지를 요청했다면 레시피정보를 가져와야하지만
         // 첫번째 페이지가 아니라면 레시피정보를 가져올 필요가 없이 댓글정보만 가져오면 된다.
         if(lastId != null && lastValue != null)
-            return replyService.findReplyList(recipeInfoId, userId, replySortType, lastId, lastValue, false);
+            return replyService.findReplyPaging(recipeInfoId, userId, replySortType, lastId, lastValue, false);
 
         RecipeFindRes recipeFindRes = (RecipeFindRes) recipeCachingService.findRecipeByCache(recipeInfoId,true);
 
         // 댓글 페이징 조회
         List<ReplyFindRes> replyFindResList = replyService
-                .findReplyList(recipeInfoId, userId, replySortType, lastId, lastValue,true);
+                .findReplyPaging(recipeInfoId, userId, replySortType, lastId, lastValue,true);
 
         RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeInfoId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));

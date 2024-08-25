@@ -98,7 +98,7 @@ public class ControllerTest {
 
     @Test
     @DisplayName("문자보내기 테스트 -> (실패 : 입력값 공백)")
-    public void sendMessageFail4() throws Exception {
+    public void sendMessageFail3() throws Exception {
         //given
 
         //when,then

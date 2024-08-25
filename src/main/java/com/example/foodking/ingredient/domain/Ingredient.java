@@ -29,7 +29,7 @@ public class Ingredient {
     private RecipeInfo recipeInfo;
 
     @Builder
-    private Ingredient(String ingredientName,String ingredientAmount, RecipeInfo recipeInfo){
+    private Ingredient(String ingredientName, String ingredientAmount, RecipeInfo recipeInfo){
         this.ingredientName=ingredientName;
         this.ingredientAmount=ingredientAmount;
         this.recipeInfo=recipeInfo;

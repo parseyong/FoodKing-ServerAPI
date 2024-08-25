@@ -28,7 +28,7 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath phoneNum = createString("phoneNum");
 
-    public final ListPath<com.example.foodking.recipe.domain.RecipeInfo, com.example.foodking.recipe.domain.QRecipeInfo> recipeInfoList = this.<com.example.foodking.recipe.domain.RecipeInfo, com.example.foodking.recipe.domain.QRecipeInfo>createList("recipeInfoList", com.example.foodking.recipe.domain.RecipeInfo.class, com.example.foodking.recipe.domain.QRecipeInfo.class, PathInits.DIRECT2);
+    public final ListPath<com.example.foodking.recipe.domain.RecipeInfo, com.example.foodking.recipe.domain.QRecipeInfo> recipeInfos = this.<com.example.foodking.recipe.domain.RecipeInfo, com.example.foodking.recipe.domain.QRecipeInfo>createList("recipeInfos", com.example.foodking.recipe.domain.RecipeInfo.class, com.example.foodking.recipe.domain.QRecipeInfo.class, PathInits.DIRECT2);
 
     public final StringPath roleName = createString("roleName");
 

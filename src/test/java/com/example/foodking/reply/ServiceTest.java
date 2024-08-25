@@ -20,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,8 +46,6 @@ public class ServiceTest {
     private User user;
     private RecipeInfo recipeInfo;
     private Reply reply;
-
-    private List<Reply> replyList = new ArrayList<>();
 
     @BeforeEach
     void beforeEach(){
@@ -128,14 +125,14 @@ public class ServiceTest {
     @DisplayName("댓글 조회 테스트 -> 성공")
     public void readReplySuccess(){
         //given
-        given(replyRepository.findReplyList(any(),any(),any(Long.class)))
+        given(replyRepository.findReplyPaging(any(),any(),any(Long.class)))
                 .willReturn(List.of(ReplyFindRes.toDTO(reply,"test",true)));
 
         //when
-        replyService.findReplyList(1L,1L, ReplySortType.LIKE,1L,12,false);
+        replyService.findReplyPaging(1L,1L, ReplySortType.LIKE,1L,12,false);
 
         //then
-        verify(replyRepository,times(1)).findReplyList(any(),any(),any(Long.class));
+        verify(replyRepository,times(1)).findReplyPaging(any(),any(),any(Long.class));
     }
 
     @Test
@@ -145,11 +142,11 @@ public class ServiceTest {
 
         //when,then
         try{
-            replyService.findReplyList(1L,1L, ReplySortType.LIKE,1L,12,false);
+            replyService.findReplyPaging(1L,1L, ReplySortType.LIKE,1L,12,false);
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_PAGE);
-            verify(replyRepository,times(1)).findReplyList(any(),any(),any(Long.class));
+            verify(replyRepository,times(1)).findReplyPaging(any(),any(),any(Long.class));
         }
     }
 

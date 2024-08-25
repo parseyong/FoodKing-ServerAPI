@@ -62,8 +62,8 @@ public class ControllerTest {
     private JwtProvider jwtProvider;
     @Autowired
     private MockMvc mockMvc;
-    private List<IngredientAddReq> ingredientAddReqList;
-    private List<RecipeWayAddReq> recipeWayAddReqList;
+    private List<IngredientAddReq> ingredientAddReqs;
+    private List<RecipeWayAddReq> recipeWayAddReqs;
     private RecipeSaveReq recipeSaveReq;
     private RecipeInfoSaveReq recipeInfoSaveReq;
     private Gson gson = new Gson();
@@ -88,7 +88,7 @@ public class ControllerTest {
                 .ingredientAmount("재료 수량2")
                 .build();
 
-        this.ingredientAddReqList = new ArrayList<>(List.of(ingredientAddReq1, ingredientAddReq2));
+        this.ingredientAddReqs = new ArrayList<>(List.of(ingredientAddReq1, ingredientAddReq2));
 
         RecipeWayAddReq recipeWayAddReq1 = RecipeWayAddReq.builder()
                 .recipeOrder(1L)
@@ -98,12 +98,12 @@ public class ControllerTest {
                 .recipeOrder(2L)
                 .recipeWay("조리법 2")
                 .build();
-        this.recipeWayAddReqList = new ArrayList<>(List.of(recipeWayAddReq1, recipeWayAddReq2));
+        this.recipeWayAddReqs = new ArrayList<>(List.of(recipeWayAddReq1, recipeWayAddReq2));
 
         this.recipeSaveReq = RecipeSaveReq.builder()
                 .recipeInfoSaveReq(recipeInfoSaveReq)
-                .ingredientAddReqs(ingredientAddReqList)
-                .recipeWayAddReqs(recipeWayAddReqList)
+                .ingredientAddReqs(ingredientAddReqs)
+                .recipeWayAddReqs(recipeWayAddReqs)
                 .build();
     }
 
@@ -151,8 +151,8 @@ public class ControllerTest {
         //given
         makeAuthentication();
         RecipeSaveReq recipeSaveReq = RecipeSaveReq.builder()
-                .ingredientAddReqs(ingredientAddReqList)
-                .recipeWayAddReqs(recipeWayAddReqList)
+                .ingredientAddReqs(ingredientAddReqs)
+                .recipeWayAddReqs(recipeWayAddReqs)
                 .build();
         String requestBody = gson.toJson(recipeSaveReq);
 
@@ -240,8 +240,8 @@ public class ControllerTest {
 
         RecipeSaveReq recipeSaveReq = RecipeSaveReq.builder()
                 .recipeInfoSaveReq(recipeInfoSaveReq)
-                .ingredientAddReqs(ingredientAddReqList)
-                .recipeWayAddReqs(recipeWayAddReqList)
+                .ingredientAddReqs(ingredientAddReqs)
+                .recipeWayAddReqs(recipeWayAddReqs)
                 .build();
 
         String requestbody = gson.toJson(recipeSaveReq);

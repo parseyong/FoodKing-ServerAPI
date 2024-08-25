@@ -6,7 +6,7 @@ import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.domain.User;
 import com.example.foodking.user.dto.request.*;
 import com.example.foodking.user.dto.response.LoginTokenRes;
-import com.example.foodking.user.dto.response.UserReadRes;
+import com.example.foodking.user.dto.response.UserFindRes;
 import com.example.foodking.user.repository.UserRepository;
 import com.example.foodking.user.service.CoolSmsService;
 import com.example.foodking.user.service.UserService;
@@ -368,12 +368,12 @@ public class ServiceTest {
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
 
         //when
-        UserReadRes userReadRes = userService.findUser(1L);
+        UserFindRes userFindRes = userService.findUser(1L);
 
         //then
-        assertThat(userReadRes.getEmail()).isEqualTo("test@google.com");
-        assertThat(userReadRes.getNickName()).isEqualTo("nickName");
-        assertThat(userReadRes.getPhoneNum()).isEqualTo("01056962173");
+        assertThat(userFindRes.getEmail()).isEqualTo("test@google.com");
+        assertThat(userFindRes.getNickName()).isEqualTo("nickName");
+        assertThat(userFindRes.getPhoneNum()).isEqualTo("01056962173");
         verify(userRepository,times(1)).findById(any(Long.class));
     }
 

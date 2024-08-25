@@ -39,13 +39,13 @@ public class RecipePagingService {
         // 쿼리 실행
         List<RecipeInfoFindRes> recipeInfoFindResList = recipeInfoRepository.findRecipeInfoPagingByCondition(
                 getBuilderForPaging(recipeInfoPagingFindReq),
-                createOrderSpecifier(recipeInfoPagingFindReq.getRecipeSortType()));
+                createOrderSpecifiers(recipeInfoPagingFindReq.getRecipeSortType()));
 
         // 존재하지 않는 페이지일 경우 예외를 던짐
         if(recipeInfoFindResList.size() == 0)
             throw new CommondException(ExceptionCode.NOT_EXIST_PAGE);
 
-        return RecipeInfoPagingFindRes.toDTO(recipeInfoFindResList,recipeCnt);
+        return RecipeInfoPagingFindRes.toDTO(recipeInfoFindResList, recipeCnt);
     }
 
     public RecipeInfoPagingFindRes findLikedRecipeInfoPaging(RecipeInfoPagingFindReq recipeInfoPagingFindReq){
@@ -54,15 +54,15 @@ public class RecipePagingService {
         Long recipeCnt = recipeInfoRepository.findLikedRecipeInfoCnt(getBuilderForCount(recipeInfoPagingFindReq));
 
         // 쿼리 실행
-        List<RecipeInfoFindRes> recipeInfoFindResDTOList = recipeInfoRepository.findLikedRecipeInfoPaging(
+        List<RecipeInfoFindRes> recipeInfoFindResList = recipeInfoRepository.findLikedRecipeInfoPaging(
                 getBuilderForPaging(recipeInfoPagingFindReq),
-                createOrderSpecifier(recipeInfoPagingFindReq.getRecipeSortType()));
+                createOrderSpecifiers(recipeInfoPagingFindReq.getRecipeSortType()));
 
         // 존재하지 않는 페이지일 경우 예외를 던짐
-        if(recipeInfoFindResDTOList.size() == 0)
+        if(recipeInfoFindResList.size() == 0)
             throw new CommondException(ExceptionCode.NOT_EXIST_PAGE);
 
-        return RecipeInfoPagingFindRes.toDTO(recipeInfoFindResDTOList, recipeCnt);
+        return RecipeInfoPagingFindRes.toDTO(recipeInfoFindResList, recipeCnt);
     }
 
     // 동적으로 쿼리의 WHERE절을 생성하는 메소드
@@ -143,7 +143,7 @@ public class RecipePagingService {
     }
 
     // 정렬 조건을 동적으로 생성하는 메소드
-    private OrderSpecifier[] createOrderSpecifier(RecipeSortType recipeSortType) {
+    private OrderSpecifier[] createOrderSpecifiers(RecipeSortType recipeSortType) {
 
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
 

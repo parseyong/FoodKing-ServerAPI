@@ -28,7 +28,7 @@ public class ServiceTest {
     private IngredientService ingredientService;
     @Mock
     private IngredientRepository ingredientRepository;
-    private List<IngredientAddReq> ingredientAddReqList;
+    private List<IngredientAddReq> ingredientAddReqs;
 
     @BeforeEach
     void beforeEach(){
@@ -41,7 +41,7 @@ public class ServiceTest {
                 .ingredientAmount("재료수량2")
                 .build();
 
-        this.ingredientAddReqList = new ArrayList<>(List.of(ingredientAddReq1, ingredientAddReq2));
+        this.ingredientAddReqs = new ArrayList<>(List.of(ingredientAddReq1, ingredientAddReq2));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class ServiceTest {
                 .build();
 
         //when
-        ingredientService.addIngredients(ingredientAddReqList,recipeInfo);
+        ingredientService.addIngredients(ingredientAddReqs,recipeInfo);
 
         //then
         verify(ingredientRepository,times(1)).saveAll(any(List.class));
@@ -72,7 +72,7 @@ public class ServiceTest {
 
         //when
         assertThat(recipeInfo.getIngredients().size()).isEqualTo(0L);
-        ingredientService.updateIngredients(ingredientAddReqList, recipeInfo);
+        ingredientService.updateIngredients(ingredientAddReqs, recipeInfo);
 
         //then
         assertThat(recipeInfo.getIngredients().size()).isEqualTo(2L);
@@ -126,7 +126,7 @@ public class ServiceTest {
 
         //when
         assertThat(recipeInfo.getIngredients().size()).isEqualTo(2L);
-        ingredientService.updateIngredients(ingredientAddReqList, recipeInfo);
+        ingredientService.updateIngredients(ingredientAddReqs, recipeInfo);
 
         //then
         assertThat(recipeInfo.getIngredients().size()).isEqualTo(2L);

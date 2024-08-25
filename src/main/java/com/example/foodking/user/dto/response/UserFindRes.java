@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class UserReadRes {
+public class UserFindRes {
 
     private String email;
 
@@ -16,8 +16,8 @@ public class UserReadRes {
 
     private String phoneNum;
 
-    public static UserReadRes toDTO(User user){
-        return UserReadRes.builder()
+    public static UserFindRes toDTO(User user){
+        return UserFindRes.builder()
                 .email(user.getEmail())
                 .nickName(user.getNickName())
                 .phoneNum(user.getPhoneNum())
