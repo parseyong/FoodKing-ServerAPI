@@ -6,7 +6,7 @@ import com.querydsl.core.types.OrderSpecifier;
 
 import java.util.List;
 
-public interface RecipeInfoPaingRepository {
+public interface RecipeInfoQdslRepository {
 
     List<RecipeInfoFindRes> findRecipeInfoPagingByCondition(BooleanBuilder builder, OrderSpecifier[] orderSpecifiers);
 

@@ -3,7 +3,7 @@ package com.example.foodking.recipe.repository.impl;
 import com.example.foodking.recipe.domain.QRecipeInfo;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.dto.recipeInfo.response.RecipeInfoFindRes;
-import com.example.foodking.recipe.repository.RecipeInfoPaingRepository;
+import com.example.foodking.recipe.repository.RecipeInfoQdslRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
@@ -22,7 +22,7 @@ import static com.example.foodking.user.domain.QUser.user;
 @Repository
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class RecipeInfoPaingRepositoryImpl implements RecipeInfoPaingRepository {
+public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 

@@ -1,7 +1,7 @@
 package com.example.foodking.reply.repository.impl;
 
 import com.example.foodking.reply.dto.response.ReplyFindRes;
-import com.example.foodking.reply.repository.ReplyPagingRepository;
+import com.example.foodking.reply.repository.ReplyQdslRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
@@ -19,7 +19,7 @@ import static com.example.foodking.user.domain.QUser.user;
 @Repository
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ReplyPagingRepositoryImpl implements ReplyPagingRepository {
+public class ReplyQdslRepositoryImpl implements ReplyQdslRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 

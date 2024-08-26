@@ -6,7 +6,7 @@ import com.querydsl.core.types.OrderSpecifier;
 
 import java.util.List;
 
-public interface ReplyPagingRepository {
+public interface ReplyQdslRepository {
 
     List<ReplyFindRes> findReplyPaging(BooleanBuilder builder, OrderSpecifier[] orderSpecifiers, Long userId);
 }
