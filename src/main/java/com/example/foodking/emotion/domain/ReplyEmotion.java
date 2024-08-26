@@ -1,6 +1,6 @@
 package com.example.foodking.emotion.domain;
 
-import com.example.foodking.emotion.common.EmotionType;
+import com.example.foodking.emotion.enums.EmotionType;
 import com.example.foodking.reply.domain.Reply;
 import com.example.foodking.user.domain.User;
 import lombok.AccessLevel;

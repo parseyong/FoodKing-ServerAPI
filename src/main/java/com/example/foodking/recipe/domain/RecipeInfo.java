@@ -2,7 +2,7 @@ package com.example.foodking.recipe.domain;
 
 import com.example.foodking.common.TimeEntity;
 import com.example.foodking.ingredient.domain.Ingredient;
-import com.example.foodking.recipe.common.RecipeInfoType;
+import com.example.foodking.recipe.enums.RecipeInfoType;
 import com.example.foodking.recipeWay.domain.RecipeWay;
 import com.example.foodking.reply.domain.Reply;
 import com.example.foodking.user.domain.User;

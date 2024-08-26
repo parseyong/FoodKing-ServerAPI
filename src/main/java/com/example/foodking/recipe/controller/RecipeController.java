@@ -1,13 +1,13 @@
 package com.example.foodking.recipe.controller;
 
 import com.example.foodking.common.CommonResDTO;
-import com.example.foodking.recipe.common.RecipeInfoType;
-import com.example.foodking.recipe.common.RecipeSortType;
 import com.example.foodking.recipe.dto.recipe.request.RecipeSaveReq;
 import com.example.foodking.recipe.dto.recipeInfo.request.RecipeInfoPagingFindReq;
+import com.example.foodking.recipe.enums.RecipeInfoType;
+import com.example.foodking.recipe.enums.RecipeSortType;
 import com.example.foodking.recipe.service.RecipePagingService;
 import com.example.foodking.recipe.service.RecipeService;
-import com.example.foodking.reply.common.ReplySortType;
+import com.example.foodking.reply.enums.ReplySortType;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

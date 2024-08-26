@@ -1,7 +1,7 @@
 package com.example.foodking.recipe.dto.recipeInfo.request;
 
-import com.example.foodking.recipe.common.RecipeInfoType;
 import com.example.foodking.recipe.domain.RecipeInfo;
+import com.example.foodking.recipe.enums.RecipeInfoType;
 import com.example.foodking.user.domain.User;
 import lombok.*;
 

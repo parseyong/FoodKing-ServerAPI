@@ -2,11 +2,11 @@ package com.example.foodking.recipe.service;
 
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
-import com.example.foodking.recipe.common.RecipeInfoType;
-import com.example.foodking.recipe.common.RecipeSortType;
 import com.example.foodking.recipe.dto.recipeInfo.request.RecipeInfoPagingFindReq;
 import com.example.foodking.recipe.dto.recipeInfo.response.RecipeInfoFindRes;
 import com.example.foodking.recipe.dto.recipeInfo.response.RecipeInfoPagingFindRes;
+import com.example.foodking.recipe.enums.RecipeInfoType;
+import com.example.foodking.recipe.enums.RecipeSortType;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;

@@ -1,6 +1,6 @@
 package com.example.foodking.recipe.dto.recipeInfo.request;
 
-import com.example.foodking.recipe.common.RecipeSortType;
+import com.example.foodking.recipe.enums.RecipeSortType;
 import lombok.*;
 
 @Getter

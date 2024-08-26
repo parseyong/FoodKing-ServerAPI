@@ -41,7 +41,7 @@ public class QRecipeInfo extends EntityPathBase<RecipeInfo> {
 
     public final NumberPath<Long> recipeInfoId = createNumber("recipeInfoId", Long.class);
 
-    public final EnumPath<com.example.foodking.recipe.common.RecipeInfoType> recipeInfoType = createEnum("recipeInfoType", com.example.foodking.recipe.common.RecipeInfoType.class);
+    public final EnumPath<com.example.foodking.recipe.enums.RecipeInfoType> recipeInfoType = createEnum("recipeInfoType", com.example.foodking.recipe.enums.RecipeInfoType.class);
 
     public final StringPath recipeName = createString("recipeName");
 

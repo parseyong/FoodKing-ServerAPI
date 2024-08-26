@@ -1,4 +1,4 @@
-package com.example.foodking.reply.common;
+package com.example.foodking.reply.enums;
 
 public enum ReplySortType {
 

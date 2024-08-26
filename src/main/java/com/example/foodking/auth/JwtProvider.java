@@ -1,6 +1,6 @@
 package com.example.foodking.auth;
 
-import com.example.foodking.common.RedissonPrefix;
+import com.example.foodking.aop.enums.RedissonPrefix;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.domain.User;

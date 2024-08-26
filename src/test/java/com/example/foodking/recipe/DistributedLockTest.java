@@ -2,7 +2,7 @@ package com.example.foodking.recipe;
 
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.example.foodking.recipe.service.RecipeService;
-import com.example.foodking.reply.common.ReplySortType;
+import com.example.foodking.reply.enums.ReplySortType;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.Executors;
 import org.junit.jupiter.api.Disabled;

@@ -1,9 +1,9 @@
 package com.example.foodking.emotion.service;
 
 import com.example.foodking.aop.distributedLock.DistributedLock;
-import com.example.foodking.emotion.common.EmotionType;
 import com.example.foodking.emotion.domain.RecipeEmotion;
 import com.example.foodking.emotion.domain.ReplyEmotion;
+import com.example.foodking.emotion.enums.EmotionType;
 import com.example.foodking.emotion.repository.RecipeEmotionRepository;
 import com.example.foodking.emotion.repository.ReplyEmotionRepository;
 import com.example.foodking.exception.CommondException;

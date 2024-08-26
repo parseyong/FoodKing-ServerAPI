@@ -2,8 +2,8 @@ package com.example.foodking.emotion;
 
 import com.example.foodking.auth.JwtProvider;
 import com.example.foodking.config.SecurityConfig;
-import com.example.foodking.emotion.common.EmotionType;
 import com.example.foodking.emotion.controller.EmotionController;
+import com.example.foodking.emotion.enums.EmotionType;
 import com.example.foodking.emotion.service.EmotionService;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;

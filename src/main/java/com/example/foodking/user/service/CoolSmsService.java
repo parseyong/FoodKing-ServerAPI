@@ -1,6 +1,6 @@
 package com.example.foodking.user.service;
 
-import com.example.foodking.common.RedissonPrefix;
+import com.example.foodking.aop.enums.RedissonPrefix;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.user.dto.request.AuthNumberCheckReq;
 import com.example.foodking.util.AuthNumberGenerator;

@@ -1,4 +1,4 @@
-package com.example.foodking.common;
+package com.example.foodking.aop.enums;
 
 public enum RedissonPrefix {
 

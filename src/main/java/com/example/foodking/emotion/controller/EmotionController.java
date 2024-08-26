@@ -1,7 +1,7 @@
 package com.example.foodking.emotion.controller;
 
 import com.example.foodking.common.CommonResDTO;
-import com.example.foodking.emotion.common.EmotionType;
+import com.example.foodking.emotion.enums.EmotionType;
 import com.example.foodking.emotion.service.EmotionService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
