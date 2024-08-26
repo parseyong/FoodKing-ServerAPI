@@ -405,8 +405,7 @@ public class ControllerTest {
         this.mockMvc.perform(get("/email/check")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.data.email").value("Required request parameter 'email' for method parameter type String is not present(관리자에게 문의하세요)"))
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
+                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다. email을 입력해주세요."))
                 .andDo(print());
         verify(userService,times(0)).checkEmailDuplication(any(String.class));
 
@@ -456,8 +455,7 @@ public class ControllerTest {
         this.mockMvc.perform(get("/nickname/check")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
-                .andExpect(jsonPath("$.data.nickName").value("Required request parameter 'nickName' for method parameter type String is not present(관리자에게 문의하세요)"))
+                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다. nickName을 입력해주세요."))
                 .andDo(print());
         verify(userService,times(0)).checkNickNameDuplication(any(String.class));
 

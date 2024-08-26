@@ -49,9 +49,8 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers,
                                                                           HttpStatus status, WebRequest request) {
 
-        Map<String, String> errors = new HashMap<>();
-        errors.put(ex.getParameterName(), ex.getMessage()+"(관리자에게 문의하세요)");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
+        String message = "올바르지 않은 입력값입니다. "+ex.getParameterName()+"을 입력해주세요.";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of(message,null));
     }
 
     // PathVariable로 입력받은 값이 공백일 경우 발생하는 예외처리
@@ -91,8 +90,9 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<CommonResDTO> handleContranintViolation(ConstraintViolationException ex){
         String msg = ex.getMessage();
-        int index = msg.indexOf(":");
 
+        // DTO클래스명을 노출시키지 않기위한 DTO클래스명 제거
+        int index = msg.indexOf(":");
         if (index >= 0) {
             msg = msg.substring(index + 1).trim();
         }
@@ -125,7 +125,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(ex.getExceptionCode().getStatus()).body(CommonResDTO.of(ex.getExceptionCode().getMessage(),errors));
     }
 
-    // @PathVariable로 입력받은 값의 타입이 올바르지 않을 때
+    // @PathVariable나 @RequestParam으로 입력받은 값의 타입이 올바르지 않을 때
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<CommonResDTO> handleMethodArgTypeException(MethodArgumentTypeMismatchException ex){
 

@@ -535,9 +535,7 @@ public class ControllerTest {
         this.mockMvc.perform(get("/recipes/{recipeInfoId}",1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
-                .andExpect(jsonPath("$.data.sort")
-                        .value("Required request parameter 'sort' for method parameter type ReplySortType is not present(관리자에게 문의하세요)"))
+                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다. sort을 입력해주세요."))
                 .andDo(print());
         verify(recipeService,times(0)).findRecipe(any(Long.class),any(Long.class),any(),any(),any());
     }
