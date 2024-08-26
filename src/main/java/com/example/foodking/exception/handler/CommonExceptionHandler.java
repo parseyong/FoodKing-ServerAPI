@@ -29,18 +29,15 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
 
     //@Valid 유효성검사 실패 시
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatus status,
-                                                                  WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers,
+                                                                  HttpStatus status, WebRequest request) {
 
         BindingResult bindingResult = ex.getBindingResult();
         Map<String, String> errors = new HashMap<>();
         bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 
         log.error(errors.toString());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
     }
 
     /*
@@ -49,34 +46,26 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
             MissingServletRequestParameterException이 발생한다.
     */
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
-                                                                          HttpHeaders headers,
-                                                                          HttpStatus status,
-                                                                          WebRequest request) {
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers,
+                                                                          HttpStatus status, WebRequest request) {
 
         Map<String, String> errors = new HashMap<>();
         errors.put(ex.getParameterName(), ex.getMessage()+"(관리자에게 문의하세요)");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
     }
 
     // PathVariable로 입력받은 값이 공백일 경우 발생하는 예외처리
     @Override
-    protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex,
-                                                               HttpHeaders headers,
-                                                               HttpStatus status,
-                                                               WebRequest request) {
+    protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers,
+                                                               HttpStatus status, WebRequest request) {
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(CommonResDTO.of("올바른 요청이 아닙니다.",null));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of("올바른 요청이 아닙니다.",null));
     }
 
     // 역직렬화 과정에서 dto필드의 타입이 맞지 않아 발생하는 예외
     @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatus status,
-                                                                  WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers,
+                                                                  HttpStatus status, WebRequest request) {
         String errorMessage = ex.getMessage();
         if(errorMessage.contains("java.lang.Long"))
             errorMessage = ": Long타입 예외";
@@ -85,21 +74,17 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
 
         String message = "올바른 요청타입이 아닙니다. 관리자에게 문의하세요";
         log.error(message+errorMessage+":"+ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(CommonResDTO.of(message+errorMessage,null));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of(message+errorMessage,null));
     }
 
     //요청 메소드가 올바르지 않을 때
     @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
-                                                                         HttpHeaders headers,
-                                                                         HttpStatus status,
-                                                                         WebRequest request) {
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers,
+                                                                         HttpStatus status, WebRequest request) {
 
         String message = "올바른 요청이 아닙니다.";
         log.error(message+":"+ex.getMessage());
-        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
-                .body(CommonResDTO.of(message,null));
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(CommonResDTO.of(message,null));
     }
 
     // requestParam으로 입력받은 값의 유효성검사 실패 시
@@ -112,8 +97,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
             msg = msg.substring(index + 1).trim();
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(CommonResDTO.of(msg,null));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of(msg,null));
     }
 
     /*
@@ -125,8 +109,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
 
         Map<String, String> errors = new HashMap<>();
         errors.put("recipeImage","파일이 존재하지 않습니다. 관리자에게 문의하세요");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResDTO.of("올바르지 않은 입력값입니다",errors));
     }
 
     // 커스텀 예외발생 시
@@ -139,9 +122,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
             errors.put(fieldName,ex.getExceptionCode().getMessage());
 
         log.error("예외가 발생했습니다. - "+fieldName+":"+ex.getExceptionCode().getMessage());
-        return ResponseEntity
-                .status(ex.getExceptionCode().getStatus())
-                .body(CommonResDTO.of(ex.getExceptionCode().getMessage(),errors));
+        return ResponseEntity.status(ex.getExceptionCode().getStatus()).body(CommonResDTO.of(ex.getExceptionCode().getMessage(),errors));
     }
 
     // @PathVariable로 입력받은 값의 타입이 올바르지 않을 때
@@ -160,8 +141,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
 
         String message = "서버 내부에 에러가 발생했습니다.";
         log.error(message+":"+ex.getMessage()+ex.getStackTrace()+ex.getCause());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(CommonResDTO.of(message,null));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResDTO.of(message,null));
     }
 }
 
