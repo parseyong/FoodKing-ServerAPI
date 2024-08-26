@@ -41,8 +41,7 @@ public class UserController {
 
     @GetMapping("/email/check")
     public ResponseEntity<CommonResDTO> checkEmailDuplication(
-            @RequestParam(name = "email") @Email(message = "이메일 형식이 올바르지 않습니다")
-            @NotBlank(message = "이메일 정보를 입력해주세요") String email){
+            @RequestParam(name = "email") @Email(message = "이메일 형식이 올바르지 않습니다") @NotBlank(message = "이메일 정보를 입력해주세요") String email){
 
         boolean isDuplicated = userService.checkEmailDuplication(email);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이메일 중복체크 완료",isDuplicated));
@@ -73,25 +72,23 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<CommonResDTO> findUser(@AuthenticationPrincipal final Long userId){
+    public ResponseEntity<CommonResDTO> findUser(final @AuthenticationPrincipal Long userId){
 
         UserFindRes userFindRes = userService.findUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 조회 성공", userFindRes));
     }
 
     @PatchMapping("/users")
-    public ResponseEntity<CommonResDTO> updateUser(
-            @AuthenticationPrincipal final Long userId,
-            @RequestBody @Valid UserUpdateReq userUpdateReq){
+    public ResponseEntity<CommonResDTO> updateUser(final @AuthenticationPrincipal Long userId,
+                                                   @RequestBody @Valid UserUpdateReq userUpdateReq){
 
         userService.updateUser(userUpdateReq,userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저정보 변경 성공",null));
     }
 
     @DeleteMapping("/users")
-    public ResponseEntity<CommonResDTO> deleteUser(
-            @RequestBody @Valid UserDeleteReq userDeleteReq,
-            final HttpServletRequest request){
+    public ResponseEntity<CommonResDTO> deleteUser(@RequestBody @Valid UserDeleteReq userDeleteReq,
+                                                   final HttpServletRequest request){
 
         userService.deleteUser(userDeleteReq,request.getHeader("Authorization"));
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("유저 삭제완료",null));

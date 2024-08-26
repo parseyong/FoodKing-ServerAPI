@@ -79,9 +79,7 @@ public class RecipeService {
     }
 
     @DistributedLock(key = "#LockRecipe")
-    public Object findRecipe(Long userId, Long recipeInfoId,
-                             ReplySortType replySortType,
-                             Long lastId, Object lastValue){
+    public Object findRecipe(Long userId, Long recipeInfoId, ReplySortType replySortType, Long lastId, Object lastValue){
 
         // 만약 첫번째 페이지를 요청했다면 레시피정보를 가져와야하지만
         // 첫번째 페이지가 아니라면 레시피정보를 가져올 필요가 없이 댓글정보만 가져오면 된다.

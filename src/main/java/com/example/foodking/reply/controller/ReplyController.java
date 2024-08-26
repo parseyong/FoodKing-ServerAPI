@@ -21,29 +21,26 @@ public class ReplyController {
     private final ReplyService replyService;
 
     @PostMapping("/recipes/{recipeInfoId}/replies")
-    public ResponseEntity<CommonResDTO> addReply(
-            @AuthenticationPrincipal final Long userId,
-            @PathVariable final Long recipeInfoId,
-            @RequestParam @NotBlank(message = "댓글내용을 입력해주세요") String content){
+    public ResponseEntity<CommonResDTO> addReply(final @AuthenticationPrincipal Long userId,
+                                                 final @PathVariable Long recipeInfoId,
+                                                 @RequestParam @NotBlank(message = "댓글내용을 입력해주세요") String content){
 
         Long replyId = replyService.addReply(userId,recipeInfoId, content);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("댓글 등록완료",replyId));
     }
 
     @PatchMapping("/replies/{replyId}")
-    public ResponseEntity<CommonResDTO> updateReply(
-            @AuthenticationPrincipal final Long userId,
-            @PathVariable final Long replyId,
-            @RequestParam @NotBlank(message = "댓글내용을 입력해주세요") String content){
+    public ResponseEntity<CommonResDTO> updateReply(final @AuthenticationPrincipal Long userId,
+                                                    final @PathVariable Long replyId,
+                                                    @RequestParam @NotBlank(message = "댓글내용을 입력해주세요") String content){
 
         replyService.updateReply(userId,replyId, content);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("댓글 수정완료",null));
     }
 
     @DeleteMapping ("/replies/{replyId}")
-    public ResponseEntity<CommonResDTO> deleteReply(
-            @AuthenticationPrincipal final Long userId,
-            @PathVariable final Long replyId){
+    public ResponseEntity<CommonResDTO> deleteReply(final @AuthenticationPrincipal Long userId,
+                                                    final @PathVariable Long replyId){
 
         replyService.deleteReply(userId,replyId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("댓글 삭제완료",null));

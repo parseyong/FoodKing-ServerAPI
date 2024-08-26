@@ -29,53 +29,48 @@ public class RecipeController {
     private final RecipePagingService recipePagingService;
 
     @PostMapping("/recipes")
-    public ResponseEntity<CommonResDTO> addRecipe(
-            @AuthenticationPrincipal final Long userId,
-            @RequestBody @Valid RecipeSaveReq recipeSaveReq){
+    public ResponseEntity<CommonResDTO> addRecipe(final @AuthenticationPrincipal Long userId,
+                                                  @RequestBody @Valid RecipeSaveReq recipeSaveReq){
 
         Long recipeInfoId = recipeService.addRecipe(recipeSaveReq,userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("레시피 등록완료",recipeInfoId));
     }
 
     @PatchMapping("/recipes/{recipeInfoId}")
-    public ResponseEntity<CommonResDTO> updateRecipe(
-            @AuthenticationPrincipal final Long userId,
-            @RequestBody @Valid RecipeSaveReq recipeSaveReq,
-            @PathVariable final Long recipeInfoId){
+    public ResponseEntity<CommonResDTO> updateRecipe(final @AuthenticationPrincipal Long userId,
+                                                     @RequestBody @Valid RecipeSaveReq recipeSaveReq,
+                                                     final @PathVariable Long recipeInfoId){
 
         recipeService.updateRecipe(recipeSaveReq, userId,recipeInfoId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("레시피 수정완료",null));
     }
 
     @DeleteMapping("/recipes/{recipeInfoId}")
-    public ResponseEntity<CommonResDTO> deleteRecipe(
-            @AuthenticationPrincipal final Long userId,
-            @PathVariable final Long recipeInfoId){
+    public ResponseEntity<CommonResDTO> deleteRecipe(final @AuthenticationPrincipal Long userId,
+                                                     final @PathVariable Long recipeInfoId){
 
         recipeService.deleteRecipe(userId,recipeInfoId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("레시피 삭제완료",null));
     }
 
     @GetMapping("/recipes/{recipeInfoId}")
-    public ResponseEntity<CommonResDTO> findRecipe(
-            @AuthenticationPrincipal final Long userId,
-            @PathVariable final Long recipeInfoId,
-            @RequestParam(name = "sort") ReplySortType replySortType,
-            @RequestParam(name = "lastId", required = false) Long lastId,
-            @RequestParam(name = "lastValue", required = false) Object lastValue){
+    public ResponseEntity<CommonResDTO> findRecipe(final @AuthenticationPrincipal Long userId,
+                                                   final @PathVariable Long recipeInfoId,
+                                                   final @RequestParam(name = "sort") ReplySortType replySortType,
+                                                   final @RequestParam(name = "lastId", required = false) Long lastId,
+                                                   final @RequestParam(name = "lastValue", required = false) Object lastValue){
 
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("레시피 상세정보 조회완료",
                         recipeService.findRecipe(userId,recipeInfoId,replySortType, lastId, lastValue)));
     }
 
     @GetMapping("/recipes/{recipeType}/list")
-    public ResponseEntity<CommonResDTO> findRecipeInfoPagingByType(
-            @AuthenticationPrincipal final Long userId,
-            @PathVariable(name = "recipeType") final RecipeInfoType recipeInfoType,
-            @RequestParam RecipeSortType recipeSortType,
-            @RequestParam(required = false) String searchKeyword,
-            @RequestParam(name = "lastId", required = false) Long lastId,
-            @RequestParam(name = "lastValue", required = false) Object lastValue){
+    public ResponseEntity<CommonResDTO> findRecipeInfoPagingByType(final @AuthenticationPrincipal Long userId,
+                                                                   final @PathVariable(name = "recipeType") RecipeInfoType recipeInfoType,
+                                                                   final @RequestParam RecipeSortType recipeSortType,
+                                                                   final @RequestParam(required = false) String searchKeyword,
+                                                                   final @RequestParam(name = "lastId", required = false) Long lastId,
+                                                                   final @RequestParam(name = "lastValue", required = false) Object lastValue){
 
         RecipeInfoPagingFindReq recipeInfoPagingFindReq = RecipeInfoPagingFindReq.builder()
                 .recipeSortType(recipeSortType)
@@ -90,12 +85,11 @@ public class RecipeController {
     }
 
     @GetMapping("/recipes/mine/list")
-    public ResponseEntity<CommonResDTO> findMyRecipeInfoPaging(
-            @AuthenticationPrincipal final Long userId,
-            @RequestParam RecipeSortType recipeSortType,
-            @RequestParam(required = false) String searchKeyword,
-            @RequestParam(name = "lastId", required = false) Long lastId,
-            @RequestParam(name = "lastValue", required = false) Object lastValue){
+    public ResponseEntity<CommonResDTO> findMyRecipeInfoPaging(final @AuthenticationPrincipal Long userId,
+                                                               final @RequestParam RecipeSortType recipeSortType,
+                                                               final @RequestParam(required = false) String searchKeyword,
+                                                               final @RequestParam(name = "lastId", required = false) Long lastId,
+                                                               final @RequestParam(name = "lastValue", required = false) Object lastValue){
 
         RecipeInfoPagingFindReq recipeInfoPagingFindReq = RecipeInfoPagingFindReq.builder()
                 .recipeSortType(recipeSortType)
@@ -110,12 +104,11 @@ public class RecipeController {
     }
 
     @GetMapping("/recipes/like/list")
-    public ResponseEntity<CommonResDTO> findLikeRecipeInfoPaging(
-            @AuthenticationPrincipal final Long userId,
-            @RequestParam RecipeSortType recipeSortType,
-            @RequestParam(required = false) String searchKeyword,
-            @RequestParam(name = "lastId", required = false) Long lastId,
-            @RequestParam(name = "lastValue", required = false) Object lastValue){
+    public ResponseEntity<CommonResDTO> findLikeRecipeInfoPaging(final @AuthenticationPrincipal Long userId,
+                                                                 final @RequestParam RecipeSortType recipeSortType,
+                                                                 final @RequestParam(required = false) String searchKeyword,
+                                                                 final @RequestParam(name = "lastId", required = false) Long lastId,
+                                                                 final @RequestParam(name = "lastValue", required = false) Object lastValue){
 
         RecipeInfoPagingFindReq recipeInfoPagingFindReq = RecipeInfoPagingFindReq.builder()
                 .recipeSortType(recipeSortType)

@@ -18,19 +18,17 @@ public class RecipeImageController {
     private final RecipeImageService recipeImageService;
 
     @PostMapping("/recipes/{recipeInfoId}/image")
-    public ResponseEntity<CommonResDTO> addImage(
-            @AuthenticationPrincipal final Long userId,
-            @RequestParam(name = "recipeImage") MultipartFile recipeImage,
-            @PathVariable final Long recipeInfoId) {
+    public ResponseEntity<CommonResDTO> addImage(final @AuthenticationPrincipal Long userId,
+                                                 final @RequestParam(name = "recipeImage") MultipartFile recipeImage,
+                                                 final @PathVariable Long recipeInfoId) {
 
         recipeImageService.addImage(recipeImage,recipeInfoId,userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResDTO.of("이미지 등록완료",null));
     }
 
     @DeleteMapping("/recipes/{recipeInfoId}/image")
-    public ResponseEntity<CommonResDTO> deleteImage(
-            @AuthenticationPrincipal final Long userId,
-            @PathVariable final Long recipeInfoId) {
+    public ResponseEntity<CommonResDTO> deleteImage(final @AuthenticationPrincipal Long userId,
+                                                    final @PathVariable Long recipeInfoId) {
 
         recipeImageService.deleteImage(recipeInfoId,userId);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이미지 삭제완료",null));
