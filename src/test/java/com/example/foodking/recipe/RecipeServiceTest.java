@@ -82,8 +82,6 @@ public class RecipeServiceTest {
         this.recipeInfo = RecipeInfo.builder()
                 .user(user)
                 .recipeName("testName")
-                .recipeWays(new ArrayList<>())
-                .ingredients(new ArrayList<>())
                 .calogy(1L)
                 .build();
     }
@@ -242,7 +240,7 @@ public class RecipeServiceTest {
     public void readRecipeSuccess(){
         //given
         RecipeInfoFindRes recipeInfoFindRes = RecipeInfoFindRes
-                .toDTO(recipeInfo,1L,"writerNickName");
+                .toDTO(recipeInfo,1L, 1L,"writerNickName");
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         given(recipeCachingService.findRecipeByCache(any(Long.class),any(Boolean.class))).willReturn(RecipeFindRes.builder()

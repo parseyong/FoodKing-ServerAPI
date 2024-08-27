@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,7 +32,8 @@ public class RecipeWayService {
     @Transactional
     public void updateRecipeWays(List<RecipeWayAddReq> recipeWayAddReqs, RecipeInfo recipeInfo){
 
-        List<RecipeWay> recipeWays = recipeInfo.getRecipeWays();
+        List<RecipeWay> recipeWays = recipeWayRepository.findAllByRecipeInfo(recipeInfo);
+        List<RecipeWay> deletedRecipeWays = new ArrayList<>();
         int minSize = Math.min(recipeWayAddReqs.size(), recipeWays.size());
 
         // 기존 조리순서 업데이트
@@ -44,7 +46,12 @@ public class RecipeWayService {
 
         // 조리순서가 줄어든 경우
         IntStream.range(recipeWayAddReqs.size(), recipeWays.size())
-                .forEach(i -> recipeWays.remove(minSize));
+                .forEach(i -> {
+                    deletedRecipeWays.add(recipeWays.get(minSize));
+                    recipeWays.remove(minSize);
+                });
 
+        recipeWayRepository.deleteAll(deletedRecipeWays);
+        recipeWayRepository.saveAll(recipeWays);
     }
 }

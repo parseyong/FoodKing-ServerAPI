@@ -16,8 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -61,7 +61,7 @@ public class ServiceTest {
     }
 
     @Test
-    @DisplayName("레시피 수정 테스트 -> (성공 : 조리법이 줄어든 경우 2개->0개 )")
+    @DisplayName("레시피 수정 테스트 -> (성공 : 조리법이 줄어든 경우 2개->1개 )")
     public void updateRecipeWayInfoSuccess(){
         //given
         RecipeWay recipeWay1 = RecipeWay.builder()
@@ -75,16 +75,20 @@ public class ServiceTest {
 
         RecipeInfo recipeInfo = RecipeInfo.builder()
                 .recipeName("testName")
-                .recipeWays(new ArrayList<>(List.of(recipeWay1, recipeWay2)))
                 .calogy(1L)
                 .build();
+        List<RecipeWay> recipeWays = new ArrayList<>();
+        recipeWays.add(recipeWay1);
+        recipeWays.add(recipeWay2);
+        given(recipeWayRepository.findAllByRecipeInfo(any(RecipeInfo.class)))
+                .willReturn(recipeWays);
 
         //when
-        assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(2L);
-        recipeWayService.updateRecipeWays(new ArrayList<>(),recipeInfo);
+        recipeWayAddReqs.remove(0);
+        recipeWayService.updateRecipeWays(recipeWayAddReqs,recipeInfo);
 
         //then
-        assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(0L);
+        verify(recipeWayRepository,times(1)).saveAll(any(List.class));
     }
 
     @Test
@@ -102,36 +106,41 @@ public class ServiceTest {
 
         RecipeInfo recipeInfo = RecipeInfo.builder()
                 .recipeName("testName")
-                .recipeWays(new ArrayList<>(List.of(recipeWay1, recipeWay2)))
                 .calogy(1L)
                 .build();
+        given(recipeWayRepository.findAllByRecipeInfo(any(RecipeInfo.class)))
+                .willReturn(List.of(recipeWay1,recipeWay2));
 
         //when
-        assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(2L);
         recipeWayService.updateRecipeWays(recipeWayAddReqs, recipeInfo);
 
         //then
-        assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(2L);
-        assertThat(recipeInfo.getRecipeWays().get(0).getRecipeWay()).isEqualTo("조리법1 수정후");
-        assertThat(recipeInfo.getRecipeWays().get(1).getRecipeWay()).isEqualTo("조리법2 수정후");
+        verify(recipeWayRepository,times(1)).saveAll(any(List.class));
     }
 
     @Test
-    @DisplayName("레시피 수정 테스트 -> (성공 : 조리법이 늘어난 경우 0개->2개 )")
+    @DisplayName("레시피 수정 테스트 -> (성공 : 조리법이 늘어난 경우 1개->2개 )")
     public void updateRecipeWayInfoSuccess3(){
         //given
+        RecipeWay recipeWay1 = RecipeWay.builder()
+                .recipeOrder(1L)
+                .recipeWay("조리법1 수정전")
+                .build();
         RecipeInfo recipeInfo = RecipeInfo.builder()
                 .recipeName("testName")
-                .recipeWays(new ArrayList<>())
                 .calogy(1L)
                 .build();
+        List<RecipeWay> recipeWays = new ArrayList<>();
+        recipeWays.add(recipeWay1);
+
+        given(recipeWayRepository.findAllByRecipeInfo(any(RecipeInfo.class)))
+                .willReturn(recipeWays);
 
         //when
-        assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(0L);
         recipeWayService.updateRecipeWays(recipeWayAddReqs,recipeInfo);
 
         //then
-        assertThat(recipeInfo.getRecipeWays().size()).isEqualTo(2L);
+        verify(recipeWayRepository,times(1)).saveAll(any(List.class));
     }
 
 }

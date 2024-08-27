@@ -16,8 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -61,25 +61,31 @@ public class ServiceTest {
     }
 
     @Test
-    @DisplayName("재료 수정 테스트 -> (성공 : 재료가 늘어난 경우 0개->2개 )")
+    @DisplayName("재료 수정 테스트 -> (성공 : 재료가 늘어난 경우 1개->2개 )")
     public void updateIngredientSuccess(){
         //given
         RecipeInfo recipeInfo = RecipeInfo.builder()
                 .recipeName("testName")
-                .ingredients(new ArrayList<>())
                 .calogy(1L)
                 .build();
+        Ingredient ingredient1 = Ingredient.builder()
+                .ingredientName("재료양1")
+                .ingredientAmount("재료수량1")
+                .build();
 
+        List<Ingredient> ingredients = new ArrayList<>();
+        ingredients.add(ingredient1);
+        given(ingredientRepository.findAllByRecipeInfo(any(RecipeInfo.class)))
+                .willReturn(ingredients);
         //when
-        assertThat(recipeInfo.getIngredients().size()).isEqualTo(0L);
         ingredientService.updateIngredients(ingredientAddReqs, recipeInfo);
 
         //then
-        assertThat(recipeInfo.getIngredients().size()).isEqualTo(2L);
+        verify(ingredientRepository,times(1)).saveAll(any(List.class));
     }
 
     @Test
-    @DisplayName("재료 수정 테스트 -> (성공 : 재료가 줄어든 경우 2개->0개 )")
+    @DisplayName("재료 수정 테스트 -> (성공 : 재료가 줄어든 경우 2개->1개 )")
     public void updateIngredientSuccess2(){
         //given
         Ingredient ingredient1 = Ingredient.builder()
@@ -93,16 +99,22 @@ public class ServiceTest {
 
         RecipeInfo recipeInfo = RecipeInfo.builder()
                 .recipeName("testName")
-                .ingredients(new ArrayList<>(List.of(ingredient1,ingredient2)))
                 .calogy(1L)
                 .build();
 
+        List<Ingredient> ingredients = new ArrayList<>();
+        ingredients.add(ingredient1);
+        ingredients.add(ingredient2);
+        given(ingredientRepository.findAllByRecipeInfo(any(RecipeInfo.class)))
+                .willReturn(ingredients);
+
         //when
-        assertThat(recipeInfo.getIngredients().size()).isEqualTo(2L);
-        ingredientService.updateIngredients(new ArrayList<>(), recipeInfo);
+        ingredientAddReqs.remove(0);
+        ingredientService.updateIngredients(ingredientAddReqs, recipeInfo);
 
         //then
-        assertThat(recipeInfo.getIngredients().size()).isEqualTo(0L);
+        verify(ingredientRepository,times(1)).saveAll(any(List.class));
+
     }
 
     @Test
@@ -120,19 +132,17 @@ public class ServiceTest {
         
         RecipeInfo recipeInfo = RecipeInfo.builder()
                 .recipeName("testName")
-                .ingredients( new ArrayList<>(List.of(ingredient1,ingredient2)))
                 .calogy(1L)
                 .build();
 
+        given(ingredientRepository.findAllByRecipeInfo(any(RecipeInfo.class)))
+                .willReturn(List.of(ingredient1,ingredient2));
+
         //when
-        assertThat(recipeInfo.getIngredients().size()).isEqualTo(2L);
         ingredientService.updateIngredients(ingredientAddReqs, recipeInfo);
 
         //then
-        assertThat(recipeInfo.getIngredients().size()).isEqualTo(2L);
-        assertThat(recipeInfo.getIngredients().get(0).getIngredientName()).isEqualTo("재료명1");
-        assertThat(recipeInfo.getIngredients().get(1).getIngredientName()).isEqualTo("재료명2");
-        assertThat(recipeInfo.getIngredients().get(0).getIngredientAmount()).isEqualTo("재료수량1");
-        assertThat(recipeInfo.getIngredients().get(1).getIngredientAmount()).isEqualTo("재료수량2");
+        verify(ingredientRepository,times(1)).saveAll(any(List.class));
+
     }
 }

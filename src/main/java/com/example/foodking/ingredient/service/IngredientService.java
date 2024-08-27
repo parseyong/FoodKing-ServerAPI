@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,7 +32,8 @@ public class IngredientService {
     @Transactional
     public void updateIngredients(List<IngredientAddReq> ingredientAddReqs, RecipeInfo recipeInfo){
 
-        List<Ingredient> ingredients = recipeInfo.getIngredients();
+        List<Ingredient> ingredients = ingredientRepository.findAllByRecipeInfo(recipeInfo);
+        List<Ingredient> deletedIngredients = new ArrayList<>();
         int minSize = Math.min(ingredientAddReqs.size(), ingredients.size());
 
         // 기존 재료 업데이트
@@ -53,7 +55,11 @@ public class IngredientService {
         // 재료가 줄어든 경우
         IntStream.range(ingredientAddReqs.size(),ingredients.size())
                 .forEach(i -> {
+                    deletedIngredients.add(ingredients.get(minSize));
                     ingredients.remove(minSize);
                 });
+
+        ingredientRepository.deleteAll(deletedIngredients);
+        ingredientRepository.saveAll(ingredients);
     }
 }

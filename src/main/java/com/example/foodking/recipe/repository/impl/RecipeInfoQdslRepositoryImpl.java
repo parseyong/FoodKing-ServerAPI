@@ -4,6 +4,7 @@ import com.example.foodking.recipe.domain.QRecipeInfo;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.dto.recipeInfo.response.RecipeInfoFindRes;
 import com.example.foodking.recipe.repository.RecipeInfoQdslRepository;
+import com.example.foodking.reply.repository.ReplyRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
@@ -25,6 +26,7 @@ import static com.example.foodking.user.domain.QUser.user;
 public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
+    private final ReplyRepository replyRepository;
 
     @Override
     public List<RecipeInfoFindRes> findRecipeInfoPagingByCondition(BooleanBuilder builder, OrderSpecifier[] orderSpecifiers) {
@@ -40,9 +42,10 @@ public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
         return tuples.stream()
                 .map(tuple -> {
                     RecipeInfo recipeInfo = tuple.get(QRecipeInfo.recipeInfo);
+                    Long replyCnt = replyRepository.countByRecipeInfo(recipeInfo);
                     Long writerUserId = tuple.get(user.userId);
                     String writerNickName = tuple.get(user.nickName);
-                    return RecipeInfoFindRes.toDTO(recipeInfo, writerUserId, writerNickName);
+                    return RecipeInfoFindRes.toDTO(recipeInfo, replyCnt, writerUserId, writerNickName);
                 })
                 .collect(Collectors.toList());
     }
@@ -88,9 +91,10 @@ public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
         return tuples.stream()
                 .map(tuple -> {
                     RecipeInfo recipeInfo = tuple.get(QRecipeInfo.recipeInfo);
+                    Long replyCnt = replyRepository.countByRecipeInfo(recipeInfo);
                     Long writerUserId = tuple.get(user.userId);
                     String writerNickName = tuple.get(user.nickName);
-                    return RecipeInfoFindRes.toDTO(recipeInfo, writerUserId, writerNickName);
+                    return RecipeInfoFindRes.toDTO(recipeInfo, replyCnt, writerUserId, writerNickName);
                 })
                 .collect(Collectors.toList());
     }
@@ -114,7 +118,9 @@ public class RecipeInfoQdslRepositoryImpl implements RecipeInfoQdslRepository {
                 .where(recipeInfo.recipeInfoId.eq(recipeinfoId))
                 .fetchOne();
 
-        return RecipeInfoFindRes.toDTO(tuple.get(recipeInfo), tuple.get(user.userId), tuple.get(user.nickName));
+        RecipeInfo recipeInfo = tuple.get(QRecipeInfo.recipeInfo);
+        Long replyCnt = replyRepository.countByRecipeInfo(recipeInfo);
+        return RecipeInfoFindRes.toDTO(recipeInfo, replyCnt, tuple.get(user.userId), tuple.get(user.nickName));
     }
 
 }

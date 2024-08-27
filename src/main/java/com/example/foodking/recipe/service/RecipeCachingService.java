@@ -3,11 +3,13 @@ package com.example.foodking.recipe.service;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.ingredient.dto.response.IngredientFindRes;
+import com.example.foodking.ingredient.repository.IngredientRepository;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.dto.recipe.response.RecipeFindRes;
 import com.example.foodking.recipe.dto.recipeInfo.response.RecipeInfoFindRes;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.example.foodking.recipeWay.dto.response.RecipeWayFindRes;
+import com.example.foodking.recipeWay.repository.RecipeWayRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
 public class RecipeCachingService {
 
     private final RecipeInfoRepository recipeInfoRepository;
+    private final RecipeWayRepository recipeWayRepository;
+    private final IngredientRepository ingredientRepository;
 
     @Qualifier("cacheRedis")
     private final RedisTemplate<String,String> cacheRedisTemplate;
@@ -46,12 +50,12 @@ public class RecipeCachingService {
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
 
         // 조리법 리스트 가져오기
-        List<RecipeWayFindRes> recipeWayFindResList = recipeInfo.getRecipeWays().stream()
+        List<RecipeWayFindRes> recipeWayFindResList = recipeWayRepository.findAllByRecipeInfo(recipeInfo).stream()
                 .map(entity -> RecipeWayFindRes.toDTO(entity))
                 .collect(Collectors.toList());
 
         // 재료 리스트 가져오기
-        List<IngredientFindRes> ingredientFindResList = recipeInfo.getIngredients().stream()
+        List<IngredientFindRes> ingredientFindResList = ingredientRepository.findAllByRecipeInfo(recipeInfo).stream()
                 .map(entity -> IngredientFindRes.toDTO(entity))
                 .collect(Collectors.toList());
 

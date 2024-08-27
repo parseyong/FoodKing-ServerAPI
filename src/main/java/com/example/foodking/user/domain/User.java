@@ -1,6 +1,5 @@
 package com.example.foodking.user.domain;
 
-import com.example.foodking.recipe.domain.RecipeInfo;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +18,7 @@ import java.util.List;
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User implements UserDetails {
+
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,9 +38,6 @@ public class User implements UserDetails {
 
     @Column(nullable = false,name = "role_name")
     private String roleName;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE,fetch = FetchType.LAZY)
-    private List<RecipeInfo> recipeInfos;
 
     @Builder
     private User(String email, String password, String nickName, String phoneNum){

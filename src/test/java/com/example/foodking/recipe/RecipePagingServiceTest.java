@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -50,8 +49,6 @@ public class RecipePagingServiceTest {
         this.recipeInfo = RecipeInfo.builder()
                 .user(user)
                 .recipeName("testName")
-                .recipeWays(new ArrayList<>())
-                .ingredients(new ArrayList<>())
                 .calogy(1L)
                 .build();
 
@@ -68,7 +65,7 @@ public class RecipePagingServiceTest {
                 .build();
 
         RecipeInfoFindRes recipeInfoFindRes = RecipeInfoFindRes
-                .toDTO(recipeInfo,1L,"writerNickName");
+                .toDTO(recipeInfo,1L, 1L,"writerNickName");
 
         given(recipeInfoRepository.findRecipeInfoTotalCnt(any())).willReturn(10L);
         given(recipeInfoRepository.findRecipeInfoPagingByCondition(any(),any()))
@@ -118,7 +115,7 @@ public class RecipePagingServiceTest {
                 .build();
 
         RecipeInfoFindRes recipeInfoFindRes = RecipeInfoFindRes
-                .toDTO(recipeInfo,1L,"writerNickName");
+                .toDTO(recipeInfo,1L,1L,"writerNickName");
 
         given(recipeInfoRepository.findLikedRecipeInfoCnt(any())).willReturn(10L);
         given(recipeInfoRepository.findLikedRecipeInfoPaging(any(),any()))

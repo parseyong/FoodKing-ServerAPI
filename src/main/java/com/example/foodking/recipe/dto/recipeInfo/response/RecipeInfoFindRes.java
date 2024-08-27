@@ -28,15 +28,8 @@ public class RecipeInfoFindRes {
     private Long writerUserId;
     private String writerNickName;
 
-    public static RecipeInfoFindRes toDTO(RecipeInfo recipeInfo, Long writerUserId, String writerNickName){
+    public static RecipeInfoFindRes toDTO(RecipeInfo recipeInfo, Long replyCnt, Long writerUserId, String writerNickName){
 
-        Long replyCnt;
-        if(recipeInfo.getReplies() == null){
-            replyCnt = 0L;
-        }
-        else{
-            replyCnt = (long) recipeInfo.getReplies().size();
-        }
         return RecipeInfoFindRes.builder()
                 .calogy(recipeInfo.getCalogy())
                 .recipeInfoType(recipeInfo.getRecipeInfoType())
