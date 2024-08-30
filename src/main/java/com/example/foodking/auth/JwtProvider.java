@@ -119,7 +119,7 @@ public class JwtProvider {
     @Transactional
     public LoginTokenRes reissueToken(HttpServletRequest request){
 
-        String refreshToken = resolveRefreshToken(request);
+        String refreshToken = findRefreshTokenByHeader(request);
 
         // refreshToken의 유효성검사
         if(refreshToken == null || !validateRefreshToken(refreshToken))
@@ -143,7 +143,7 @@ public class JwtProvider {
     }
 
     // Http헤더에서 AccessToken을 가져오는 메소드
-    public String resolveAccessToken(HttpServletRequest request) {
+    public String findAccessTokenByHeader(HttpServletRequest request) {
 
         String token = request.getHeader("Authorization");
 
@@ -155,7 +155,7 @@ public class JwtProvider {
     }
 
     // Http헤더에서 RefreshToken을 가져오는 메소드
-    public String resolveRefreshToken(HttpServletRequest request) {
+    public String findRefreshTokenByHeader(HttpServletRequest request) {
 
         String token = request.getHeader("RefreshToken");
         
