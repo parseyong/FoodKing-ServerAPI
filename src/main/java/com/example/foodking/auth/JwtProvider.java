@@ -59,23 +59,6 @@ public class JwtProvider {
         refreshSecretKey = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    @Transactional
-    public void logOut(Long userId, String accessToken){
-
-        //Bearer 제거
-        accessToken = accessToken.substring(7);
-
-        //accessToken을 블랙리스트에 추가
-        authRedis.opsForValue().set(
-                RedissonPrefix.BLACK_LIST_REDIS + accessToken,
-                String.valueOf(userId),
-                validAccessTokenTime,
-                TimeUnit.MILLISECONDS);
-
-        //tokenRedis에서 refreshToekn삭제
-        authRedis.delete(RedissonPrefix.TOKEN_REDIS + String.valueOf(userId));
-    }
-
     // 엑세스토큰을 생성해서 반환하는 메소드
     public String createAccessToken(Long userId, Collection<? extends GrantedAuthority> roles) {
 
@@ -114,7 +97,24 @@ public class JwtProvider {
 
         return  refreshToken;
     }
-    
+
+    @Transactional
+    public void logOut(Long userId, String accessToken){
+
+        //Bearer 제거
+        accessToken = accessToken.substring(7);
+
+        //accessToken을 블랙리스트에 추가
+        authRedis.opsForValue().set(
+                RedissonPrefix.BLACK_LIST_REDIS + accessToken,
+                String.valueOf(userId),
+                validAccessTokenTime,
+                TimeUnit.MILLISECONDS);
+
+        //tokenRedis에서 refreshToekn삭제
+        authRedis.delete(RedissonPrefix.TOKEN_REDIS + String.valueOf(userId));
+    }
+
     // 토큰 재발급, 탈취에 대한 위험성을 최소화하기 위해 accessToken외에 refreshToken도 재발급을 한다.
     @Transactional
     public LoginTokenRes reissueToken(HttpServletRequest request){
@@ -122,7 +122,7 @@ public class JwtProvider {
         String refreshToken = findRefreshTokenByHeader(request);
 
         // refreshToken의 유효성검사
-        if(refreshToken == null || !validateRefreshToken(refreshToken))
+        if(refreshToken == null || !checkValidationRefreshToken(refreshToken))
             throw new CommondException(ExceptionCode.LOGIN_FAIL);
 
         // refreshToken에서 userId값 추출
@@ -140,6 +140,14 @@ public class JwtProvider {
                 .accessToken(createAccessToken(Long.valueOf(userId), user.getAuthorities()))
                 .refreshToken(createRefreshToken(Long.valueOf(userId),user.getAuthorities()))
                 .build();
+    }
+
+    // 토큰에서 추출한 userId값을 통해 인증객체를 생성하는 메소드
+    @Transactional(readOnly = true)
+    public Authentication findAuthenticationByAccessToken(String accessToken) {
+
+        User user = (User) customUserDetailsService.loadUserByUsername(this.findUserIdByAccessToken(accessToken));
+        return new UsernamePasswordAuthenticationToken(user.getUserId(),user.getPassword(),user.getAuthorities());
     }
 
     // Http헤더에서 AccessToken을 가져오는 메소드
@@ -166,16 +174,8 @@ public class JwtProvider {
         return null;
     }
 
-    // 토큰에서 추출한 userId값을 통해 인증객체를 생성하는 메소드
-    @Transactional(readOnly = true)
-    public Authentication findAuthenticationByAccessToken(String accessToken) {
-
-        User user = (User) customUserDetailsService.loadUserByUsername(this.findUserIdByAccessToken(accessToken));
-        return new UsernamePasswordAuthenticationToken(user.getUserId(),user.getPassword(),user.getAuthorities());
-    }
-
     // AccessToken의 유효성을 검증하는 메소드
-    public boolean validateAccessToken(String accessToken) {
+    public boolean checkValidationAccessToken(String accessToken) {
         try {
             String blackList = authRedis.opsForValue().get(RedissonPrefix.BLACK_LIST_REDIS + accessToken);
             if(blackList != null)
@@ -189,7 +189,7 @@ public class JwtProvider {
     }
 
     // RefreshToken의 유효성을 검증하는 메소드, 레디스에 존재하는 지 여부는 userId를 key로 하기때문에 reIssue메소드에서 수행한다.
-    private boolean validateRefreshToken(String refreshToken) {
+    private boolean checkValidationRefreshToken(String refreshToken) {
         try {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(refreshSecretKey).build().parseClaimsJws(refreshToken);
             return !claims.getBody().getExpiration().before(new Date());
