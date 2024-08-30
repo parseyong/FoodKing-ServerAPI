@@ -32,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 // 이 클래스의 메소드중 트랜잭션이 필요한 메소드가 소수이기 때문에 클래스대신 메소드에 직접 선언해주었다.
 public class JwtProvider {
 
+    private final CustomUserDetailsService customUserDetailsService;
+
     @Value("${JWT.Access.SecretKey}")
     private String accessSecretKey;
 
@@ -41,13 +43,10 @@ public class JwtProvider {
     @Qualifier("authRedis")
     private final RedisTemplate<String,String> authRedis;
 
-
     // 30분
     public Long validAccessTokenTime = 30 * 60 * 1000L;
     // 1달
     private Long validRefreshTokenTime = 30 * 24 * 60 * 60L;
-    private final CustomUserDetailsService customUserDetailsService;
-
 
     @PostConstruct
     protected void init() {
