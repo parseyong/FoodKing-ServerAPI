@@ -41,7 +41,8 @@ public class UserController {
 
     @GetMapping("/email/check")
     public ResponseEntity<CommonResDTO> checkEmailDuplication(
-            @RequestParam(name = "email") @Email(message = "이메일 형식이 올바르지 않습니다") @NotBlank(message = "이메일 정보를 입력해주세요") String email){
+            final @RequestParam(name = "email") @Email(message = "이메일 형식이 올바르지 않습니다")
+            @NotBlank(message = "이메일 정보를 입력해주세요") String email){
 
         boolean isDuplicated = userService.checkEmailDuplication(email);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이메일 중복체크 완료",isDuplicated));
@@ -49,7 +50,7 @@ public class UserController {
 
     @GetMapping("/nickname/check")
     public ResponseEntity<CommonResDTO> checkNickNameDuplication(
-            @RequestParam(name = "nickName") @NotBlank(message = "닉네임 정보를 입력해주세요") String nickName){
+            final @RequestParam(name = "nickName") @NotBlank(message = "닉네임 정보를 입력해주세요") String nickName){
 
         boolean isDuplicated = userService.checkNickNameDuplication(nickName);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("닉네임 중복체크 완료",isDuplicated));
@@ -57,7 +58,7 @@ public class UserController {
 
     @GetMapping("/users/email/find")
     public ResponseEntity<CommonResDTO> findEmail(
-            @RequestParam @NotBlank(message = "전화번호를 입력하세요") String phoneNum){
+            final @RequestParam @NotBlank(message = "전화번호를 입력하세요") String phoneNum){
 
         String email = userService.findEmail(phoneNum);
         return ResponseEntity.status(HttpStatus.OK).body(CommonResDTO.of("이메일 찾기 성공",email));

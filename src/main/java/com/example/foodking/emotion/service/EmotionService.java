@@ -3,7 +3,7 @@ package com.example.foodking.emotion.service;
 import com.example.foodking.aop.distributedLock.DistributedLock;
 import com.example.foodking.emotion.domain.RecipeEmotion;
 import com.example.foodking.emotion.domain.ReplyEmotion;
-import com.example.foodking.emotion.enums.EmotionType;
+import com.example.foodking.emotion.dto.req.EmotionToggleReq;
 import com.example.foodking.emotion.repository.RecipeEmotionRepository;
 import com.example.foodking.emotion.repository.ReplyEmotionRepository;
 import com.example.foodking.exception.CommondException;
@@ -31,7 +31,7 @@ public class EmotionService {
 
 
     @DistributedLock(key = "#LockReplyEmotion")
-    public void toggleReplyEmotion(Long userId, Long replyId, EmotionType emotionType){
+    public void toggleReplyEmotion(Long userId, Long replyId, EmotionToggleReq emotionToggleReq){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
         Reply  reply = replyRepository.findById(replyId)
@@ -42,7 +42,7 @@ public class EmotionService {
         // 만약 등록된 이모션이 없다면 이모션 등록
         if(replyEmotionOptional.isEmpty()){
             ReplyEmotion replyEmotion = ReplyEmotion.builder()
-                    .emotionType(emotionType)
+                    .emotionType(emotionToggleReq.getEmotionType())
                     .user(user)
                     .reply(reply)
                     .build();
@@ -64,7 +64,7 @@ public class EmotionService {
     }
 
     @DistributedLock(key = "#LockRecipeEmotion")
-    public void toggleRecipeInfoEmotion(Long userId, Long recipeInfoId, EmotionType emotionType){
+    public void toggleRecipeInfoEmotion(Long userId, Long recipeInfoId, EmotionToggleReq emotionToggleReq){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
         RecipeInfo  recipeInfo = recipeInfoRepository.findById(recipeInfoId)
@@ -75,7 +75,7 @@ public class EmotionService {
         // 만약 등록된 이모션이 없다면 이모션 등록
         if(recipeEmotionOptional.isEmpty()){
             RecipeEmotion recipeEmotion = RecipeEmotion.builder()
-                    .emotionType(emotionType)
+                    .emotionType(emotionToggleReq.getEmotionType())
                     .user(user)
                     .recipeInfo(recipeInfo)
                     .build();

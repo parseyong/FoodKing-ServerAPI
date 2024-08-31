@@ -6,6 +6,8 @@ import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.example.foodking.reply.domain.Reply;
+import com.example.foodking.reply.dto.request.ReplyAddReq;
+import com.example.foodking.reply.dto.request.ReplyUpdateReq;
 import com.example.foodking.reply.dto.response.ReplyFindRes;
 import com.example.foodking.reply.enums.ReplySortType;
 import com.example.foodking.reply.repository.ReplyRepository;
@@ -76,7 +78,7 @@ public class ServiceTest {
         given(recipeInfoRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(recipeInfo));
 
         //when
-        replyService.addReply(1L,1L,"댓글테스트");
+        replyService.addReply(1L,1L, ReplyAddReq.builder().content("댓글내용").build());
 
         //then
         verify(replyRepository,times(1)).save(any(Reply.class));
@@ -92,7 +94,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            replyService.addReply(1L,1L,"댓글테스트");
+            replyService.addReply(1L,1L, ReplyAddReq.builder().content("댓글내용").build());
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_USER);
@@ -111,7 +113,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            replyService.addReply(1L,1L,"댓글테스트");
+            replyService.addReply(1L,1L,ReplyAddReq.builder().content("댓글내용").build());
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_RECIPEINFO);
@@ -158,7 +160,7 @@ public class ServiceTest {
         given(user.getUserId()).willReturn(1L);
 
         //when
-        replyService.updateReply(1L,1L,"수정된 댓글");
+        replyService.updateReply(1L,1L, ReplyUpdateReq.builder().content("수정된 댓글").build());
 
         //then
         assertThat(reply.getContent()).isEqualTo("수정된 댓글");
@@ -174,7 +176,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            replyService.updateReply(1L,1L,"수정된 댓글");
+            replyService.updateReply(1L,1L,ReplyUpdateReq.builder().content("수정된 댓글").build());
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.NOT_EXIST_REPLY);
@@ -193,7 +195,7 @@ public class ServiceTest {
 
         //when,then
         try{
-            replyService.updateReply(1L,1L,"수정된 댓글");
+            replyService.updateReply(1L,1L,ReplyUpdateReq.builder().content("수정된 댓글").build());
             fail("예외가 발생하지 않음");
         }catch (CommondException ex){
             assertThat(ex.getExceptionCode()).isEqualTo(ExceptionCode.ACCESS_FAIL_REPLY);

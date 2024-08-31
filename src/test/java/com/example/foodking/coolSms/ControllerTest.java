@@ -6,6 +6,7 @@ import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.controller.CoolSmsController;
 import com.example.foodking.user.dto.request.AuthNumberCheckReq;
+import com.example.foodking.user.dto.request.MessageSendReq;
 import com.example.foodking.user.service.CoolSmsService;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
@@ -47,69 +48,86 @@ public class ControllerTest {
     @DisplayName("문자보내기 테스트 -> (성공)")
     public void sendMessageSuccess() throws Exception {
         //given
+        MessageSendReq messageSendReq = MessageSendReq.builder()
+                .phoneNum("01011111111")
+                .build();
+        String requestBody = gson.toJson(messageSendReq);
 
         //when,then
         this.mockMvc.perform(post("/message/send")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("phoneNum","01056962173"))
+                        .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("인증번호 전송"))
                 .andDo(print());
 
-        verify(coolSmsService,times(1)).sendMessage(any(String.class));
+        verify(coolSmsService,times(1)).sendMessage(any(MessageSendReq.class));
     }
 
     @Test
     @DisplayName("문자보내기 테스트 -> (실패 : 전화번호 형식 예외)")
     public void sendMessageFail1() throws Exception {
         //given
-        given(coolSmsService.sendMessage(any(String.class)))
+        MessageSendReq messageSendReq = MessageSendReq.builder()
+                .phoneNum("번호아님")
+                .build();
+        String requestBody = gson.toJson(messageSendReq);
+        given(coolSmsService.sendMessage(any(MessageSendReq.class)))
                 .willThrow(new CommondException(ExceptionCode.NOT_PHONENUM_TYPE));
 
         //when,then
         this.mockMvc.perform(post("/message/send")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("phoneNum","번호아님"))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 전화번호 형식이 아닙니다"))
                 .andExpect(jsonPath("$.data.phoneNum").value("올바른 전화번호 형식이 아닙니다"))
                 .andDo(print());
 
-        verify(coolSmsService,times(1)).sendMessage(any(String.class));
+        verify(coolSmsService,times(1)).sendMessage(any(MessageSendReq.class));
     }
 
     @Test
     @DisplayName("문자보내기 테스트 -> (실패 : Coolsms 내부 문제)")
     public void sendMessageFail2() throws Exception {
         //given
-        given(coolSmsService.sendMessage(any(String.class)))
+        MessageSendReq messageSendReq = MessageSendReq.builder()
+                .phoneNum("01011111111")
+                .build();
+        String requestBody = gson.toJson(messageSendReq);
+        given(coolSmsService.sendMessage(any(MessageSendReq.class)))
                 .willThrow(new CommondException(ExceptionCode.COOLSMS_EXCEPTION));
 
         //when,then
         this.mockMvc.perform(post("/message/send")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("phoneNum","01056962173"))
+                        .content(requestBody))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value("인증시스템에 문제가 발생했습니다"))
                 .andDo(print());
 
-        verify(coolSmsService,times(1)).sendMessage(any(String.class));
+        verify(coolSmsService,times(1)).sendMessage(any(MessageSendReq.class));
     }
 
     @Test
     @DisplayName("문자보내기 테스트 -> (실패 : 입력값 공백)")
     public void sendMessageFail3() throws Exception {
         //given
+        MessageSendReq messageSendReq = MessageSendReq.builder()
+                .phoneNum("")
+                .build();
+        String requestBody = gson.toJson(messageSendReq);
 
         //when,then
         this.mockMvc.perform(post("/message/send")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("phoneNum",""))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("전화번호를 입력하세요"))
+                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
+                .andExpect(jsonPath("$.data.phoneNum").value("전화번호를 입력하세요"))
                 .andDo(print());
 
-        verify(coolSmsService,times(0)).sendMessage(any(String.class));
+        verify(coolSmsService,times(0)).sendMessage(any(MessageSendReq.class));
     }
 
     @Test

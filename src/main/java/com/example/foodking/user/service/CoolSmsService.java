@@ -3,6 +3,7 @@ package com.example.foodking.user.service;
 import com.example.foodking.aop.enums.RedissonPrefix;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.user.dto.request.AuthNumberCheckReq;
+import com.example.foodking.user.dto.request.MessageSendReq;
 import com.example.foodking.util.AuthNumberGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -43,7 +44,8 @@ public class CoolSmsService {
 
     // 입력된 전화번호에 인증번호를 발급한다.
     @Transactional
-    public String sendMessage(String phoneNum){
+    public String sendMessage(MessageSendReq messageSendReq){
+        String phoneNum = messageSendReq.getPhoneNum();
 
         if(phoneNum.length() > 12 || phoneNum.length() < 8 || !Pattern.matches("\\d+", phoneNum))
             throw new CommondException(NOT_PHONENUM_TYPE);

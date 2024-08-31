@@ -5,7 +5,10 @@ import com.example.foodking.config.SecurityConfig;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.reply.controller.ReplyController;
+import com.example.foodking.reply.dto.request.ReplyAddReq;
+import com.example.foodking.reply.dto.request.ReplyUpdateReq;
 import com.example.foodking.reply.service.ReplyService;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,37 +50,41 @@ public class ControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private Gson gson = new Gson();
+
     @Test
     @DisplayName("댓글 등록 테스트 -> 성공")
     public void addReplySuccess() throws Exception {
         //given
         makeAuthentication();
+        String requestBody = gson.toJson( ReplyAddReq.builder().content("댓글내용").build() );
 
         //when,then
         this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content","댓글내용"))
+                        .content(requestBody))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("댓글 등록완료"))
                 .andDo(print());
 
-        verify(replyService,times(1)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(1)).addReply(any(Long.class),any(Long.class),any(ReplyAddReq.class));
     }
 
     @Test
     @DisplayName("댓글 등록 테스트 -> (실패 : 인증실패)")
     public void addReplyFail1() throws Exception {
         //given
+        String requestBody = gson.toJson( ReplyAddReq.builder().content("댓글내용").build() );
 
         //when,then
         this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content","댓글내용"))
+                        .content(requestBody))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
 
-        verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(ReplyAddReq.class));
     }
 
     @Test
@@ -85,16 +92,18 @@ public class ControllerTest {
     public void addReplyFail2() throws Exception {
         //given
         makeAuthentication();
+        String requestBody = gson.toJson( ReplyAddReq.builder().content("").build() );
 
         //when,then
         this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content",""))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("댓글내용을 입력해주세요"))
+                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
+                .andExpect(jsonPath("$.data.content").value("댓글내용을 입력해주세요"))
                 .andDo(print());
 
-        verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(ReplyAddReq.class));
     }
 
     @Test
@@ -102,15 +111,16 @@ public class ControllerTest {
     public void addReplyFail3() throws Exception {
         //given
         makeAuthentication();
+        String requestBody = gson.toJson( ReplyAddReq.builder().content("댓글내용").build() );
 
         //when,then
         this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies"," ")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content","댓글내용"))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
 
-        verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(ReplyAddReq.class));
     }
 
     @Test
@@ -118,15 +128,16 @@ public class ControllerTest {
     public void addReplyFail4() throws Exception {
         //given
         makeAuthentication();
+        String requestBody = gson.toJson( ReplyAddReq.builder().content("댓글내용").build() );
 
         //when,then
         this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies","ㅎㅇ")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content","댓글내용"))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("recipeInfoId이 Long타입이여야 합니다."));
 
-        verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).addReply(any(Long.class),any(Long.class),any(ReplyAddReq.class));
     }
 
     @Test
@@ -134,18 +145,19 @@ public class ControllerTest {
     public void addReplyFail5() throws Exception {
         //given
         makeAuthentication();
+        String requestBody = gson.toJson( ReplyAddReq.builder().content("댓글내용").build() );
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_USER))
-                .when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
+                .when(replyService).addReply(any(Long.class),any(Long.class),any(ReplyAddReq.class));
 
         //when,then
         this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content","댓글내용"))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 유저입니다"))
                 .andDo(print());
 
-        verify(replyService,times(1)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(1)).addReply(any(Long.class),any(Long.class),any(ReplyAddReq.class));
     }
 
     @Test
@@ -153,18 +165,19 @@ public class ControllerTest {
     public void addReplyFail6() throws Exception {
         //given
         makeAuthentication();
+        String requestBody = gson.toJson( ReplyAddReq.builder().content("댓글내용").build() );
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO))
-                .when(replyService).addReply(any(Long.class),any(Long.class),any(String.class));
+                .when(replyService).addReply(any(Long.class),any(Long.class),any(ReplyAddReq.class));
 
         //when,then
         this.mockMvc.perform(post("/recipes/{recipeInfoId}/replies",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content","댓글내용"))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 레시피입니다"))
                 .andDo(print());
 
-        verify(replyService,times(1)).addReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(1)).addReply(any(Long.class),any(Long.class),any(ReplyAddReq.class));
     }
 
     @Test
@@ -172,32 +185,34 @@ public class ControllerTest {
     public void updateReplySuccess() throws Exception {
         //given
         makeAuthentication();
+        String requestBody = gson.toJson( ReplyUpdateReq.builder().content("수정된 댓글내용").build() );
 
         //when,then
         this.mockMvc.perform(patch("/replies/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content","댓글내용"))
+                        .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("댓글 수정완료"))
                 .andDo(print());
 
-        verify(replyService,times(1)).updateReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(1)).updateReply(any(Long.class),any(Long.class),any(ReplyUpdateReq.class));
     }
 
     @Test
     @DisplayName("댓글 수정 테스트 -> (실패 : 인증실패)")
     public void updateReplyFail1() throws Exception {
         //given
+        String requestBody = gson.toJson( ReplyUpdateReq.builder().content("수정된 댓글내용").build() );
 
         //when,then
         this.mockMvc.perform(patch("/replys/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content","댓글내용"))
+                        .content(requestBody))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("인증에 실패하였습니다"))
                 .andDo(print());
 
-        verify(replyService,times(0)).updateReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).updateReply(any(Long.class),any(Long.class),any(ReplyUpdateReq.class));
     }
 
     @Test
@@ -205,16 +220,18 @@ public class ControllerTest {
     public void updateReplyFail2() throws Exception {
         //given
         makeAuthentication();
+        String requestBody = gson.toJson( ReplyUpdateReq.builder().content("").build() );
 
         //when,then
         this.mockMvc.perform(patch("/replies/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content",""))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("댓글내용을 입력해주세요"))
+                .andExpect(jsonPath("$.message").value("올바르지 않은 입력값입니다"))
+                .andExpect(jsonPath("$.data.content").value("댓글내용을 입력해주세요"))
                 .andDo(print());
 
-        verify(replyService,times(0)).updateReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).updateReply(any(Long.class),any(Long.class),any(ReplyUpdateReq.class));
     }
 
     @Test
@@ -222,15 +239,16 @@ public class ControllerTest {
     public void updateReplyFail3() throws Exception {
         //given
         makeAuthentication();
+        String requestBody = gson.toJson( ReplyUpdateReq.builder().content("수정된 댓글내용").build() );
 
         //when,then
         this.mockMvc.perform(patch("/replies/{replyId}"," ")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content","댓글내용"))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("올바른 요청이 아닙니다."));
 
-        verify(replyService,times(0)).updateReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).updateReply(any(Long.class),any(Long.class),any(ReplyUpdateReq.class));
     }
 
     @Test
@@ -238,15 +256,16 @@ public class ControllerTest {
     public void updateReplyFail4() throws Exception {
         //given
         makeAuthentication();
+        String requestBody = gson.toJson( ReplyUpdateReq.builder().content("수정된 댓글내용").build() );
 
         //when,then
         this.mockMvc.perform(patch("/replies/{replyId}","ㅎㅇ")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content","댓글내용"))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("replyId이 Long타입이여야 합니다."));
 
-        verify(replyService,times(0)).updateReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(0)).updateReply(any(Long.class),any(Long.class),any(ReplyUpdateReq.class));
     }
 
     @Test
@@ -254,17 +273,18 @@ public class ControllerTest {
     public void updateReplyFail5() throws Exception {
         //given
         makeAuthentication();
+        String requestBody = gson.toJson( ReplyUpdateReq.builder().content("수정된 댓글내용").build() );
         doThrow(new CommondException(ExceptionCode.NOT_EXIST_REPLY))
-                .when(replyService).updateReply(any(Long.class),any(Long.class),any(String.class));
+                .when(replyService).updateReply(any(Long.class),any(Long.class),any(ReplyUpdateReq.class));
 
         //when,then
         this.mockMvc.perform(patch("/replies/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content","댓글내용"))
+                        .content(requestBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("존재하지 않는 댓글입니다"));
 
-        verify(replyService,times(1)).updateReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(1)).updateReply(any(Long.class),any(Long.class),any(ReplyUpdateReq.class));
     }
 
     @Test
@@ -272,17 +292,18 @@ public class ControllerTest {
     public void updateReplyFail6() throws Exception {
         //given
         makeAuthentication();
+        String requestBody = gson.toJson( ReplyUpdateReq.builder().content("수정된 댓글내용").build() );
         doThrow(new CommondException(ExceptionCode.ACCESS_FAIL_REPLY))
-                .when(replyService).updateReply(any(Long.class),any(Long.class),any(String.class));
+                .when(replyService).updateReply(any(Long.class),any(Long.class),any(ReplyUpdateReq.class));
 
         //when,then
         this.mockMvc.perform(patch("/replies/{replyId}",1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("content","댓글내용"))
+                        .content(requestBody))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("해당 댓글에 대한 권한이 없습니다"));
 
-        verify(replyService,times(1)).updateReply(any(Long.class),any(Long.class),any(String.class));
+        verify(replyService,times(1)).updateReply(any(Long.class),any(Long.class),any(ReplyUpdateReq.class));
     }
 
     @Test

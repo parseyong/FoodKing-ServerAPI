@@ -9,7 +9,6 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RecipeInfoPagingFindReq {
 
-
     private RecipeSortType recipeSortType;
 
     private String searchKeyword;

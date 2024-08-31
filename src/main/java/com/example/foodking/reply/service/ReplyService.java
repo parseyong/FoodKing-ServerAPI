@@ -5,6 +5,8 @@ import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.example.foodking.reply.domain.Reply;
+import com.example.foodking.reply.dto.request.ReplyAddReq;
+import com.example.foodking.reply.dto.request.ReplyUpdateReq;
 import com.example.foodking.reply.dto.response.ReplyFindRes;
 import com.example.foodking.reply.enums.ReplySortType;
 import com.example.foodking.reply.repository.ReplyRepository;
@@ -34,7 +36,7 @@ public class ReplyService {
     private final RecipeInfoRepository recipeInfoRepository;
 
     @Transactional
-    public Long addReply(Long userId, Long recipeInfoId, String content){
+    public Long addReply(Long userId, Long recipeInfoId, ReplyAddReq replyAddReq){
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_USER));
@@ -42,7 +44,7 @@ public class ReplyService {
                 .orElseThrow(() -> new CommondException(ExceptionCode.NOT_EXIST_RECIPEINFO));
 
         Reply reply = Reply.builder()
-                .content(content)
+                .content(replyAddReq.getContent())
                 .user(user)
                 .recipeInfo(recipeInfo)
                 .build();
@@ -76,14 +78,14 @@ public class ReplyService {
     }
 
     @Transactional
-    public void updateReply(Long userId, Long replyId, String content){
+    public void updateReply(Long userId, Long replyId, ReplyUpdateReq replyUpdateReq){
 
         Reply reply = findReplyById(replyId);
 
         if(!isMyReply(userId,reply.getUser()))
             throw new CommondException(ExceptionCode.ACCESS_FAIL_REPLY);;
 
-        reply.updateContent(content);
+        reply.updateContent(replyUpdateReq.getContent());
         replyRepository.save(reply);
     }
 
