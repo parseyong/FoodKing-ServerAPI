@@ -26,12 +26,12 @@ public class RecipeEmotion {
     @Column(nullable = false, name = "emotion_status")
     private EmotionType emotionType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "recipe_info_id",nullable = false)
     private RecipeInfo recipeInfo;

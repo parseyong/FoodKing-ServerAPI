@@ -26,12 +26,12 @@ public class ReplyEmotion {
     @Column(nullable = false, name = "emotion_status")
     private EmotionType emotionType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "reply_id",nullable = false)
     private Reply reply;
