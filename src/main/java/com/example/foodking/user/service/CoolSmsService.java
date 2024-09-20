@@ -1,6 +1,6 @@
 package com.example.foodking.user.service;
 
-import com.example.foodking.aop.enums.RedissonPrefix;
+import com.example.foodking.common.RedisPrefix;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.user.dto.request.AuthNumberCheckReq;
 import com.example.foodking.user.dto.request.MessageSendReq;
@@ -62,7 +62,7 @@ public class CoolSmsService {
             coolSms.send(params);
             //인증번호 확인을 위해 발급된 인증번호를 key-value(전화번호-인증번호)형태로 저장, 60초 후 자동 소멸
             authRedis.opsForValue().set(
-                    RedissonPrefix.AUTH_NUM_REDIS + phoneNum,
+                    RedisPrefix.AUTH_NUM_REDIS + phoneNum,
                     String.valueOf(authenticationNumber),
                     60,
                     TimeUnit.SECONDS);
@@ -80,13 +80,13 @@ public class CoolSmsService {
     public void checkAuthNum(AuthNumberCheckReq authNumberCheckReq) {
 
         String authenticationNum = authRedis.opsForValue()
-                .get(RedissonPrefix.AUTH_NUM_REDIS + authNumberCheckReq.getPhoneNum());
+                .get(RedisPrefix.AUTH_NUM_REDIS + authNumberCheckReq.getPhoneNum());
 
         if(authenticationNum == null || !authenticationNum.equals(authNumberCheckReq.getAuthNumber()))
             throw new CommondException(SMS_AUTHENTICATION_FAIL);
 
         authRedis.opsForValue().set(
-                RedissonPrefix.IS_AUTH_NUM_REDIS + authNumberCheckReq.getPhoneNum(),
+                RedisPrefix.IS_AUTH_NUM_REDIS + authNumberCheckReq.getPhoneNum(),
                 "true",
                 10,
                 TimeUnit.MINUTES);
@@ -94,7 +94,7 @@ public class CoolSmsService {
 
     // 해당 전화번호가 인증이 완료된 전화번호인지 체크
     public boolean isAuthenticatedNum(String phoneNum){
-        String isAuth = authRedis.opsForValue().get(RedissonPrefix.IS_AUTH_NUM_REDIS + phoneNum);
+        String isAuth = authRedis.opsForValue().get(RedisPrefix.IS_AUTH_NUM_REDIS + phoneNum);
 
         if(isAuth == null){
             throw new CommondException(SMS_NOT_AUTHENTICATION);
@@ -104,7 +104,7 @@ public class CoolSmsService {
 
     @Transactional
     public void deleteAuthInfo(String phoneNum){
-        authRedis.delete(RedissonPrefix.AUTH_NUM_REDIS + phoneNum);
-        authRedis.delete(RedissonPrefix.IS_AUTH_NUM_REDIS + phoneNum);
+        authRedis.delete(RedisPrefix.AUTH_NUM_REDIS + phoneNum);
+        authRedis.delete(RedisPrefix.IS_AUTH_NUM_REDIS + phoneNum);
     }
 }

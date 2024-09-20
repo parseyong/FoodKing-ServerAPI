@@ -1,6 +1,6 @@
 package com.example.foodking.auth;
 
-import com.example.foodking.aop.enums.RedissonPrefix;
+import com.example.foodking.common.RedisPrefix;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.domain.User;
@@ -90,7 +90,7 @@ public class JwtProvider {
         
         // 레디스에 RefreshToken 저장
         authRedis.opsForValue().set(
-                RedissonPrefix.TOKEN_REDIS + String.valueOf(userId),
+                RedisPrefix.TOKEN_REDIS + String.valueOf(userId),
                 refreshToken,
                 validRefreshTokenTime,
                 TimeUnit.SECONDS);
@@ -106,13 +106,13 @@ public class JwtProvider {
 
         //accessToken을 블랙리스트에 추가
         authRedis.opsForValue().set(
-                RedissonPrefix.BLACK_LIST_REDIS + accessToken,
+                RedisPrefix.BLACK_LIST_REDIS + accessToken,
                 String.valueOf(userId),
                 validAccessTokenTime,
                 TimeUnit.MILLISECONDS);
 
         //tokenRedis에서 refreshToekn삭제
-        authRedis.delete(RedissonPrefix.TOKEN_REDIS + String.valueOf(userId));
+        authRedis.delete(RedisPrefix.TOKEN_REDIS + String.valueOf(userId));
     }
 
     // 토큰 재발급, 탈취에 대한 위험성을 최소화하기 위해 accessToken외에 refreshToken도 재발급을 한다.
@@ -129,7 +129,7 @@ public class JwtProvider {
         String userId = findUserIdByRefreshToken(refreshToken);
 
         // 레디스에 존재하는 토큰인지 확인
-        String tokenInRedis = authRedis.opsForValue().get(RedissonPrefix.TOKEN_REDIS + userId);
+        String tokenInRedis = authRedis.opsForValue().get(RedisPrefix.TOKEN_REDIS + userId);
 
         if(tokenInRedis == null || !tokenInRedis.equals(refreshToken))
             throw new CommondException(ExceptionCode.LOGIN_FAIL);
@@ -177,7 +177,7 @@ public class JwtProvider {
     // AccessToken의 유효성을 검증하는 메소드
     public boolean checkValidationAccessToken(String accessToken) {
         try {
-            String blackList = authRedis.opsForValue().get(RedissonPrefix.BLACK_LIST_REDIS + accessToken);
+            String blackList = authRedis.opsForValue().get(RedisPrefix.BLACK_LIST_REDIS + accessToken);
             if(blackList != null)
                 return false;
 

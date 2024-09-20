@@ -1,6 +1,6 @@
-package com.example.foodking.aop.enums;
+package com.example.foodking.common;
 
-public enum RedissonPrefix {
+public enum RedisPrefix {
 
     AUTH_NUM_REDIS,
     IS_AUTH_NUM_REDIS,
