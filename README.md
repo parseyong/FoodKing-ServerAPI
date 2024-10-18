@@ -22,6 +22,7 @@ FoodKing은 대규모 트래픽을 가정하여 개발된 서비스입니다.<br
 13. <strong>캐싱</strong>을 통한 레시피 조회성능 향상<br>
 14. <strong>사용자 인증</strong>의 문제점 개선<br>
 15. <strong>캐시갱신</strong> 성능 향상<br>
+16. <strong>nginx</strong>을 통한 프록시서버
 
 ## 🍳트러블 슈팅
 - [FoodKing #1] 쿼리튜닝 - 레시피 단건조회,페이징조회 로직의 성능을 향상시킨 이야기<br>
