@@ -53,18 +53,17 @@
 ## 🍳쿼리튜닝 후 성능비교
 
 - <strong>약 790% 성능향상</strong> <br>
-- 로컬에서 성능측정을 했기때문에 절대적인 TPS값은 낮게 측정되었습니다.<br>
- 
+- 로컬에서 성능측정을 했기때문에 절대적인 TPS값은 낮게 측정되었으며 timeOut으로인한 에러또한 발생했습니다.<br>
+- 자세한 설명은 트러블 슈팅 #1번을 참고하시면 감사하겠습니다. <br>
+ <br>
 <p align="center">
-  <figure style="display:inline-block; margin-right: 20px;">
-    <img src="https://github.com/user-attachments/assets/1f80f115-e006-4523-b39f-981492c47bf2" width="800px">
-    <figcaption align="center"><strong>튜닝 전 성능</strong></figcaption>
-  </figure>
+  
+  <img src="https://github.com/user-attachments/assets/1f80f115-e006-4523-b39f-981492c47bf2" width="800px"><br>
+  <strong>튜닝 전 TPS</strong>
   <br>
-  <figure style="display:inline-block;">
-    <img src="https://github.com/user-attachments/assets/d0c9f201-db3b-4f05-8841-7ff5f9d5c377" width="800px">
-    <figcaption align="center"><strong>튜닝 후 성능</strong></figcaption>
-  </figure>
+  
+  <img src="https://github.com/user-attachments/assets/d0c9f201-db3b-4f05-8841-7ff5f9d5c377" width="800px"><br>
+  <strong>튜닝 후 TPS</strong>
 </p>
 
 <br>
