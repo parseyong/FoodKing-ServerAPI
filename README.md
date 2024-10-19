@@ -33,6 +33,7 @@
 17. <strong>일관성</strong>있는 코드 컨벤션
 18. <strong>Layered Architecture</strong>
 19. <strong>스케일 아웃과 로드밸런싱</strong>
+<br>
 
 ## 🍳트러블 슈팅
 - [FoodKing #1] 쿼리튜닝 - 레시피 단건조회(<strong>210%</strong>),페이징조회(<strong>790%</strong>) 로직의 성능을 향상시킨 이야기<br>
@@ -47,6 +48,26 @@
   https://psy217300.tistory.com/209<br><br>
 - [FoodKing #6] Docker와 Git Action을 통한 CI/CD 자동화 구축<br>
   https://psy217300.tistory.com/225<br>
+<br>
+
+## 🍳쿼리튜닝 후 성능비교
+
+- <strong>약 790% 성능향상</strong> <br>
+- 로컬에서 성능측정을 했기때문에 절대적인 TPS값은 낮게 측정되었습니다.<br>
+ 
+<p align="center">
+  <figure style="display:inline-block; margin-right: 20px;">
+    <img src="https://github.com/user-attachments/assets/1f80f115-e006-4523-b39f-981492c47bf2" width="800px">
+    <figcaption align="center"><strong>튜닝 전 성능</strong></figcaption>
+  </figure>
+  <br>
+  <figure style="display:inline-block;">
+    <img src="https://github.com/user-attachments/assets/d0c9f201-db3b-4f05-8841-7ff5f9d5c377" width="800px">
+    <figcaption align="center"><strong>튜닝 후 성능</strong></figcaption>
+  </figure>
+</p>
+
+<br>
 
 ## 🍳사용 기술
 - Java 17
@@ -57,15 +78,18 @@
 - Docker<br>
 - Ngrinder<br>
 - Gradle<br>
+<br>
 
 ## 🍳FoodKing 구조도
 
 ![웹 아키텍쳐 구조](https://github.com/user-attachments/assets/a9df8fe6-ff9a-414d-9cd3-b9245f88cf4e)
+<br>
 
 ## 🍳Foodking ERD
 
 https://www.erdcloud.com/d/cDhCYyzgXiLxH5EJa
 ![image](https://github.com/user-attachments/assets/0dc9fb3f-3ddc-4ccb-97e9-acf6cab8c545)
+<br>
 
 ## 🍳Front
 
