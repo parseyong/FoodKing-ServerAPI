@@ -1,9 +1,16 @@
-## 🍳FoodKing 소개
-<br>
-한식, 양식, 일식, 중식 상관없이 모든 음식에 대한 레시피를 공유하는 서비스입니다.<br>
-자신만의 레시피를 공유하거나 필요한 레시피를 손쉽게 찾아 요리할 수 있습니다.<br>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/1393b9a3-1e60-4d2a-bdc7-22798b9b28dd" width="400px">
+</p>
 
-FoodKing은 대규모 트래픽을 가정하여 개발된 서비스입니다.<br>
+<p align="center">
+  <b style="font-size:18px;">한식, 양식, 일식, 중식 상관없이 모든 음식에 대한 레시피를 공유하는 서비스입니다.</b><br>
+  <b style="font-size:18px;">자신만의 레시피를 공유하거나 필요한 레시피를 손쉽게 찾아 요리할 수 있습니다.</b>
+  <br>
+  <br>
+  <b style="font-size:18px;">FoodKing은 대규모 트래픽을 가정하여 개발된 서비스입니다.</b>
+</p>
+
+<br>
 <br>
 
 ## 🍳FoodKing의 주요 관심사
