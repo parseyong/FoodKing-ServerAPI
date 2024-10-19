@@ -29,10 +29,13 @@
 13. <strong>캐싱</strong>을 통한 레시피 조회성능 향상<br>
 14. <strong>사용자 인증</strong>의 문제점 개선<br>
 15. <strong>캐시갱신</strong> 성능 향상<br>
-16. <strong>Nginx</strong>을 통한 프록시서버
-17. <strong>일관성</strong>있는 코드 컨벤션
-18. <strong>Layered Architecture</strong>
-19. <strong>스케일 아웃과 로드밸런싱</strong>
+16. <strong>Nginx</strong>을 통한 프록시서버<br>
+17. <strong>일관성</strong>있는 코드 컨벤션<br>
+18. <strong>Layered Architecture</strong><br>
+19. <strong>스케일 아웃과 로드밸런싱</strong><br>
+20. <strong>Restful</strong>한 API <br>
+21. <strong>양방향 연관관계 mapping</strong> 지양<br>
+22. How가 아닌 <strong>Why</strong><br>
 <br>
 
 ## 🍳트러블 슈팅
