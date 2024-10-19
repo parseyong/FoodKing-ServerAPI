@@ -25,6 +25,7 @@ FoodKing은 대규모 트래픽을 가정하여 개발된 서비스입니다.<br
 16. <strong>Nginx</strong>을 통한 프록시서버
 17. <strong>일관성</strong>있는 코드 컨벤션
 18. <strong>Layered Architecture</strong>
+19. <strong>스케일 아웃과 로드밸런싱</strong>
 
 ## 🍳트러블 슈팅
 - [FoodKing #1] 쿼리튜닝 - 레시피 단건조회(<strong>210%</strong>),페이징조회(<strong>790%</strong>) 로직의 성능을 향상시킨 이야기<br>
