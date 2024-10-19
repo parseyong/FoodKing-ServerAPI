@@ -75,6 +75,7 @@
 - Java 17
 - SpringBoot 2.7.5<br>
 - JPA<br>
+- QueryDsl<br>
 - MariaDB<br>
 - Redis<br>
 - Docker<br>
