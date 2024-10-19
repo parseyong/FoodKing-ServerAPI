@@ -7,25 +7,27 @@ FoodKing은 대규모 트래픽을 가정하여 개발된 서비스입니다.<br
 <br>
 
 ## 🍳FoodKing의 주요 관심사
-1. <strong>solid원칙</strong>을 통한 객체지향적인 코드개발<br>
+1. <strong>SOLID원칙</strong>을 통한 객체지향적인 코드개발<br>
 2. 분산락을 통한 <strong>동시성 제어</strong><br>
 3. 대규모 트래픽에 대비한 <strong>쿼리튜닝</strong><br>
-4. <strong>Master-slave Replication</strong> 을 통한 DB부하 분산<br>
+4. <strong>Master-Slave Replication</strong> 을 통한 DB부하 분산<br>
 5. nGrinder를 통한 <strong>성능 분석</strong><br>
 6. <strong>N+1쿼리</strong> 지양
-7. <strong>no Offset</strong>을 통한 페이징 성능 향상
+7. <strong>No Offset</strong>을 통한 페이징 성능 향상
 8. <strong>비정규화</strong>를 통한 조회성능 향상
 9. <strong>CI/CD 파이프라인 자동화</strong><br>
 10. 지속적인 리팩토링을 통한 <strong>clean code</strong><br>
-11. <strong>단위Test code</strong>를 통한 프로젝트 안정성 강화<br>
+11. <strong>207개의 단위Test code</strong>를 통한 프로젝트 안정성 강화<br>
 12. <strong>DockerHub</strong>을 통한 개발환경 통일<br>
 13. <strong>캐싱</strong>을 통한 레시피 조회성능 향상<br>
 14. <strong>사용자 인증</strong>의 문제점 개선<br>
 15. <strong>캐시갱신</strong> 성능 향상<br>
-16. <strong>nginx</strong>을 통한 프록시서버
+16. <strong>Nginx</strong>을 통한 프록시서버
+17. <strong>일관성</strong>있는 코드 컨벤션
+18. <strong>Layered Architecture</strong>
 
 ## 🍳트러블 슈팅
-- [FoodKing #1] 쿼리튜닝 - 레시피 단건조회,페이징조회 로직의 성능을 향상시킨 이야기<br>
+- [FoodKing #1] 쿼리튜닝 - 레시피 단건조회(<strong>210%</strong>),페이징조회(<strong>790%</strong>) 로직의 성능을 향상시킨 이야기<br>
   https://psy217300.tistory.com/200<br><br>
 - [FoodKing #2] 사용자 인증 - Token인증 적용 및 문제점을 해결해가는 과정<br>
   https://psy217300.tistory.com/201<br><br>
@@ -39,6 +41,7 @@ FoodKing은 대규모 트래픽을 가정하여 개발된 서비스입니다.<br
   https://psy217300.tistory.com/225<br>
 
 ## 🍳사용 기술
+- Java 17
 - SpringBoot 2.7.5<br>
 - JPA<br>
 - MariaDB<br>
@@ -46,7 +49,6 @@ FoodKing은 대규모 트래픽을 가정하여 개발된 서비스입니다.<br
 - Docker<br>
 - Ngrinder<br>
 - Gradle<br>
-- Java<br>
 
 ## 🍳FoodKing 구조도
 
