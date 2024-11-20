@@ -29,17 +29,21 @@ public class CoolSmsService {
 
     @Value("${CoolSMS.Api.Key}")
     private String apiKey; // 발급받은 api_key
+
     @Value("${CoolSMS.Api.Secret}")
     private String apiSecret; // 발급받은 api_secret
+
     @Value("${CoolSMS.Caller}")
     private String caller; // 발신자 번호
+
     private Message coolSms;
 
     @Qualifier("authRedis")
     private final RedisTemplate<String,String> authRedis;
+
     @PostConstruct
     protected void init() {
-        coolSms = new  Message(apiKey,apiSecret);
+        coolSms = new Message(apiKey,apiSecret);
     }
 
     // 입력된 전화번호에 인증번호를 발급한다.

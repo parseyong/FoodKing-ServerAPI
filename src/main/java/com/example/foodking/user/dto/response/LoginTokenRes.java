@@ -7,8 +7,8 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class LoginTokenRes {
+public final class LoginTokenRes {
 
-    String accessToken;
-    String refreshToken;
+    private final String accessToken;
+    private final String refreshToken;
 }

@@ -29,6 +29,7 @@ public class RecipeImageService {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
+
     private final RecipeInfoRepository recipeInfoRepository;
 
     @Transactional

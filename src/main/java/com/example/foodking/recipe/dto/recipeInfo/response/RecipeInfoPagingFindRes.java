@@ -11,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class RecipeInfoPagingFindRes {
 
-    private Long totalRecipeCnt;
-    private List<RecipeInfoFindRes> recipeInfoFindResList;
+    private final Long totalRecipeCnt;
+    private final List<RecipeInfoFindRes> recipeInfoFindResList;
 
     public static RecipeInfoPagingFindRes toDTO(List<RecipeInfoFindRes> recipeInfoFindResList, Long totalRecipeCnt){
         return RecipeInfoPagingFindRes.builder()

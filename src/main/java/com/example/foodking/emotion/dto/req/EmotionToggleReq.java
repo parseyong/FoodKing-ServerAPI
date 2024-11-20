@@ -12,5 +12,5 @@ import javax.validation.constraints.NotNull;
 public class EmotionToggleReq {
 
     @NotNull(message = "이모션 타입을 입력해주세요.")
-    EmotionType emotionType;
+    private EmotionType emotionType;
 }

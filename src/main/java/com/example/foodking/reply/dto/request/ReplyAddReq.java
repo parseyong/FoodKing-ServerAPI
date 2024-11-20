@@ -11,5 +11,5 @@ import javax.validation.constraints.NotBlank;
 public class ReplyAddReq {
 
     @NotBlank(message = "댓글내용을 입력해주세요")
-    String content;
+    private String content;
 }

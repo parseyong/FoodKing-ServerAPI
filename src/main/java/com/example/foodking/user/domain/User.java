@@ -47,6 +47,7 @@ public class User implements UserDetails {
         this.phoneNum=phoneNum;
         this.roleName="ROLE_USER";
     }
+
     public void updateNickName(String nickName){
         this.nickName=nickName;
     }

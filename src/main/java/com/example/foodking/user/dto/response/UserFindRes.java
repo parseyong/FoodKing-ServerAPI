@@ -8,13 +8,13 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class UserFindRes {
+public final class UserFindRes {
 
-    private String email;
+    private final String email;
 
-    private String nickName;
+    private final String nickName;
 
-    private String phoneNum;
+    private final String phoneNum;
 
     public static UserFindRes toDTO(User user){
         return UserFindRes.builder()
