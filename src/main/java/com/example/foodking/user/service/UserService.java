@@ -35,10 +35,9 @@ public class UserService {
 
         isMatchPassword(loginReq.getPassword(), user.getPassword(), ExceptionCode.LOGIN_FAIL);
 
-        return LoginTokenRes.builder()
-                .accessToken(jwtProvider.createAccessToken(user.getUserId(), user.getAuthorities()))
-                .refreshToken(jwtProvider.createRefreshToken(user.getUserId(),user.getAuthorities()))
-                .build();
+        return LoginTokenRes.toDto(
+                jwtProvider.createAccessToken(user.getUserId(), user.getAuthorities()),
+                jwtProvider.createRefreshToken(user.getUserId(),user.getAuthorities()));
     }
 
     @Transactional

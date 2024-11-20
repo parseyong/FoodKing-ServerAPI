@@ -11,4 +11,11 @@ public final class LoginTokenRes {
 
     private final String accessToken;
     private final String refreshToken;
+
+    public static LoginTokenRes toDto(String accessToken, String refreshToken){
+        return LoginTokenRes.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 }

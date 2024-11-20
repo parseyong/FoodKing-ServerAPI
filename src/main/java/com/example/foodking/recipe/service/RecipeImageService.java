@@ -8,7 +8,7 @@ import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.recipe.domain.RecipeInfo;
 import com.example.foodking.recipe.repository.RecipeInfoRepository;
 import com.example.foodking.util.FileNameGenerator;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,16 +21,20 @@ import java.net.URL;
 import static com.example.foodking.recipe.service.RecipeService.isMyRecipe;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RecipeImageService {
 
     private final AmazonS3 amazonS3;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
-
+    private final String bucketName;
     private final RecipeInfoRepository recipeInfoRepository;
+
+    @Autowired
+    public RecipeImageService(RecipeInfoRepository recipeInfoRepository, AmazonS3 amazonS3,
+                              @Value("${cloud.aws.s3.bucket}") String bucketName){
+        this.recipeInfoRepository = recipeInfoRepository;
+        this.amazonS3 = amazonS3;
+        this.bucketName = bucketName;
+    }
 
     @Transactional
     public void addImage(MultipartFile newImage, Long recipeInfoId, Long userId) {

@@ -9,7 +9,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,7 +19,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -28,35 +27,35 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@RequiredArgsConstructor
-// 이 클래스의 메소드중 트랜잭션이 필요한 메소드가 소수이기 때문에 클래스대신 메소드에 직접 선언해주었다.
 public class JwtProvider {
 
     private final CustomUserDetailsService customUserDetailsService;
 
-    @Value("${JWT.Access.SecretKey}")
-    private String accessSecretKey;
+    private final String accessSecretKey;
 
-    @Value("${JWT.Refresh.SecretKey}")
-    private String refreshSecretKey;
+    private final String refreshSecretKey;
 
-    @Qualifier("authRedis")
     private final RedisTemplate<String,String> authRedis;
 
     // 30분
-    public Long validAccessTokenTime = 30 * 60 * 1000L;
+    public final Long validAccessTokenTime = 30 * 60 * 1000L;
     // 1달
-    private Long validRefreshTokenTime = 30 * 24 * 60 * 60L;
+    private final Long validRefreshTokenTime = 30 * 24 * 60 * 60L;
 
-    @PostConstruct
-    protected void init() {
+    @Autowired
+    public JwtProvider(CustomUserDetailsService customUserDetailsService,
+                       @Value("${JWT.Access.SecretKey}") String accessSecretKey,
+                       @Value("${JWT.Refresh.SecretKey}") String refreshSecretKey,
+                       @Qualifier("authRedis") RedisTemplate<String,String> authRedis){
         /*
             secretKey에 특수문자가 있을 경우 통신할 때 문자는 os가 알아서 바이너리로 바꾼다.
             그러나 이러한 특수한 문자는 os마다 바꾸는 방법이 다를 수 있고 같은 secretKey를 쓰더라도 인증실패가 될 수 있다.
             따라서 애플리케이션에서 안전한 문자로 바꿔서 os에 전달하여 이러한 문제를 해결할 수 있다.
         */
-        accessSecretKey = Base64.getEncoder().encodeToString(accessSecretKey.getBytes(StandardCharsets.UTF_8));
-        refreshSecretKey = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes(StandardCharsets.UTF_8));
+        this.accessSecretKey = Base64.getEncoder().encodeToString(accessSecretKey.getBytes(StandardCharsets.UTF_8));
+        this.refreshSecretKey = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes(StandardCharsets.UTF_8));
+        this.customUserDetailsService = customUserDetailsService;
+        this.authRedis = authRedis;
     }
 
     // 엑세스토큰을 생성해서 반환하는 메소드
@@ -136,10 +135,10 @@ public class JwtProvider {
 
         User user = (User) customUserDetailsService.loadUserByUsername(userId);
 
-        return LoginTokenRes.builder()
-                .accessToken(createAccessToken(Long.valueOf(userId), user.getAuthorities()))
-                .refreshToken(createRefreshToken(Long.valueOf(userId),user.getAuthorities()))
-                .build();
+        return LoginTokenRes.toDto(
+                createAccessToken(Long.valueOf(userId), user.getAuthorities()),
+                createRefreshToken(Long.valueOf(userId),user.getAuthorities()));
+
     }
 
     // 토큰에서 추출한 userId값을 통해 인증객체를 생성하는 메소드

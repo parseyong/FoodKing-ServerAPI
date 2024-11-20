@@ -5,17 +5,16 @@ import com.example.foodking.exception.CommondException;
 import com.example.foodking.user.dto.request.AuthNumberCheckReq;
 import com.example.foodking.user.dto.request.MessageSendReq;
 import com.example.foodking.util.AuthNumberGenerator;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -24,27 +23,26 @@ import static com.example.foodking.exception.ExceptionCode.*;
 
 @Service
 @Log4j2
-@RequiredArgsConstructor
 public class CoolSmsService {
 
-    @Value("${CoolSMS.Api.Key}")
-    private String apiKey; // 발급받은 api_key
+    private final String caller; // 발신자 번호
 
-    @Value("${CoolSMS.Api.Secret}")
-    private String apiSecret; // 발급받은 api_secret
+    private final Message coolSms;
 
-    @Value("${CoolSMS.Caller}")
-    private String caller; // 발신자 번호
-
-    private Message coolSms;
-
-    @Qualifier("authRedis")
     private final RedisTemplate<String,String> authRedis;
 
-    @PostConstruct
-    protected void init() {
+    @Autowired
+    public CoolSmsService(@Value("${CoolSMS.Api.Key}") String apiKey,
+                          @Value("${CoolSMS.Api.Secret}") String apiSecret,
+                          @Value("${CoolSMS.Caller}") String caller,
+                          @Qualifier("authRedis") RedisTemplate<String,String> authRedis){
+
+        this.caller = caller;
+        this.authRedis = authRedis;
         coolSms = new Message(apiKey,apiSecret);
     }
+
+
 
     // 입력된 전화번호에 인증번호를 발급한다.
     @Transactional

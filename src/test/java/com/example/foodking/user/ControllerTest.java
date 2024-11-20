@@ -5,6 +5,7 @@ import com.example.foodking.config.SecurityConfig;
 import com.example.foodking.exception.CommondException;
 import com.example.foodking.exception.ExceptionCode;
 import com.example.foodking.user.controller.UserController;
+import com.example.foodking.user.domain.User;
 import com.example.foodking.user.dto.request.*;
 import com.example.foodking.user.dto.response.LoginTokenRes;
 import com.example.foodking.user.dto.response.UserFindRes;
@@ -63,10 +64,7 @@ public class ControllerTest {
                 .email("test@google.com")
                 .password("1234")
                 .build();
-        LoginTokenRes loginTokenRes = LoginTokenRes.builder()
-                .accessToken("access")
-                .refreshToken("refresh")
-                .build();
+        LoginTokenRes loginTokenRes = LoginTokenRes.toDto("access","refresh");
 
         given(userService.login(any(LoginReq.class))).willReturn(loginTokenRes);
         String requestBody = gson.toJson(loginReq);
@@ -672,12 +670,14 @@ public class ControllerTest {
     public void readUserInfoSuccess() throws Exception {
         //given
         makeAuthentication();
-        UserFindRes userFindRes = UserFindRes.builder()
+        User user = spy(User.builder()
+                .password("1234")
                 .nickName("nickName")
                 .phoneNum("01056962173")
                 .email("test@google.com")
-                .build();
+                .build());
 
+        UserFindRes userFindRes = UserFindRes.toDTO(user);
         given(userService.findUser(any(Long.class))).willReturn(userFindRes);
 
         //when,then
@@ -697,12 +697,14 @@ public class ControllerTest {
     @DisplayName("유저정보 조회 테스트 -> (조회 실패 : 인증 실패)")
     public void readUserInfoFail1() throws Exception {
         //given
-        UserFindRes userFindRes = UserFindRes.builder()
+        User user = spy(User.builder()
+                .password("1234")
                 .nickName("nickName")
                 .phoneNum("01056962173")
                 .email("test@google.com")
-                .build();
+                .build());
 
+        UserFindRes userFindRes = UserFindRes.toDTO(user);
         given(userService.findUser(any(Long.class))).willReturn(userFindRes);
 
         //when,then
