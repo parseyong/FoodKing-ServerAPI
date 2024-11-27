@@ -14,28 +14,21 @@
 <br>
 
 ## 🍳FoodKing의 주요 관심사
-1. <strong>SOLID원칙</strong>을 통한 객체지향적인 코드개발<br>
-2. 분산락을 통한 <strong>동시성 제어</strong><br>
-3. 대규모 트래픽에 대비한 <strong>쿼리튜닝</strong><br>
-4. <strong>Master-Slave Replication</strong> 을 통한 DB부하 분산<br>
-5. nGrinder를 통한 <strong>성능 분석</strong><br>
-6. <strong>N+1쿼리</strong> 지양
-7. <strong>No Offset</strong>을 통한 페이징 성능 향상
-8. <strong>비정규화</strong>를 통한 조회성능 향상
-9. <strong>CI/CD 파이프라인 자동화</strong><br>
-10. 지속적인 리팩토링을 통한 <strong>clean code</strong><br>
-11. <strong>207개의 단위Test code</strong>를 통한 프로젝트 안정성 강화<br>
-12. <strong>DockerHub</strong>을 통한 개발환경 통일<br>
-13. <strong>캐싱</strong>을 통한 레시피 조회성능 향상<br>
-14. <strong>사용자 인증</strong>의 문제점 개선<br>
-15. <strong>캐시갱신</strong> 성능 향상<br>
-16. <strong>Nginx</strong>을 통한 프록시서버<br>
-17. <strong>일관성</strong>있는 코드 컨벤션<br>
-18. <strong>Layered Architecture</strong><br>
-19. <strong>스케일 아웃과 로드밸런싱</strong><br>
-20. <strong>Restful</strong>한 API <br>
-21. <strong>양방향 연관관계 mapping</strong> 지양<br>
-22. How가 아닌 <strong>Why</strong><br>
+1. Git Action과 DockerHub를 통한 CI/CD 자동화 구축
+2. 쿼리튜닝과 비정규화를 통한 790%의 조회성능 향상
+3. Ngrinder을 통한 성능 분석
+4. Nginx를 통한 프록시 서버 구축 & Scale Out과 LoadBalancing
+5. N+1쿼리 지양
+6. 양방향 연관관계 Mapping 지양
+7. Master-Slave Replication 을 통한 DB부하 분산
+8. Redisson의 분산락을 통한 동시성 제어
+9. SOLID원칙을 통한 객체지향적인 코드 개발
+10. 207개의 Unit Test code를 통한 프로젝트 안정성 강화
+11. 지속적인 리팩토링과 일관된 코드컨벤션을 통한 Clean Code 지향
+12. 사용자 인증,인가의 문제점 개선
+13. Caching을 통한 조회성능 향상
+14. Layered Architecture
+15. Restful한 API
 <br>
 
 ## 🍳트러블 슈팅
@@ -45,7 +38,7 @@
   https://psy217300.tistory.com/201<br><br>
 - [FoodKing #3] 분산락을 통해 동시성 제어를 해본 이야기 - 분산락을 선택한 이유<br>
   https://psy217300.tistory.com/202<br><br>
-- [FoodKing #4] 캐싱 - 어느 곳에 캐싱을 적용해야 할 까?<br>
+- [FoodKing #4] 캐싱 - 어느 곳에 캐싱을 적용해야 할까?<br>
   https://psy217300.tistory.com/208<br><br>
 - [FoodKing #5] 캐시 갱신방법 - keys * ,scan<br>
   https://psy217300.tistory.com/209<br><br>
