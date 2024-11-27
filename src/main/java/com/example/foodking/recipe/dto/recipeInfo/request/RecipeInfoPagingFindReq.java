@@ -1,24 +1,25 @@
 package com.example.foodking.recipe.dto.recipeInfo.request;
 
 import com.example.foodking.recipe.enums.RecipeSortType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder // 테스트를 위한 빌더추가
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RecipeInfoPagingFindReq {
 
-    private RecipeSortType recipeSortType;
+    private final RecipeSortType recipeSortType;
 
-    private String searchKeyword;
+    private final String searchKeyword;
 
-    private Long userId;
+    private final Long userId;
 
-    private Object condition;
+    private final Object condition;
 
-    private Long lastId;
+    private final Long lastId;
 
-    private Object lastValue;
+    private final Object lastValue;
 
 }

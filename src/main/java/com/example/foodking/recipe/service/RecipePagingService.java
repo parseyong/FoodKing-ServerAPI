@@ -92,19 +92,19 @@ public class RecipePagingService {
             RecipeSortType recipeSortType = recipeInfoPagingFindReq.getRecipeSortType();
 
             if(recipeSortType.equals(RecipeSortType.LIKE)){
-                builder.and(recipeInfo.likeCnt.loe(Long.valueOf(String.valueOf(recipeInfoPagingFindReq.getLastValue()))));
+                builder.and(recipeInfo.likeCnt.loe( (Long)recipeInfoPagingFindReq.getLastValue()));
                 builder.and(recipeInfo.recipeInfoId.gt(recipeInfoPagingFindReq.getLastId()));
             }
             else if(recipeSortType.equals(RecipeSortType.VISIT)){
-                builder.and(recipeInfo.visitCnt.loe(Long.valueOf(String.valueOf(recipeInfoPagingFindReq.getLastValue()))));
+                builder.and(recipeInfo.visitCnt.loe( (Long)recipeInfoPagingFindReq.getLastValue()));
                 builder.and(recipeInfo.recipeInfoId.gt(recipeInfoPagingFindReq.getLastId()));
             }
             else if(recipeSortType.equals(RecipeSortType.CALOGY)){
-                builder.and(recipeInfo.calogy.goe(Long.valueOf(String.valueOf(recipeInfoPagingFindReq.getLastValue()))));
+                builder.and(recipeInfo.calogy.goe( (Long)recipeInfoPagingFindReq.getLastValue()));
                 builder.and(recipeInfo.recipeInfoId.gt(recipeInfoPagingFindReq.getLastId()));
             }
             else if(recipeSortType.equals(RecipeSortType.COOKTIME)){
-                builder.and(recipeInfo.cookingTime.goe(Long.valueOf(String.valueOf(recipeInfoPagingFindReq.getLastValue()))));
+                builder.and(recipeInfo.cookingTime.goe( (Long)recipeInfoPagingFindReq.getLastValue()));
                 builder.and(recipeInfo.recipeInfoId.gt(recipeInfoPagingFindReq.getLastId()));
             }
             else {
