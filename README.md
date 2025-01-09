@@ -14,21 +14,22 @@
 <br>
 
 ## 🍳FoodKing의 주요 관심사
-1. Git Action과 DockerHub를 통한 CI/CD 자동화 구축
-2. 쿼리튜닝과 비정규화를 통한 790%의 조회성능 향상
-3. Ngrinder을 통한 성능 분석
-4. Nginx를 통한 프록시 서버 구축 & Scale Out과 LoadBalancing
-5. N+1쿼리 지양
-6. 양방향 연관관계 Mapping 지양
-7. Master-Slave Replication 을 통한 DB부하 분산
-8. Redisson의 분산락을 통한 동시성 제어
-9. SOLID원칙을 통한 객체지향적인 코드 개발
-10. 207개의 Unit Test code를 통한 프로젝트 안정성 강화
-11. 지속적인 리팩토링과 일관된 코드컨벤션을 통한 Clean Code 지향
-12. 사용자 인증,인가의 문제점 개선
-13. Caching을 통한 조회성능 향상
-14. Layered Architecture
-15. Restful한 API
+- Git Action과 DockerHub를 통한 CI/CD 자동화 구축
+- 쿼리튜닝과 비정규화를 통한 790%의 조회성능 향상
+- Ngrinder을 통한 성능 분석
+- Nginx를 통한 프록시 서버 구축 & Scale Out과 LoadBalancing
+- N+1쿼리 지양
+- 양방향 연관관계 Mapping 지양
+- Master-Slave Replication 을 통한 DB부하 분산
+- Redisson의 분산락을 통한 동시성 제어
+- SOLID원칙을 통한 객체지향적인 코드 개발
+- 207개의 Unit Test code를 통한 프로젝트 안정성 강화
+- 지속적인 리팩토링과 일관된 코드컨벤션을 통한 Clean Code 지향
+- 사용자 인증,인가의 문제점 개선
+- Caching을 통한 조회성능 향상
+- Layered Architecture
+- Restful한 API
+
 <br>
 
 ## 🍳트러블 슈팅
