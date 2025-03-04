@@ -35,10 +35,10 @@
 ## 🍳트러블 슈팅
 - [FoodKing #1] 쿼리튜닝 - 레시피 단건조회(<strong>210%</strong>),페이징조회(<strong>790%</strong>) 로직의 성능을 향상시킨 이야기<br>
   https://psy217300.tistory.com/200<br><br>
-- [FoodKing #2] 사용자 인증 - Token인증 적용 및 문제점을 해결해가는 과정<br>
-  https://psy217300.tistory.com/201<br><br>
-- [FoodKing #3] 분산락을 통해 동시성 제어를 해본 이야기 - 분산락을 선택한 이유<br>
+- [FoodKing #2] 분산락을 통해 동시성 제어를 해본 이야기 - 분산락을 선택한 이유<br>
   https://psy217300.tistory.com/202<br><br>
+- [FoodKing #3] 사용자 인증 - Token인증 적용 및 문제점을 해결해가는 과정<br>
+  https://psy217300.tistory.com/201<br><br>
 - [FoodKing #4] 캐싱 - 어느 곳에 캐싱을 적용해야 할까?<br>
   https://psy217300.tistory.com/208<br><br>
 - [FoodKing #5] 캐시 갱신방법 - keys * ,scan<br>
